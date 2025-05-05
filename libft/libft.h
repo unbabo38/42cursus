@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 11:03:52 by rchallie          #+#    #+#             */
-/*   Updated: 2025/05/05 00:45:20 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 22:19:31 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ void	ft_striteri(char *s, void (*f)(unsigned int, char *));
 
 void	*ft_memset(void *b, int c, size_t len);
 void	*ft_memcpy(void *dst, const void *src, size_t n);
-void	*ft_memccpy(void *dst, const void *src, int c, size_t n);
 void	*ft_memmove(void *dst, const void *src, size_t len);
 void	*ft_memchr(const void *s, int c, size_t n);
 void	*ft_calloc(size_t count, size_t size);

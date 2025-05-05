@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:42:45 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/05 18:44:36 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 22:20:13 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 	size_t	i;
 
 	i = 0;
+	if (!dest && !src)
+		return (NULL);
 	if (dest > src)
 	{
 		while (n--)

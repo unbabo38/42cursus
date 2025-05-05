@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:12:30 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/05 18:36:13 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 22:43:11 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,8 @@ int	ft_atoi(const char *str)
 #include <stdint.h>
 int	main(void)
 {
-	printf("Result 1: %d\n", ft_atoi("-2147483648"));
-	printf("Result 2: %d\n", atoi("-2147483648"));
+	printf("Result 1: %d\n", ft_atoi("-21474836498888888"));
+	printf("Result 2: %d\n", atoi("-21474836498888888"));
 	printf("Result 1: %d\n", ft_atoi("2147483647"));
 	printf("Result 2: %d\n", atoi("2147483647"));
 	return (0);
