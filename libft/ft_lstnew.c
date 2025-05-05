@@ -6,13 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:42:28 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 21:42:28 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:53:46 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
 #include "libft.h"
-#include <stdio.h>
 
 t_list	*ft_lstnew(void *content)
 {
@@ -27,6 +25,8 @@ t_list	*ft_lstnew(void *content)
 }
 
 /*
+#include <stdlib.h>
+#include <stdio.h>
 int main(void)
 {
 	t_list *node = ft_lstnew("Hello");

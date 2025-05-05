@@ -6,13 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:42:35 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/05 18:04:40 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:43:28 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
 
 void	*ft_memcpy(void *dest, const void *src, size_t n)
 {
@@ -30,6 +28,8 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 }
 
 /*
+#include <string.h>
+#include <stdio.h>
 int main()
 {
 	unsigned char buffer1[10] = {1, 2, 3, 4, 5, 0}; // テスト用データ

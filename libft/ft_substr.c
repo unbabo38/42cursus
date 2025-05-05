@@ -6,13 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:44:09 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/05 03:38:40 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:48:41 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
@@ -44,6 +42,8 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 }
 
 /*
+#include <string.h>
+#include <stdio.h>
 int main(void)
 {
 	printf("%s", ft_substr("42tokyo", 2, 3));

@@ -6,13 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:42:50 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/05 02:47:48 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:44:45 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
 
 void	*ft_memset(void *s, int c, size_t n)
 {
@@ -29,6 +27,9 @@ void	*ft_memset(void *s, int c, size_t n)
 	return (s);
 }
 /*
+#include <string.h>
+#include <stdio.h>
+
 int main() {
 	unsigned char buffer1[10];
     unsigned char buffer2[10];

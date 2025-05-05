@@ -6,14 +6,10 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:43:20 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/05 13:28:19 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:45:59 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "libft.h"
 #include <stdlib.h>
 
@@ -109,6 +105,8 @@ char	**ft_split(char const *s, char c)
 }
 
 /*
+#include <string.h>
+#include <stdio.h>
 int main(void)
 {
 	const char *s = "   Hello   World  this is   C ";

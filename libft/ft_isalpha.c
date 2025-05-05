@@ -6,14 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:28:12 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 21:29:42 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:35:39 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <ctype.h>
-#include <stdio.h>
-#include <assert.h>
 
 int	ft_isalpha(int c)
 {
@@ -25,8 +22,12 @@ int	ft_isalpha(int c)
 		return (0);
 }
 /*
+
+#include <ctype.h>
+#include <stdio.h>
+#include <assert.h>
 int main() {
-//	printf("Testing 0: ft_isalpha(0) = %d, isalpha(0) = %d\n", 
+//	printf("Testing 0: ft_isalpha(0) = %d, isalpha(0) = %d\n",
 	ft_isalpha(2147483647), isalpha(2147483647));
 	printf("Testing 0: ft_isalpha(0) = %d", ft_isalpha(2147483647));
 	assert(ft_isalpha('a') == isalpha('a'));

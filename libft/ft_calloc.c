@@ -6,14 +6,12 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:17:54 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/05 02:58:37 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:36:27 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
 
 void	*ft_calloc(size_t count, size_t size)
 {
@@ -26,6 +24,8 @@ void	*ft_calloc(size_t count, size_t size)
 	return (ptr);
 }
 /*
+#include <stdio.h>
+#include <assert.h>
 int	main(void)
 {
 	size_t count = 10;

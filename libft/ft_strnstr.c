@@ -6,14 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:43:54 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/05 16:37:38 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:48:15 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
-#include <stddef.h>
 
 char	*ft_strnstr(const char *big, const char *little, size_t len)
 {
@@ -42,6 +39,9 @@ char	*ft_strnstr(const char *big, const char *little, size_t len)
 	return (0);
 }
 /*
+#include <string.h>
+#include <stdio.h>
+#include <stddef.h>
 int main(void)
 {
     char big[] = "Hello, World!";

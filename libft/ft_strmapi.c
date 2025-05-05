@@ -6,13 +6,12 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:43:49 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 23:57:14 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:47:49 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
+#include <stdlib.h>
 
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 {
@@ -34,6 +33,8 @@ char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 	return (processed_s);
 }
 /*
+#include <stdio.h>
+
 int main(void)
 {
 

@@ -6,13 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:43:51 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 23:55:48 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:48:00 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
 
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
@@ -26,6 +24,8 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 /*
+#include <string.h>
+#include <stdio.h>
 int	main(void)
 {
 	const char *tests[][2] = {

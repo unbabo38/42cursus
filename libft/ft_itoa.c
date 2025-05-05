@@ -6,13 +6,12 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:41:58 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 22:00:30 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:39:02 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
+#include <stdlib.h>
 
 static int	ft_numlen(int n, long *num)
 {
@@ -57,6 +56,9 @@ char	*ft_itoa(int n)
 }
 
 /*
+#include <string.h>
+#include <stdio.h>
+
 int main(void)
 {
 	int values[] = {0, 42, -1234, 2147483647, -2147483648};

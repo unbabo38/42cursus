@@ -6,13 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:42:31 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 23:49:14 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:42:59 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
 
 int	ft_lstsize(t_list *lst)
 {
@@ -26,3 +24,7 @@ int	ft_lstsize(t_list *lst)
 	}
 	return (i);
 }
+/*
+#include <string.h>
+#include <stdio.h>
+*/

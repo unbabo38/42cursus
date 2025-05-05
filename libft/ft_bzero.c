@@ -6,13 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:16:50 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 21:17:25 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:36:14 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
 
 void	ft_bzero(void *s, size_t n)
 {
@@ -26,6 +24,8 @@ void	ft_bzero(void *s, size_t n)
 	}
 }
 /*
+#include <string.h>
+#include <stdio.h>
 int main() {
 	unsigned char buffer1[10];
 	unsigned char buffer2[10];

@@ -6,13 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:42:41 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/05 00:08:50 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:43:19 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
 
 int	ft_memcmp(const void *s1, const void *s2, size_t n)
 {
@@ -32,6 +30,8 @@ int	ft_memcmp(const void *s1, const void *s2, size_t n)
 	return (0);
 }
 /*
+#include <string.h>
+#include <stdio.h>
 int main(void)
 {
     char s1[] = "Hello, World!";

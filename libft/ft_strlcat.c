@@ -6,13 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:43:40 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/05 11:55:17 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:47:20 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
 
 size_t	ft_strlcat(char *dst, const char *src, size_t size)
 {
@@ -38,6 +36,9 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 }
 
 /*
+
+#include <string.h>
+#include <stdio.h>
 int	main(void)
 {
 	char	dest[20] = "rrrrrr";  // 初期値6文字 + 空き領域あり

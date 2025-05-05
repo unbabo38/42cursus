@@ -6,12 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:44:15 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 23:50:30 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:48:57 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <ctype.h>
 
 int	ft_toupper(int c)
 {
@@ -19,3 +18,4 @@ int	ft_toupper(int c)
 		return (c - 32);
 	return (c);
 }
+/*#include <ctype.h>*/

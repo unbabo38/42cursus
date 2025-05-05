@@ -6,13 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:42:38 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/05 01:58:58 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:43:09 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
 
 void	*ft_memchr(const void *s, int c, size_t n)
 {
@@ -32,6 +30,9 @@ void	*ft_memchr(const void *s, int c, size_t n)
 	return (0);
 }
 /*
+#include <string.h>
+#include <stdio.h>
+
 int	main(void)
 {
 	const char *s = "Hello, world!";

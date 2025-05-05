@@ -6,14 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:12:30 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 21:16:15 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:36:13 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
-#include <stdint.h>
 
 int	ft_atoi(const char *str)
 {
@@ -41,6 +38,9 @@ int	ft_atoi(const char *str)
 	return (nbr);
 }
 /*
+#include <string.h>
+#include <stdio.h>
+#include <stdint.h>
 int	main(void)
 {
 	printf("Result 1: %d\n", ft_atoi("-2147483648"));

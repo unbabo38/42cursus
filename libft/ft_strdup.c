@@ -6,14 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:43:26 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 21:43:27 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:46:22 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
 
 char	*ft_strdup(const char *s1)
@@ -29,6 +26,9 @@ char	*ft_strdup(const char *s1)
 	return (ptr);
 }
 /*
+#include <string.h>
+#include <stdio.h>
+#include <assert.h>
 int	main(void)
 {
 	const char *src = "Hello, 42Tokyo!";

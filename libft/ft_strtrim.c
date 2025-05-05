@@ -6,13 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:43:59 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 23:54:29 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:53:20 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <string.h>
-#include <stdio.h>
 
 char	*ft_strtrim(char const *s1, char const *set)
 {
@@ -20,7 +18,7 @@ char	*ft_strtrim(char const *s1, char const *set)
 	size_t	right;
 
 	left = 0;
-	right = strlen(s1);
+	right = ft_strlen(s1);
 	if (!s1)
 		return (NULL);
 	if (!set)
@@ -32,6 +30,8 @@ char	*ft_strtrim(char const *s1, char const *set)
 	return (ft_substr(s1, left, right - left));
 }
 /*
+#include <string.h>
+#include <stdio.h>
 int main(void)
 {
 	char const *s1 = "hoge";
