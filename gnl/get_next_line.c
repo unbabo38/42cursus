@@ -3,60 +3,85 @@
 
 #include "get_next_line.h"
 
-char *get_next_line(int fd)
+#include "get_next_line.h"
+
+int	is_invalid_or_empty(ssize_t bytes_read, char **served)
 {
-	static char *served_string[4064];
-	char buffer[BUFFER_SIZE + 1];
-	ssize_t bytes_read = 1;
-	char *line;
-	char *rest;
-	int i = 0;
+	if (bytes_read < 0 || !*served || (*served)[0] == '\0')
+	{
+		free(*served);
+		*served = NULL;
+		return (1);
+	}
+	return (0);
+}
 
-	if (fd < 0 || fd >= 4064 || BUFFER_SIZE <= 0)
-		return NULL;
+ssize_t	read_and_store(int fd, char **served, char *buffer)
+{
+	ssize_t		bytes_read;
+	char		*tmp;
 
-	// 読み込み（改行が出るまで）
-	while ((!served_string[fd] || !ft_strchr(served_string[fd], '\n')) &&
-		   (bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0)
+	bytes_read = 1;
+	while ((!*served || !ft_strchr(*served, '\n')) &&
+		(bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
 		buffer[bytes_read] = '\0';
-		char *tmp;
-		if (!served_string[fd])
-			tmp = ft_strdup(buffer);  // 初期NULL対応
+		if (!*served)
+			tmp = ft_strdup(buffer);
 		else
-			tmp = ft_strjoin(served_string[fd], buffer);
-
+			tmp = ft_strjoin(*served, buffer);
 		if (!tmp)
-			return (free(served_string[fd]), served_string[fd] = NULL, NULL);
-
-		free(served_string[fd]);
-		served_string[fd] = tmp;
+			return (free(*served), *served = NULL, -1);
+		free(*served);
+		*served = tmp;
 	}
+	return (bytes_read);
+}
 
-	// 読み込みエラー or EOF + 何もない
-	if (bytes_read < 0 || !served_string[fd] || served_string[fd][0] == '\0')
-	{
-		free(served_string[fd]);
-		served_string[fd] = NULL;
-		return NULL;
-	}
+char	*extract_line(char *served)
+{
+	char	*line;
+	int		i;
 
-	// 改行または終端までの長さを数える
-	while (served_string[fd][i] && served_string[fd][i] != '\n')
+	i = 0;
+	while (served[i] && served[i] != '\n')
 		i++;
-	if (served_string[fd][i] == '\n')
+	if (served[i] == '\n')
 		i++;
+	line = ft_substr(served, 0, i);
+	return (line);
+}
 
-	line = ft_substr(served_string[fd], 0, i);
+char	*update_remain(char *served, int line_len)
+{
+	char	*rest;
+
+	rest = ft_strdup(served + line_len);
+	free(served);
+	return (rest);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	*served_string[4064];
+	char		buffer[BUFFER_SIZE + 1];
+	ssize_t		bytes_read;
+	char		*line;
+	int			line_len;
+
+	if (fd < 0 || fd >= 4064 || BUFFER_SIZE <= 0)
+		return (NULL);
+	bytes_read = read_and_store(fd, &served_string[fd], buffer);
+	if (is_invalid_or_empty(bytes_read, &served_string[fd]))
+		return (NULL);
+	line = extract_line(served_string[fd]);
 	if (!line)
 		return (free(served_string[fd]), served_string[fd] = NULL, NULL);
-
-	rest = ft_strdup(served_string[fd] + i);
-	free(served_string[fd]);
-	served_string[fd] = rest;
-
-	return line;
+	line_len = ft_strlen(line);
+	served_string[fd] = update_remain(served_string[fd], line_len);
+	return (line);
 }
+
 
 /*
 int main(void)
