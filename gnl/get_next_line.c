@@ -1,7 +1,14 @@
-#include "get_next_line.h"
-
-
-#include "get_next_line.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/16 14:06:29 by tmura             #+#    #+#             */
+/*   Updated: 2025/05/16 14:06:32 by tmura            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "get_next_line.h"
 
@@ -22,9 +29,11 @@ ssize_t	read_and_store(int fd, char **served, char *buffer)
 	char		*tmp;
 
 	bytes_read = 1;
-	while ((!*served || !ft_strchr(*served, '\n')) &&
-		(bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0)
+	while ((!*served || !ft_strchr(*served, '\n')) && bytes_read)
 	{
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		if (bytes_read <= 0)
+			break ;
 		buffer[bytes_read] = '\0';
 		if (!*served)
 			tmp = ft_strdup(buffer);
@@ -64,14 +73,18 @@ char	*update_remain(char *served, int line_len)
 char	*get_next_line(int fd)
 {
 	static char	*served_string[4064];
-	char		buffer[BUFFER_SIZE + 1];
+	char		*buffer;
 	ssize_t		bytes_read;
 	char		*line;
 	int			line_len;
 
 	if (fd < 0 || fd >= 4064 || BUFFER_SIZE <= 0)
 		return (NULL);
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer)
+		return (NULL);
 	bytes_read = read_and_store(fd, &served_string[fd], buffer);
+	free(buffer);
 	if (is_invalid_or_empty(bytes_read, &served_string[fd]))
 		return (NULL);
 	line = extract_line(served_string[fd]);
@@ -81,7 +94,6 @@ char	*get_next_line(int fd)
 	served_string[fd] = update_remain(served_string[fd], line_len);
 	return (line);
 }
-
 
 /*
 int main(void)
