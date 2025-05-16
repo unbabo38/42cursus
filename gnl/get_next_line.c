@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 14:06:29 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/16 14:06:32 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/17 02:25:15 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ ssize_t	read_and_store(int fd, char **served, char *buffer)
 	char		*tmp;
 
 	bytes_read = 1;
-	while ((!*served || !ft_strchr(*served, '\n')) && bytes_read)
+	while (bytes_read > 0 && (!*served || !ft_strchr(*served, '\n')))
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read <= 0)
@@ -40,7 +40,11 @@ ssize_t	read_and_store(int fd, char **served, char *buffer)
 		else
 			tmp = ft_strjoin(*served, buffer);
 		if (!tmp)
-			return (free(*served), *served = NULL, -1);
+		{
+			free(*served);
+			*served = NULL;
+			return (-1);
+		}
 		free(*served);
 		*served = tmp;
 	}
@@ -51,28 +55,44 @@ char	*extract_line(char *served)
 {
 	char	*line;
 	int		i;
-
+	//printf("befor_line %s ", served);
+	if (!served)
+		return (NULL);
 	i = 0;
 	while (served[i] && served[i] != '\n')
 		i++;
 	if (served[i] == '\n')
 		i++;
 	line = ft_substr(served, 0, i);
+	if (!line)
+		return (NULL);
+	//printf("made_line %s ", line);
+
 	return (line);
 }
 
 char	*update_remain(char *served, int line_len)
 {
 	char	*rest;
+	//printf("befor_line %s ", served);
 
-	rest = ft_strdup(served + line_len);
+	rest = ft_substr(served, line_len, ft_strlen(served) - line_len);
+	if (!rest)
+	{
+		free(served);
+		served = NULL;
+		return (NULL);
+	}
 	free(served);
+	served = NULL;
+	//printf("made_line_update %s ", rest);
+
 	return (rest);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*served_string[4064];
+	static char	*left_over[4064];
 	char		*buffer;
 	ssize_t		bytes_read;
 	char		*line;
@@ -81,17 +101,26 @@ char	*get_next_line(int fd)
 	if (fd < 0 || fd >= 4064 || BUFFER_SIZE <= 0)
 		return (NULL);
 	buffer = malloc(BUFFER_SIZE + 1);
-	if (!buffer)
-		return (NULL);
-	bytes_read = read_and_store(fd, &served_string[fd], buffer);
+	if (!buffer) {
+		free(left_over[fd]);
+		left_over[fd] = NULL;
+		return NULL;
+	}
+	bytes_read = read_and_store(fd, &left_over[fd], buffer);
 	free(buffer);
-	if (is_invalid_or_empty(bytes_read, &served_string[fd]))
+	if (bytes_read == -1)
 		return (NULL);
-	line = extract_line(served_string[fd]);
+	if (is_invalid_or_empty(bytes_read, &left_over[fd]))
+		return (NULL);
+	line = extract_line(left_over[fd]);
 	if (!line)
-		return (free(served_string[fd]), served_string[fd] = NULL, NULL);
+	{
+		free(left_over[fd]);
+		left_over[fd] = NULL;
+		return (NULL);
+	}
 	line_len = ft_strlen(line);
-	served_string[fd] = update_remain(served_string[fd], line_len);
+	left_over[fd] = update_remain(left_over[fd], line_len);
 	return (line);
 }
 

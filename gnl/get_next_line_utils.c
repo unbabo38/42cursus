@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/16 14:37:49 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/16 14:37:53 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/17 01:10:44 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ char	*ft_strdup(const char *s)
 	char	*dup;
 	size_t	i;
 
+	if (!s)
+		return (NULL);
 	len = ft_strlen(s);
 	dup = (char *)malloc(len + 1);
 	if (!dup)
@@ -58,7 +60,7 @@ char	*ft_strdup(const char *s)
 	return (dup);
 }
 
-char	*ft_strjoin(char *s1, const char *s2)
+char	*ft_strjoin(const char *s1, const char *s2)
 {
 	size_t	len1;
 	size_t	len2;
@@ -81,26 +83,29 @@ char	*ft_strjoin(char *s1, const char *s2)
 	return (joined);
 }
 
-char	*ft_substr(const char *s, unsigned int start, size_t len)
+char *ft_substr(const char *s, unsigned int start, size_t len)
 {
-	size_t	i;
-	size_t	max_len;
-	char	*sub;
+	char *substr;
+	size_t i = 0;
 
-	if (!s || start >= ft_strlen(s))
+	if (!s)
+		return (NULL);
+	if (start >= ft_strlen(s))
 		return (ft_strdup(""));
-	max_len = ft_strlen(s + start);
+
+	size_t max_len = ft_strlen(s + start);
 	if (len > max_len)
 		len = max_len;
-	sub = (char *)malloc(len + 1);
-	if (!sub)
+
+	substr = malloc(len + 1);
+	if (!substr)
 		return (NULL);
-	i = 0;
-	while (i < len)
+
+	while (i < len && s[start + i])
 	{
-		sub[i] = s[start + i];
+		substr[i] = s[start + i];
 		i++;
 	}
-	sub[len] = '\0';
-	return (sub);
+	substr[i] = '\0';
+	return (substr);
 }
