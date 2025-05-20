@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 17:35:11 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/20 18:07:47 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/20 18:26:52 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	reset_fd_state(t_fd_state *state)
 	state->bytes = 0;
 	state->bufp = NULL;
 	i = 0;
-	while (state->buffer[i])
+	while (i < BUFFER_SIZE)
 	{
 		state->buffer[i] = 0;
 		i++;
