@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 18:01:56 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/21 12:58:41 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/21 14:39:05 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,12 @@ int	ft_getchar(int fd, t_fd_state *state)
 {
 	int	read_bytes;
 
+	if (!state->buffer)
+	{
+		state->buffer = malloc(BUFFER_SIZE);
+		if (!state->buffer)
+			return (-42);
+	}
 	if (state->bytes == 0)
 	{
 		read_bytes = read(fd, state->buffer, BUFFER_SIZE);

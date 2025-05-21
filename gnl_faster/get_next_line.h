@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 17:35:03 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/21 10:38:51 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/21 14:17:05 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ typedef struct s_string
 typedef struct s_fd_state
 {
 	int			bytes;
-	char		buffer[BUFFER_SIZE];
+	char		*buffer;
 	char		*bufp;
 }				t_fd_state;
 

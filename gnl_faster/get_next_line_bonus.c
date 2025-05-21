@@ -5,17 +5,23 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/20 16:48:35 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/21 10:45:49 by tmura            ###   ########.fr       */
+/*   Created: 2025/05/20 18:01:56 by tmura             #+#    #+#             */
+/*   Updated: 2025/05/21 14:39:00 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "get_next_line.h"
 
 int	ft_getchar(int fd, t_fd_state *state)
 {
 	int	read_bytes;
 
+	if (!state->buffer)
+	{
+		state->buffer = malloc(BUFFER_SIZE);
+		if (!state->buffer)
+			return (-42);
+	}
 	if (state->bytes == 0)
 	{
 		read_bytes = read(fd, state->buffer, BUFFER_SIZE);
@@ -98,3 +104,33 @@ char	*get_next_line(int fd)
 		return (finalize_and_return(state, &str));
 	return (handle_error(state, &str));
 }
+/*
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "get_next_line.h"
+int main(void)
+{
+	const char *filename = "giant_1tb.txt";
+	int fd = open(filename, O_RDONLY);
+	if (fd < 0)
+	{
+		perror("Failed to open file");
+		return 1;
+	}
+
+	char *line = get_next_line(fd);
+	if (!line)
+	{
+		printf("get_next_line returned NULL\n");
+	}
+	else
+	{
+		printf("Line read successfully! Length: %zu\n", strlen(line));
+		free(line);
+	}
+	close(fd);
+	return 0;
+}
+*/
