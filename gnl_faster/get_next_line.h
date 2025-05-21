@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 17:35:03 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/20 18:08:00 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/21 10:38:51 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <stdio.h>
+# include <limits.h>
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 42
@@ -33,18 +34,17 @@ typedef struct s_fd_state
 	int			bytes;
 	char		buffer[BUFFER_SIZE];
 	char		*bufp;
-	t_string	str;
 }				t_fd_state;
 
 char	*get_next_line(int fd);
 char	*ft_strdup(const char *s1);
-void	free_and_reset(t_fd_state *state);
+void	free_and_reset(t_string *str);
 void	reset_fd_state(t_fd_state *state);
-char	*handle_error(t_fd_state *state);
-int		expand_line_buffer(t_fd_state *state);
+char	*handle_error(t_fd_state *state, t_string *str);
+int		expand_line_buffer(t_string *str);
 int		ft_getchar(int fd, t_fd_state *state);
-int		ft_insert_char_to_line(t_fd_state *state, char c);
-char	*finalize_and_return(t_fd_state *state);
-int		read_loop(int fd, t_fd_state *state);
+int		ft_insert_char_to_line(t_string *str, char c);
+char	*finalize_and_return(t_fd_state *state, t_string *str);
+int		read_loop(int fd, t_fd_state *state, t_string *str);
 
 #endif
