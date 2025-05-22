@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 18:01:56 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/21 14:39:05 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/22 13:20:57 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,19 @@ int	ft_insert_char_to_line(t_string *str, char c)
 char	*finalize_and_return(t_fd_state *state, t_string *str)
 {
 	char	*ret;
+	int		i;
 
 	if (ft_insert_char_to_line(str, '\0') == -1)
 		return (handle_error(state, str));
-	ret = ft_strdup(str->line);
+	ret = malloc(str->line_length);
 	if (!ret)
 		return (handle_error(state, str));
+	i = 0;
+	while (i < str->line_length)
+	{
+		ret[i] = str->line[i];
+		i++;
+	}
 	free_and_reset(str);
 	return (ret);
 }

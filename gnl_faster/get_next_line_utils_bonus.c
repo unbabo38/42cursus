@@ -6,12 +6,12 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 18:02:07 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/21 14:26:37 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/22 18:17:51 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
+/*
 char	*ft_strdup(const char *s1)
 {
 	char	*ptr;
@@ -33,7 +33,7 @@ char	*ft_strdup(const char *s1)
 	ptr[i] = '\0';
 	return (ptr);
 }
-
+*/
 void	free_and_reset(t_string *str)
 {
 	if (str->line)

@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 18:01:56 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/21 14:39:00 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/22 18:17:41 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,19 @@ int	ft_insert_char_to_line(t_string *str, char c)
 char	*finalize_and_return(t_fd_state *state, t_string *str)
 {
 	char	*ret;
+	int		i;
 
 	if (ft_insert_char_to_line(str, '\0') == -1)
 		return (handle_error(state, str));
-	ret = ft_strdup(str->line);
+	ret = malloc(str->line_length);
 	if (!ret)
 		return (handle_error(state, str));
+	i = 0;
+	while (i < str->line_length)
+	{
+		ret[i] = str->line[i];
+		i++;
+	}
 	free_and_reset(str);
 	return (ret);
 }
@@ -86,12 +93,12 @@ int	read_loop(int fd, t_fd_state *state, t_string *str)
 
 char	*get_next_line(int fd)
 {
-	static t_fd_state	fds[1024];
+	static t_fd_state	fds[1048576];
 	t_fd_state			*state;
 	t_string			str;
 	int					res;
 
-	if (fd < 0 || fd >= 1024 || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd >= 1048576 || BUFFER_SIZE <= 0)
 		return (NULL);
 	state = &fds[fd];
 	str.line = NULL;

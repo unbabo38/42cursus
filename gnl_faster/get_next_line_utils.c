@@ -6,21 +6,17 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 18:02:07 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/21 14:18:31 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/22 13:04:40 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-char	*ft_strdup(const char *s1)
+/*
+char	*ft_strndup(const char *s1, const int len)
 {
 	char	*ptr;
-	size_t	len;
-	size_t	i;
+	int		i;
 
-	len = 0;
-	while (s1[len])
-		len++;
 	ptr = malloc(len + 1);
 	if (!ptr)
 		return (NULL);
@@ -33,7 +29,7 @@ char	*ft_strdup(const char *s1)
 	ptr[i] = '\0';
 	return (ptr);
 }
-
+*/
 void	free_and_reset(t_string *str)
 {
 	if (str->line)

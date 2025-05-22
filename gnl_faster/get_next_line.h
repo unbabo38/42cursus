@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 17:35:03 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/21 14:17:05 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/22 13:05:46 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ typedef struct s_fd_state
 }				t_fd_state;
 
 char	*get_next_line(int fd);
-char	*ft_strdup(const char *s1);
+char	*ft_strndup(const char *s1, const int len);
 void	free_and_reset(t_string *str);
 void	reset_fd_state(t_fd_state *state);
 char	*handle_error(t_fd_state *state, t_string *str);
