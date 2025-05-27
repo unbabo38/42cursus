@@ -65,7 +65,7 @@ int main()
 	//printf("%d",printf(" %-4d ", 9));
 	//printf("%d",ft_printf(" %-4d ", 9));
 	//printf("%d", printf(" %X ", -99));
-	//printf("%d", ft_printf(" %i ", 42));
+	ft_printf(" %s ", "42");
 
 }
 */

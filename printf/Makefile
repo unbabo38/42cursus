@@ -1,50 +1,37 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: YOURNAME <your@email.com>                   +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/05/25                                #+#    #+#              #
-#    Updated: 2025/05/25                                ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME = libftprintf.a
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
-# ボーナスディレクトリ配下の .c ファイルだけを対象にする
-BONUS_DIR = bonus
-
-SRCS = $(BONUS_DIR)/ft_printf_bonus.c \
-       $(BONUS_DIR)/scan_line_bonus.c \
-       $(BONUS_DIR)/print_bonus.c \
-       $(BONUS_DIR)/print_hexadecimal_low_bonus.c \
-       $(BONUS_DIR)/print_integer_bonus.c
-
+# 通常
+SRCS = ft_printf.c scan_line.c print.c
 OBJS = $(SRCS:.c=.o)
 
-INCLUDES = $(BONUS_DIR)/ft_printf_bonus.h
+# ボーナス
+SRCS_BONUS = $(wildcard bonus/*.c)
+OBJS_BONUS = $(SRCS_BONUS:.c=.o)
 
+INCLUDES = ft_printf.h
+
+# 通常ビルド
 all: $(NAME)
 
 $(NAME): $(OBJS)
 	ar rcs $(NAME) $(OBJS)
 
-bonus: $(BONUS_OBJS)
-	ar rcs $(NAME) $(BONUS_OBJS)
-# .o ファイルは bonus ディレクトリに依存（.oはカレントに作られる）
+# ボーナスビルド
+bonus: $(OBJS_BONUS)
+	ar rcs $(NAME) $(OBJS_BONUS)
+
 %.o: %.c $(INCLUDES)
-	$(CC) $(CFLAGS) -I $(BONUS_DIR) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(OBJS_BONUS)
 
 fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re bonus

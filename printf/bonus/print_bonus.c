@@ -92,6 +92,7 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 		i++;
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
+/*
 int print_string(t_format *fmt, const char *string)
 {
 	int len = 0;
@@ -127,6 +128,7 @@ int print_string(t_format *fmt, const char *string)
 	}
 	return (len + actual_padding);
 }
+	*/
 int print_percent(t_format *fmt)
 {
 	fmt = fmt;
@@ -145,7 +147,7 @@ char sign_check(t_format *fmt, int decimal)
 	else
 		return ('\0');
 }
-
+/*
 int print_decimal(t_format *fmt, int decimal)
 {
 	const char *ten_base = "0123456789";
@@ -214,6 +216,7 @@ int print_decimal(t_format *fmt, int decimal)
 	free(char_decimal);
 	return (total_len);
 }
+	*/
 /*
 int print_integer(t_format *fmt, int decimal)
 {
@@ -484,6 +487,7 @@ int print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low)
 	return (total_len);
 }
 	*/
+	/*
 int print_hexadecimal_up(t_format *fmt, unsigned int hex_decimal_up)
 {
 	const char *up_base = "0123456789ABCDEF";
@@ -543,6 +547,8 @@ int print_hexadecimal_up(t_format *fmt, unsigned int hex_decimal_up)
 	free(num);
 	return (total_len);
 }
+	*/
+	/*
 int print_pointer(t_format *fmt, void *ptr)
 {
 	const char *low_base = "0123456789abcdef";
@@ -583,3 +589,4 @@ int print_pointer(t_format *fmt, void *ptr)
 	free(num);
 	return (total_len);
 }
+*/

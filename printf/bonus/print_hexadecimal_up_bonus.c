@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   print_hexadecimal_low_bonus.c                      :+:      :+:    :+:   */
+/*   print_hexadecimal_up_bonus.c                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 13:49:42 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/27 16:56:15 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/27 17:16:59 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,15 +71,15 @@ int print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low)
 }
 	*/
 
-t_render_info	compute_hex_render_info(t_format *fmt, unsigned int value)
+t_render_info	compute_uphex_render_info(t_format *fmt, unsigned int value)
 {
 	t_render_info	info;
-	const char		*low_base;
+	const char		*up_base;
 
-	low_base = "0123456789abcdef";
+	up_base = "0123456789ABCDEF";
 	info.sign_char = '\0';
 	info.sign_len = 0;
-	info.str = itoa_base(value, low_base);
+	info.str = itoa_base(value, up_base);
 	info.len = ft_strlen(info.str);
 	if (fmt->has_precision && fmt->precision == 0 && value == 0)
 		info.len = 0;
@@ -90,7 +90,7 @@ t_render_info	compute_hex_render_info(t_format *fmt, unsigned int value)
 	if ((fmt->flg & FLG_HASH) && value != 0)
 	{
 		info.prefix_len = 2;
-		info.prefix_str = "0x";
+		info.prefix_str = "0X";
 	}
 	info.total_len = info.prefix_len + info.pad_zero + info.len;
 	info.pad_space = max(fmt->width - info.total_len, 0);
@@ -98,11 +98,11 @@ t_render_info	compute_hex_render_info(t_format *fmt, unsigned int value)
 	return (info);
 }
 
-int	print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low)
+int	print_hexadecimal_up(t_format *fmt, unsigned int hex_decimal_up)
 {
 	t_render_info	info;
 
-	info = compute_hex_render_info(fmt, hex_decimal_low);
+	info = compute_uphex_render_info(fmt, hex_decimal_up);
 	render_output(fmt, &info);
 	free(info.str);
 	return (info.total_len);

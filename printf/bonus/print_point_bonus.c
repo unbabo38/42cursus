@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   print_hexadecimal_low_bonus.c                      :+:      :+:    :+:   */
+/*   print_point.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/27 13:49:42 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/27 16:56:15 by tmura            ###   ########.fr       */
+/*   Created: 2025/05/27 17:08:57 by tmura             #+#    #+#             */
+/*   Updated: 2025/05/27 17:21:20 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,39 +71,40 @@ int print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low)
 }
 	*/
 
-t_render_info	compute_hex_render_info(t_format *fmt, unsigned int value)
+t_render_info compute_pointer_render_info(t_format *fmt, void *ptr)
 {
-	t_render_info	info;
-	const char		*low_base;
+	t_render_info info;
+	const char *base = "0123456789abcdef";
+	unsigned long long ptr_num = (unsigned long long)ptr;
 
-	low_base = "0123456789abcdef";
 	info.sign_char = '\0';
 	info.sign_len = 0;
-	info.str = itoa_base(value, low_base);
+
+	info.str = itoa_base_unsigned(ptr_num, base);
 	info.len = ft_strlen(info.str);
-	if (fmt->has_precision && fmt->precision == 0 && value == 0)
+	if (fmt->has_precision && fmt->precision == 0 && ptr_num == 0)
 		info.len = 0;
+	info.prefix_str = "0x";
+	info.prefix_len = 2;
 	info.pad_zero = 0;
 	if (fmt->precision > info.len)
 		info.pad_zero = fmt->precision - info.len;
-	info.prefix_len = 0;
-	if ((fmt->flg & FLG_HASH) && value != 0)
-	{
-		info.prefix_len = 2;
-		info.prefix_str = "0x";
-	}
 	info.total_len = info.prefix_len + info.pad_zero + info.len;
 	info.pad_space = max(fmt->width - info.total_len, 0);
 	info.total_len += info.pad_space;
-	return (info);
+	return info;
 }
 
-int	print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low)
+int print_pointer(t_format *fmt, void *ptr)
 {
-	t_render_info	info;
-
-	info = compute_hex_render_info(fmt, hex_decimal_low);
+	unsigned long long ptr_num = (unsigned long long)ptr;
+	if (ptr_num == 0)
+	{
+		print_string(fmt, "(nil)");
+		return (5);
+	}
+	t_render_info info = compute_pointer_render_info(fmt, ptr);
 	render_output(fmt, &info);
 	free(info.str);
-	return (info.total_len);
+	return info.total_len;
 }

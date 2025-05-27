@@ -70,7 +70,7 @@ int print_integer(t_format *fmt, int decimal)
 {
 	t_render_info info;
 	info = compute_render_info(fmt, decimal);
-	render_integer(fmt, &info);
+	render_output(fmt, &info);
 	free(info.str);
 	return (info.total_len);
 }
@@ -97,56 +97,4 @@ t_render_info compute_render_info(t_format *fmt, int decimal)
 	info.pad_space = max(fmt->width - info.total_len, 0);
 	info.total_len += info.pad_space;
 	return (info);
-}
-
-void render_integer(t_format *fmt, t_render_info *info)
-{
-	if (fmt->flg & FLG_LEFT)
-		render_left_aligned_integer(info);
-	else
-		render_right_aligned_integer(fmt, info);
-}
-
-void render_left_aligned_integer(t_render_info *info)
-{
-	if (info->sign_char)
-		write(1, &info->sign_char, 1);
-	while (info->pad_zero-- > 0)
-		write(1, "0", 1);
-	if (info->len > 0)
-		write(1, info->str, info->len);
-	while (info->pad_space-- > 0)
-		write(1, " ", 1);
-}
-
-void render_right_aligned_integer(t_format *fmt, t_render_info *info)
-{
-	if ((fmt->flg & FLG_ZERO) && !fmt->has_precision)
-		render_right_zero_padded(info);
-	else
-		render_right_space_padded(info);
-}
-
-void render_right_zero_padded(t_render_info *info)
-{
-	if (info->sign_char)
-		write(1, &info->sign_char, 1);
-	while (info->pad_space-- > 0)
-		write(1, "0", 1);
-	while (info->pad_zero-- > 0)
-		write(1, "0", 1);
-	if (info->len > 0)
-		write(1, info->str, info->len);
-}
-
-void render_right_space_padded(t_render_info *info)
-{
-	while (info->pad_space-- > 0)
-		write(1, " ", 1);
-	if (info->sign_char)
-		write(1, &info->sign_char, 1);
-	while (info->pad_zero-- > 0)
-		write(1, "0", 1);
-	if (info->len > 0)
-		write(1, info->str, info->len);
 }

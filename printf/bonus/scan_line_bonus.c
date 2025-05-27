@@ -103,7 +103,7 @@ int print_arg(t_format *fmt, va_list *ap)
 	else if (fmt->specifier == 's')
 		return print_string(fmt, va_arg(*ap, char *));
 	else if (fmt->specifier == 'd' || fmt->specifier == 'i')
-		return print_decimal(fmt, va_arg(*ap, int));
+		return print_integer(fmt, va_arg(*ap, int));
 	else if (fmt->specifier == 'u')
 		return print_unsigned_decimal(fmt, va_arg(*ap, unsigned int));
 	else if (fmt->specifier == 'x')

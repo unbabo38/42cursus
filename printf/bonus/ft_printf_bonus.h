@@ -28,6 +28,7 @@ typedef struct s_render_info {
 	int		pad_zero;
 	int		pad_space;
 	int		prefix_len;
+	const char *prefix_str;  // ← これを追加すれば汎用OK
 	int		total_len;
 } t_render_info;
 
@@ -46,6 +47,7 @@ int print_arg(t_format *fmt, va_list *ap);
 int print_char(t_format *fmt, const char c);
 int print_string(t_format *fmt, const char *s);
 int print_decimal(t_format *fmt, int n);
+int print_integer(t_format *fmt, int n);
 int print_unsigned_decimal(t_format *fmt, unsigned int n);
 int print_hexadecimal_low(t_format *fmt, unsigned int n);
 int print_hexadecimal_up(t_format *fmt, unsigned int n);
@@ -64,22 +66,31 @@ char 	*itoa_base_unsigned(unsigned long long n, const char *base);
 // ===== 補助的な関数（必要なら） =====
 int     max(int a, int b);
 
-
+/*
 t_render_info compute_render_info(t_format *fmt, int decimal);
 void 	render_integer(t_format *fmt, t_render_info *info);
 void 	render_left_aligned_integer(t_render_info *info);
 void 	render_right_aligned_integer(t_format *fmt, t_render_info *info);
 void 	render_right_zero_padded(t_render_info *info);
 void 	render_right_space_padded(t_render_info *info);
+*/
+t_render_info compute_render_info(t_format *fmt, int decimal);
+void render_output(t_format *fmt, t_render_info *info);
+void render_left(t_render_info *info);
+void render_right_zero(t_render_info *info);
+void render_right_space(t_render_info *info);
 
 t_render_info compute_hex_render_info(t_format *fmt, unsigned int value);
+t_render_info compute_uphex_render_info(t_format *fmt, unsigned int value);
+t_render_info compute_pointer_render_info(t_format *fmt, void *ptr);
+
+/*
 int print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low);
 void render_hexadecimal_low(t_format *fmt, t_render_info *info);
 void render_right_aligned_hex(t_format *fmt, t_render_info *info);
 void render_right_zero_padded_hex(t_render_info *info);
 void render_right_space_padded_hex(t_render_info *info);
 void render_left_aligned_hex(t_render_info *info);
-/*
 void			render_hexadecimal_low(t_format *fmt, t_render_info *info);
 void			render_left_aligned_hex(t_render_info *info);
 void			render_right_aligned_hex(t_format *fmt, t_render_info *info);
