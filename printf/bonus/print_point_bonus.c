@@ -70,17 +70,17 @@ int print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low)
 	return (total_len);
 }
 	*/
-
+/*
 t_render_info compute_pointer_render_info(t_format *fmt, void *ptr)
 {
 	t_render_info info;
-	const char *base = "0123456789abcdef";
+	const char *low_base = "0123456789abcdef";
 	unsigned long long ptr_num = (unsigned long long)ptr;
 
 	info.sign_char = '\0';
 	info.sign_len = 0;
 
-	info.str = itoa_base_unsigned(ptr_num, base);
+	info.str = itoa_base_unsigned(ptr_num, low_base);
 	info.len = ft_strlen(info.str);
 	if (fmt->has_precision && fmt->precision == 0 && ptr_num == 0)
 		info.len = 0;
@@ -94,16 +94,19 @@ t_render_info compute_pointer_render_info(t_format *fmt, void *ptr)
 	info.total_len += info.pad_space;
 	return info;
 }
-
+*/
 int print_pointer(t_format *fmt, void *ptr)
 {
+	t_render_info	info;
+
 	unsigned long long ptr_num = (unsigned long long)ptr;
 	if (ptr_num == 0)
 	{
 		print_string(fmt, "(nil)");
 		return (5);
 	}
-	t_render_info info = compute_pointer_render_info(fmt, ptr);
+	//t_render_info info = compute_pointer_render_info(fmt, ptr);
+	info = compute_unsigned_render_info(fmt, (unsigned long long)ptr_num, "0123456789abcdef", "0x", 0);
 	render_output(fmt, &info);
 	free(info.str);
 	return info.total_len;

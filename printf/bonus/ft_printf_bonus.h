@@ -83,6 +83,8 @@ void render_right_space(t_render_info *info);
 t_render_info compute_hex_render_info(t_format *fmt, unsigned int value);
 t_render_info compute_uphex_render_info(t_format *fmt, unsigned int value);
 t_render_info compute_pointer_render_info(t_format *fmt, void *ptr);
+t_render_info compute_unsigned_decimal_render_info(t_format *fmt, int decimal);
+
 
 /*
 int print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low);
@@ -99,5 +101,21 @@ void			render_right_space_padded_hex(t_render_info *info);
 */
 
 char sign_check(t_format *fmt, int decimal);
+extern const char *low_base;
+extern const char *up_base;
+extern const char *ten_base;
+
+
+
+t_render_info	compute_unsigned_render_info(
+	t_format *fmt,
+	unsigned long long val,
+	const char *base,
+	const char *prefix,
+	int use_prefix_when_zero
+);
+
+t_render_info	compute_signed_render_info(t_format *fmt, int val);
+
 
 #endif

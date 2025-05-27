@@ -1,7 +1,5 @@
 #include "ft_printf.h"
-const char *low_base = "0123456789abcdef";
-const char *up_base = "0123456789ABCDEF";
-const char *ten_base = "0123456789";
+
 int	max(int left, int right)
 {
 	if (left >= right)
@@ -129,7 +127,7 @@ int print_string(t_format *fmt, const char *string)
 }
 int print_percent(t_format *fmt)
 {
-	fmt = fmt;
+	(void)fmt;
 	char percent = '%';
 	write(1, &percent, 1);
 	return (1);
@@ -156,6 +154,7 @@ int print_decimal(t_format *fmt, int decimal)
 	if (is_negative)
 		decimal = -decimal;
 	//print("decimal:%d\n", decimal);
+	const char *ten_base = "0123456789";
 	char *char_decimal = itoa_base(decimal, ten_base);
 
 	int	len = ft_strlen(char_decimal);
@@ -223,7 +222,7 @@ int print_integer(t_format *fmt, int decimal)
 	int sign_len = (sign_char != '\0');
 	if (is_negative)
 		decimal = -decimal;
-
+	const char *ten_base = "0123456789";
 	char *char_decimal = itoa_base(decimal, ten_base);
 	int	len = ft_strlen(char_decimal);
 
@@ -280,6 +279,7 @@ int print_integer(t_format *fmt, int decimal)
 }
 int print_unsigned_decimal(t_format *fmt, unsigned int decimal)
 {
+	const char *ten_base = "0123456789";
 	char *char_decimal;
 	char_decimal = itoa_base(decimal, ten_base);
 	int	len = ft_strlen(char_decimal);
@@ -424,6 +424,7 @@ char *itoa_base(long long n, const char *base)
 }
 int print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low)
 {
+	const char *low_base = "0123456789abcdef";
 	char *num = itoa_base(hex_decimal_low, low_base);
 	int	len = ft_strlen(num);
 	int precision_padding;
@@ -481,7 +482,8 @@ int print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low)
 }
 int print_hexadecimal_up(t_format *fmt, unsigned int hex_decimal_up)
 {
-	char *num = itoa_base(hex_decimal_up, up_base);
+	const char *low_base = "0123456789ABCDEF";
+	char *num = itoa_base(hex_decimal_up, low_base);
 	int	len = ft_strlen(num);
 	int precision_padding;
 	precision_padding = 0;
@@ -544,6 +546,8 @@ int print_pointer(t_format *fmt, void *ptr)
 		print_string(fmt, "(nil)");
 		return (5);
 	}
+	const char *low_base = "0123456789abcdef";
+
 	char *num = itoa_base_unsigned(ptr_num, low_base);
 	int	len = ft_strlen(num);
 	int prefix_len = 2;

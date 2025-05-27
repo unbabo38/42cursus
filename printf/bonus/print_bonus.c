@@ -1,7 +1,5 @@
 #include "ft_printf_bonus.h"
-const char *low_base = "0123456789abcdef";
-const char *up_base = "0123456789ABCDEF";
-const char *ten_base = "0123456789";
+
 int	max(int left, int right)
 {
 	if (left >= right)
@@ -131,7 +129,7 @@ int print_string(t_format *fmt, const char *string)
 	*/
 int print_percent(t_format *fmt)
 {
-	fmt = fmt;
+	(void)fmt;
 	char percent = '%';
 	write(1, &percent, 1);
 	return (1);
@@ -283,6 +281,7 @@ int print_integer(t_format *fmt, int decimal)
 	return (total_len);
 }
 */
+/*
 int print_unsigned_decimal(t_format *fmt, unsigned int decimal)
 {
 	const char *ten_base = "0123456789";
@@ -335,35 +334,23 @@ int print_unsigned_decimal(t_format *fmt, unsigned int decimal)
 	free(char_decimal);
 	return (total_len);
 }
-
+*/
 char *itoa_base_unsigned(unsigned long long n, const char *base)
 {
-	//printf("n:%lld\n", n);
 	unsigned long long tmp = n;
-	//printf("tmp:%lld\n", tmp);
-
 	int digit;
 	unsigned long long len;
 	char *num;
-	/*
 
-	*/
 	len = ft_strlen(base);
-	//printf("len:%lld\n", len);
-
 	digit = 0;
 	if (n == 0)
 		digit++;
-	//printf("tmp:%lld\n", tmp);
-
 	while (tmp > 0)
 	{
-		////printf("digit:%d\n", digit);
-		//printf("tmp:%lld\n", tmp);
 		digit++;
 		tmp /= len;
 	}
-	//printf("%d\n", digit);
 	num = malloc(digit + 1);
 	if (!num)
 		return (NULL);
@@ -375,44 +362,30 @@ char *itoa_base_unsigned(unsigned long long n, const char *base)
 		num[digit] = (base[n % len]);
 		n /= len;
 	}
-	//printf("%s\n", num);
-
 	return (num);
 }
 
 char *itoa_base(long long n, const char *base)
 {
-	//printf("n:%lld\n", n);
 	long long tmp;
 	if (n < 0)
 		n = (long long)(-(n + 1)) + 1;
 	else
 		n = (long long)n;
 	tmp = n;
-	//printf("tmp:%lld\n", tmp);
-
 	int digit;
 	unsigned long long len;
 	char *num;
-	/*
 
-	*/
 	len = ft_strlen(base);
-	//printf("len:%lld\n", len);
-
 	digit = 0;
 	if (n == 0)
 		digit++;
-	//printf("tmp:%lld\n", tmp);
-
 	while (tmp > 0)
 	{
-		////printf("digit:%d\n", digit);
-		//printf("tmp:%lld\n", tmp);
 		digit++;
 		tmp /= len;
 	}
-	//printf("%d\n", digit);
 	num = malloc(digit + 1);
 	if (!num)
 		return (NULL);
@@ -424,8 +397,6 @@ char *itoa_base(long long n, const char *base)
 		num[digit] = (base[n % len]);
 		n /= len;
 	}
-	//printf("%s\n", num);
-
 	return (num);
 }
 /*

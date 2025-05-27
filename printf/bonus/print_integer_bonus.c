@@ -69,32 +69,18 @@ int print_integer(t_format *fmt, int decimal)
 int print_integer(t_format *fmt, int decimal)
 {
 	t_render_info info;
-	info = compute_render_info(fmt, decimal);
+	info = compute_signed_render_info(fmt, decimal);
 	render_output(fmt, &info);
 	free(info.str);
 	return (info.total_len);
 }
 
-t_render_info compute_render_info(t_format *fmt, int decimal)
+
+int print_unsigned_decimal(t_format *fmt, unsigned int decimal)
 {
 	t_render_info info;
-	int is_negative;
-	const char *ten_base = "0123456789";
-
-	is_negative = (decimal < 0);
-	info.sign_char = sign_check(fmt, decimal);
-	info.sign_len = (info.sign_char != '\0');
-	if (is_negative)
-		decimal = -decimal;
-	info.str = itoa_base(decimal, ten_base);
-	info.len = ft_strlen(info.str);
-	if (fmt->has_precision && fmt->precision == 0 && decimal == 0)
-		info.len = 0;
-	info.pad_zero = 0;
-	if (fmt->precision > info.len)
-		info.pad_zero = fmt->precision - info.len;
-	info.total_len = info.sign_len + info.pad_zero + info.len;
-	info.pad_space = max(fmt->width - info.total_len, 0);
-	info.total_len += info.pad_space;
-	return (info);
+	info = compute_unsigned_render_info(fmt, decimal, "0123456789", NULL, 0);
+	render_output(fmt, &info);
+	free(info.str);
+	return (info.total_len);
 }

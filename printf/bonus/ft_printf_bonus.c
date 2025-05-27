@@ -1,6 +1,8 @@
 #include "ft_printf_bonus.h"
 
-
+//const char *low_base = "0123456789abcdef";
+//const char *up_base = "0123456789ABCDEF";
+//const char *ten_base = "0123456789";
 
 
 int ft_printf(const char *s, ...)

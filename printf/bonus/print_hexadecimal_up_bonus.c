@@ -70,7 +70,7 @@ int print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low)
 	return (total_len);
 }
 	*/
-
+/*
 t_render_info	compute_uphex_render_info(t_format *fmt, unsigned int value)
 {
 	t_render_info	info;
@@ -97,12 +97,12 @@ t_render_info	compute_uphex_render_info(t_format *fmt, unsigned int value)
 	info.total_len += info.pad_space;
 	return (info);
 }
-
+*/
 int	print_hexadecimal_up(t_format *fmt, unsigned int hex_decimal_up)
 {
 	t_render_info	info;
 
-	info = compute_uphex_render_info(fmt, hex_decimal_up);
+	info = compute_unsigned_render_info(fmt, hex_decimal_up, "0123456789ABCDEF", "0x", 0);
 	render_output(fmt, &info);
 	free(info.str);
 	return (info.total_len);
