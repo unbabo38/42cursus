@@ -41,8 +41,18 @@ int main()
 	//ft_printf(" %p ", LONG_MIN);
 	//printf(" %p %p ", LONG_MIN, LONG_MAX);
 	//ft_printf(" %d", );
-	ft_printf(" %d ", INT_MIN);
+	//ft_printf(" %d ", INT_MIN);
 	//ft_printf(" %p %p ", 0, 0);
-
+	//ft_printf("%5%");
+	//printf("%5%");
+	//ft_printf("%7.5s", "bombastic");
+	//ft_printf("%.03s", NULL);
+	//printf("%.03s", NULL);
+	//printf("%.03d", 42);
+	//printf("%.3i", 13862);
+	//ft_printf("%.3i", 13862);
+	//ft_printf("%3.1s", NULL);
+	//ft_printf("percent 2 %12%");
+	ft_printf("%p", NULL);
 }
 */

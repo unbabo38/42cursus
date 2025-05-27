@@ -1,11 +1,11 @@
-#ifndef FT_PRINTF_H
-# define FT_PRINTF_H
+#ifndef FT_PRINTF_BONUS_H
+# define FT_PRINTF_BONUS_H
 
 #include <stdarg.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdint.h>
-
+#include <stdio.h>
 #define FLG_LEFT (1 << 1)
 #define FLG_ZERO (1 << 2)
 #define FLG_PLUS (1 << 3)
@@ -20,6 +20,16 @@ typedef struct s_format {
     char specifier;
 } t_format;
 
+typedef struct s_render_info {
+	char	*str;
+	int		len;
+	int		sign_len;
+	char	sign_char;
+	int		pad_zero;
+	int		pad_space;
+	int		prefix_len;
+	int		total_len;
+} t_render_info;
 
 // ===== メイン関数 =====
 int ft_printf(const char *s, ...);
@@ -48,8 +58,35 @@ int     ft_strlen(const char *s);
 int     ft_isdigit(int c);
 int     ft_atoi(const char *s);
 char    *ft_itoa(int n);
-char *itoa_base(unsigned int n, const char *base);
+char 	*itoa_base(long long n, const char *base);
+char 	*itoa_base_unsigned(unsigned long long n, const char *base);
+
 // ===== 補助的な関数（必要なら） =====
 int     max(int a, int b);
+
+
+t_render_info compute_render_info(t_format *fmt, int decimal);
+void 	render_integer(t_format *fmt, t_render_info *info);
+void 	render_left_aligned_integer(t_render_info *info);
+void 	render_right_aligned_integer(t_format *fmt, t_render_info *info);
+void 	render_right_zero_padded(t_render_info *info);
+void 	render_right_space_padded(t_render_info *info);
+
+t_render_info compute_hex_render_info(t_format *fmt, unsigned int value);
+int print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low);
+void render_hexadecimal_low(t_format *fmt, t_render_info *info);
+void render_right_aligned_hex(t_format *fmt, t_render_info *info);
+void render_right_zero_padded_hex(t_render_info *info);
+void render_right_space_padded_hex(t_render_info *info);
+void render_left_aligned_hex(t_render_info *info);
+/*
+void			render_hexadecimal_low(t_format *fmt, t_render_info *info);
+void			render_left_aligned_hex(t_render_info *info);
+void			render_right_aligned_hex(t_format *fmt, t_render_info *info);
+void			render_right_zero_padded_hex(t_render_info *info);
+void			render_right_space_padded_hex(t_render_info *info);
+*/
+
+char sign_check(t_format *fmt, int decimal);
 
 #endif

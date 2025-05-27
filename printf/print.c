@@ -81,21 +81,37 @@ int print_char(t_format *fmt, const char c)
 	}
 	return (i + 1);
 }
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	size_t	i;
 
-int print_string(t_format *fmt, const char *str)
+	i = 0;
+	if (n == 0)
+		return (0);
+	while (i < n - 1 && s1[i] != '\0' && s2[i] != '\0' && s1[i] == s2[i])
+		i++;
+	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+}
+int print_string(t_format *fmt, const char *string)
 {
 	int len = 0;
 	int actual_padding = 0;
 	int padding = 0;
-	if (!str)
+	const char *str;
+	if (!string)
 		str = "(null)";
+	else
+		str = string;
 	len = ft_strlen(str);
-	actual_padding = max(fmt->width - len, 0);
 
 	if (fmt->has_precision && fmt->precision < len)
 		len = fmt->precision;
 	if (fmt->has_precision && fmt->precision == 0)
 		len = 0;
+	if (!string && fmt->has_precision && fmt->precision <=5)
+		len = 0;
+	actual_padding = max(fmt->width - len, 0);
+
 	padding = actual_padding;
 	if (fmt->flg & FLG_LEFT)
 	{
@@ -113,7 +129,9 @@ int print_string(t_format *fmt, const char *str)
 }
 int print_percent(t_format *fmt)
 {
-	print_char(fmt, '%');
+	fmt = fmt;
+	char percent = '%';
+	write(1, &percent, 1);
 	return (1);
 }
 char sign_check(t_format *fmt, int decimal)
@@ -145,15 +163,15 @@ int print_decimal(t_format *fmt, int decimal)
 
 	int precision_padding;
 	precision_padding = 0;
-	if (fmt->has_precision && fmt->precision < len)
-		len = fmt->precision;
+	//if (fmt->has_precision && fmt->precision < len)
+	//	len = fmt->precision;
 	if (fmt->has_precision && fmt->precision == 0 && decimal == 0)
 		len = 0;
 	if (fmt->precision > len)
 		precision_padding = fmt->precision - len;
 	int total_len = sign_len + precision_padding + len;
 	int padding = max(fmt->width - total_len, 0);
-
+	total_len += padding;
 	if (fmt->flg & FLG_LEFT)
 	{
 		if (sign_char)
@@ -182,10 +200,10 @@ int print_decimal(t_format *fmt, int decimal)
 		{
 			//printf("%s", char_decimal);
 			//printf("%d", len);
-			if (sign_char)
-				write(1, &sign_char, 1);
 			while (padding-- > 0)
     			write(1, " ", 1);
+			if (sign_char)
+				write(1, &sign_char, 1);
 			while (precision_padding-- > 0)
     			write(1, "0", 1);
 			if (len > 0)
@@ -211,14 +229,15 @@ int print_integer(t_format *fmt, int decimal)
 
 	int precision_padding;
 	precision_padding = 0;
-	if (fmt->has_precision && fmt->precision < len)
-		len = fmt->precision;
+	//if (fmt->has_precision && fmt->precision < len)
+	//	len = fmt->precision;
 	if (fmt->has_precision && fmt->precision == 0 && decimal == 0)
 		len = 0;
 	if (fmt->precision > len)
 		precision_padding = fmt->precision - len;
 	int total_len = sign_len + precision_padding + len;
 	int padding = max(fmt->width - total_len, 0);
+	total_len += padding;
 
 	if (fmt->flg & FLG_LEFT)
 	{
@@ -246,10 +265,10 @@ int print_integer(t_format *fmt, int decimal)
 		}
 		else
 		{
-			if (sign_char)
-				write(1, &sign_char, 1);
 			while (padding-- > 0)
     			write(1, " ", 1);
+			if (sign_char)
+				write(1, &sign_char, 1);
 			while (precision_padding-- > 0)
     			write(1, "0", 1);
 			if (len > 0)
@@ -268,15 +287,15 @@ int print_unsigned_decimal(t_format *fmt, unsigned int decimal)
 
 	int precision_padding;
 	precision_padding = 0;
-	if (fmt->has_precision && fmt->precision < len)
-		len = fmt->precision;
+	//if (fmt->has_precision && fmt->precision < len)
+	//	len = fmt->precision;
 	if (fmt->has_precision && fmt->precision == 0 && decimal == 0)
 		len = 0;
 	if (fmt->precision > len)
 		precision_padding = fmt->precision - len;
 	int total_len = precision_padding + len;
 	int padding = max(fmt->width - total_len, 0);
-
+	total_len += padding;
 	if (fmt->flg & FLG_LEFT)
 	{
 		while (precision_padding-- > 0)
@@ -412,15 +431,15 @@ int print_hexadecimal_low(t_format *fmt, unsigned int hex_decimal_low)
 	int prefix_len = 0;
 	if ((fmt->flg & FLG_HASH) && hex_decimal_low != 0)
 		prefix_len = 2;
-	if (fmt->has_precision && fmt->precision < len)
-		len = fmt->precision;
+	//if (fmt->has_precision && fmt->precision < len)
+	//	len = fmt->precision;
 	if (fmt->has_precision && fmt->precision == 0 && hex_decimal_low == 0)
 		len = 0;
 	if (fmt->precision > len)
 		precision_padding = fmt->precision - len;
 	int total_len = prefix_len + precision_padding + len;
 	int padding = max(fmt->width - total_len, 0);
-
+	total_len += padding;
 	if (fmt->flg & FLG_LEFT)
 	{
 		if (prefix_len)
@@ -469,19 +488,19 @@ int print_hexadecimal_up(t_format *fmt, unsigned int hex_decimal_up)
 	int prefix_len = 0;
 	if ((fmt->flg & FLG_HASH) && hex_decimal_up != 0)
 		prefix_len = 2;
-	if (fmt->has_precision && fmt->precision < len)
-		len = fmt->precision;
+	//if (fmt->has_precision && fmt->precision < len)
+	//	len = fmt->precision;
 	if (fmt->has_precision && fmt->precision == 0 && hex_decimal_up == 0)
 		len = 0;
 	if (fmt->precision > len)
 		precision_padding = fmt->precision - len;
 	int total_len = prefix_len + precision_padding + len;
 	int padding = max(fmt->width - total_len, 0);
-
+	total_len += padding;
 	if (fmt->flg & FLG_LEFT)
 	{
 		if (prefix_len)
-			write(1, "0x", 2);
+			write(1, "0X", 2);
 		while (precision_padding-- > 0)
     		write(1, "0", 1);
 		if (len > 0)
@@ -494,7 +513,7 @@ int print_hexadecimal_up(t_format *fmt, unsigned int hex_decimal_up)
 		if (fmt->flg & FLG_ZERO && !fmt->has_precision)
 		{
 			if (prefix_len)
-				write(1, "0x", 2);
+				write(1, "0X", 2);
 			while (padding-- > 0)
     			write(1, "0", 1);
 			while (precision_padding-- > 0)
@@ -507,7 +526,7 @@ int print_hexadecimal_up(t_format *fmt, unsigned int hex_decimal_up)
 			while (padding-- > 0)
     			write(1, " ", 1);
 			if (prefix_len)
-				write(1, "0x", 2);
+				write(1, "0X", 2);
 			while (precision_padding-- > 0)
     			write(1, "0", 1);
 			if (len > 0)
@@ -522,19 +541,19 @@ int print_pointer(t_format *fmt, void *ptr)
 	unsigned long long ptr_num = (unsigned long long)ptr;
 	if (ptr_num == 0)
 	{
-		write(1, "(nil)", 5);
+		print_string(fmt, "(nil)");
 		return (5);
 	}
 	char *num = itoa_base_unsigned(ptr_num, low_base);
 	int	len = ft_strlen(num);
 	int prefix_len = 2;
-	if (fmt->has_precision && fmt->precision < len)
-		len = fmt->precision;
+	//if (fmt->has_precision && fmt->precision < len)
+	//	len = fmt->precision;
 	if (fmt->has_precision && fmt->precision == 0 && ptr_num == 0)
 		len = 0;
 	int total_len = prefix_len + len;
 	int padding = max(fmt->width - total_len, 0);
-
+	total_len += padding;
 	if (fmt->flg & FLG_LEFT)
 	{
 		if (prefix_len)
