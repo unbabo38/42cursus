@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 14:49:12 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/30 10:52:01 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/30 14:52:56 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ int	handle_percent(const char *s, int *i, va_list *ap)
 	ft_bzero(&fmt, sizeof(t_format));
 	scan_line(s, i, ap, &fmt);
 	len = print_arg(&fmt, ap);
+	if (len == ERROR)
+		return (ERROR);
 	return (len);
 }
 
@@ -76,7 +78,7 @@ int	print_arg(t_format *fmt, va_list *ap)
 		return (print_pointer(fmt, va_arg(*ap, void *)));
 	else if (fmt->specifier == '%')
 		return (print_percent());
-	return (0);
+	return (ERROR);
 }
 
 /*
