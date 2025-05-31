@@ -6,43 +6,47 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 14:49:26 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/30 10:49:14 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/31 15:59:45 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ft_printf.h"
 
-int	print_char(t_format *fmt, const char c)
+int	print_width(t_format *fmt)
 {
 	int	i;
 
 	i = 0;
+	while (i < fmt->width - 1)
+	{
+		if (safe_write(1, " ", 1) == ERROR)
+			return (ERROR);
+		i++;
+	}
+	return (i);
+}
+
+int	print_char(t_format *fmt, const char c)
+{
+	int	print_size;
+
+	print_size = 1;
 	if (fmt->flg & FLG_LEFT)
 	{
 		if (safe_write(1, &c, 1) == ERROR)
 			return (ERROR);
-		while (i < fmt->width - 1)
-		{
-			if (safe_write(1, " ", 1) == ERROR)
-				return (ERROR);
-			i++;
-		}
+		print_size += print_width(fmt);
 	}
 	else
 	{
-		while (i < fmt->width - 1)
-		{
-			if (safe_write(1, " ", 1) == ERROR)
-				return (ERROR);
-			i++;
-		}
+		print_size += print_width(fmt);
 		if (safe_write(1, &c, 1) == ERROR)
 			return (ERROR);
 	}
-	return (i + 1);
+	return (print_size);
 }
 
-int write_string(t_format *fmt, t_info *info)
+int	write_string(t_format *fmt, t_info *info)
 {
 	if (fmt->flg & FLG_LEFT)
 	{
@@ -74,7 +78,7 @@ int	print_string(t_format *fmt, char *string)
 	if (fmt->has_precision && fmt->precision == 0)
 		info.len = 0;
 	if (!string && fmt->has_precision && fmt->precision <= 5)
-		info.len = 0;
+		info.len = 0; 
 	actual_padding = max(fmt->width - info.len, 0);
 	info.padding = actual_padding;
 	if (write_string(fmt, &info) == ERROR)
