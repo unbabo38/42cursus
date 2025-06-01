@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   print_not_num.c                                    :+:      :+:    :+:   */
+/*   print_strings.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 14:49:26 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/31 15:59:45 by tmura            ###   ########.fr       */
+/*   Updated: 2025/06/01 11:55:34 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ int	print_string(t_format *fmt, char *string)
 	if (fmt->has_precision && fmt->precision == 0)
 		info.len = 0;
 	if (!string && fmt->has_precision && fmt->precision <= 5)
-		info.len = 0; 
+		info.len = 0;
 	actual_padding = max(fmt->width - info.len, 0);
 	info.padding = actual_padding;
 	if (write_string(fmt, &info) == ERROR)

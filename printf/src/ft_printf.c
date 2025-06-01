@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 14:49:12 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/30 14:52:56 by tmura            ###   ########.fr       */
+/*   Updated: 2025/06/01 11:03:54 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ int	ft_printf(const char *s, ...)
 	va_list	ap;
 	int		total_len;
 
+	if (!s)
+		return (ERROR);
 	va_start(ap, s);
 	total_len = handle_format_loop(s, &ap);
 	va_end(ap);
@@ -29,13 +31,20 @@ int	handle_format_loop(const char *s, va_list *ap)
 {
 	int	i;
 	int	total_len;
+	int	result_handle_percent;
 
 	i = 0;
 	total_len = 0;
+	result_handle_percent = 0;
 	while (s[i])
 	{
 		if (s[i] == '%')
-			total_len += handle_percent(s, &i, ap);
+		{
+			result_handle_percent = handle_percent(s, &i, ap);
+			if (result_handle_percent == ERROR)
+				return (ERROR);
+			total_len += result_handle_percent;
+		}
 		else
 		{
 			write(1, &s[i], 1);
@@ -53,7 +62,8 @@ int	handle_percent(const char *s, int *i, va_list *ap)
 
 	(*i)++;
 	ft_bzero(&fmt, sizeof(t_format));
-	scan_line(s, i, ap, &fmt);
+	if (scan_line(s, i, ap, &fmt) == ERROR)
+		return (ERROR);
 	len = print_arg(&fmt, ap);
 	if (len == ERROR)
 		return (ERROR);

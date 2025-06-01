@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 14:49:06 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/30 10:49:04 by tmura            ###   ########.fr       */
+/*   Updated: 2025/06/01 12:10:23 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ char	sign_check(t_format *fmt, int decimal)
 		return ('\0');
 }
 
-void	format_sign(t_info *info, t_format *fmt, int decimal)
+int	format_sign(t_info *info, t_format *fmt, int decimal)
 {
 	const char	*ten_base;
 
@@ -43,6 +43,8 @@ void	format_sign(t_info *info, t_format *fmt, int decimal)
 	if (decimal < 0)
 		decimal = -decimal;
 	info->char_decimal = itoa_base(decimal, ten_base);
+	if (!info->char_decimal)
+		return (ERROR);
 	info->len = ft_strlen(info->char_decimal);
 	if (fmt->has_precision && fmt->precision == 0 && decimal == 0)
 		info->len = 0;
@@ -51,6 +53,7 @@ void	format_sign(t_info *info, t_format *fmt, int decimal)
 	info->total_len = info->sign_len + info->precision_padding + info->len;
 	info->padding = max(fmt->width - info->total_len, 0);
 	info->total_len += info->padding;
+	return (OK);
 }
 
 int	format_unsign(t_info *info, t_format *fmt,

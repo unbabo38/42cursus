@@ -6,18 +6,20 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 14:49:39 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/30 10:49:20 by tmura            ###   ########.fr       */
+/*   Updated: 2025/06/01 11:20:36 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ft_printf.h"
 
-void	scan_line(const char *line, int *i, va_list *ap, t_format *fmt)
+int	scan_line(const char *line, int *i, va_list *ap, t_format *fmt)
 {
 	parse_flags(line, i, fmt);
 	parse_width(line, i, ap, fmt);
 	parse_precision(line, i, ap, fmt);
-	parse_specifier(line, i, fmt);
+	if (parse_specifier(line, i, fmt) == ERROR)
+		return (ERROR);
+	return (OK);
 }
 
 void	parse_flags(const char *line, int *i, t_format *fmt)
@@ -82,7 +84,7 @@ void	parse_precision(const char *s, int *i, va_list *ap, t_format *fmt)
 	}
 }
 
-void	parse_specifier(const char *line, int *i, t_format *fmt)
+int	parse_specifier(const char *line, int *i, t_format *fmt)
 {
 	if (line[*i] == 'c')
 		fmt->specifier = 'c';
@@ -103,6 +105,7 @@ void	parse_specifier(const char *line, int *i, t_format *fmt)
 	else if (line[*i] == '%')
 		fmt->specifier = '%';
 	else
-		return ;
+		return (ERROR);
 	(*i)++;
+	return (OK);
 }

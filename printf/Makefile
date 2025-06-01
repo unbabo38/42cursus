@@ -6,7 +6,7 @@
 #    By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/30 10:44:30 by tmura             #+#    #+#              #
-#    Updated: 2025/05/30 10:53:08 by tmura            ###   ########.fr        #
+#    Updated: 2025/06/01 12:09:43 by tmura            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,10 +16,10 @@ CFLAGS = -Wall -Wextra -Werror
 
 SRCFILES = 	ft_printf.c \
 		scan_line.c \
-		print_not_num.c \
+		print_strings.c \
 		print_nums.c \
 		output.c \
-		convert.c \
+		base_convert.c \
 		format.c \
 		utils.c
 
@@ -76,5 +76,4 @@ bonus: all
 
 test: all
 	@\$(CC) test.c $(NAME) $(LIBFT) -o test
-# $(VALGRIND) $(VALGRIND_FLAGS)
-	./test
+	$(VALGRIND) $(VALGRIND_FLAGS) ./test
