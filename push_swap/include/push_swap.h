@@ -7,7 +7,8 @@
 #include <stdlib.h>
 typedef struct s_node {
 	int value;
-	int is_lis; // たとえばLIS判定用
+	int keep; // ← LISに含まれるなら1
+
 	struct s_node *next;
 } t_list;
 typedef struct cheap

@@ -90,6 +90,11 @@ t_cheap calculate(t_list *a, t_list *b)
 
 	while (tmp)
 	{
+		if (tmp->keep) {
+			tmp = tmp->next;
+			idx++;
+			continue;
+		}
 		//printf("  [idx = %d] tmp->value = %d\n", idx, tmp->value);
 
 		int position_b = find_position_b(tmp, b);
