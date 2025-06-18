@@ -1,35 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstadd_back.c                                   :+:      :+:    :+:   */
+/*   push.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/04 21:42:03 by tmura             #+#    #+#             */
-/*   Updated: 2025/06/17 23:55:26 by tmura            ###   ########.fr       */
+/*   Created: 2025/06/17 13:23:54 by tmura             #+#    #+#             */
+/*   Updated: 2025/06/18 11:04:35 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/libft.h"
-#include <stdio.h>
+#include "./include/push_swap.h"
 
-void	ft_lstadd_back(t_list **lst, t_list *new)
+void	pa(t_list **a, t_list **b)
 {
-	t_list	*tmp;
+	t_list	*node;
 
-	if (!lst)
+	if (!b || !*b)
 		return ;
-	if (!*lst)
-	{
-		*lst = new;
-		return ;
-	}
-	tmp = *lst;
-	while (tmp->next)
-		tmp = tmp->next;
-	tmp->next = new;
+	node = *b;
+	*b = node->next;
+	node->next = *a;
+	*a = node;
+	printf("pa\n");
 }
-/*
-#include <string.h>
-#include <stdio.h>
-*/
+
+void	pb(t_list **a, t_list **b)
+{
+	t_list	*node;
+
+	if (!a || !*a)
+		return ;
+	node = *a;
+	*a = node->next;
+	node->next = *b;
+	*b = node;
+	printf("pb\n");
+}

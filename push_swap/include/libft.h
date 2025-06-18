@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/07 11:03:52 by rchallie          #+#    #+#             */
-/*   Updated: 2025/06/15 14:04:22 by tmura            ###   ########.fr       */
+/*   Updated: 2025/06/17 23:58:27 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,9 @@
 
 typedef struct s_list
 {
-	void			*content;
+	int				value;
 	struct s_list	*next;
-	struct s_list 	*prev;
-}				t_list;
+}	t_list;
 
 void	ft_bzero(void *s, size_t n);
 void	ft_putchar_fd(char c, int fd);
