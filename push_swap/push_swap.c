@@ -46,7 +46,13 @@ int main(int argc, char **argv)
 		t_cheap mv = calculate(a, b);
 		execute_move(&a, &b, mv);
 	}
+
 	rotate_a_to_max(&b);
+	//printf("B :\n");
+	for (t_list *tmp = b; tmp; tmp = tmp->next)
+		//printf("%d ", tmp->value); // valueがある構造体前提
+	//printf("\n");
+
 	sort_two_or_three(&a);
 	push_back_to_a(&a, &b);
 	rotate_a_to_min(&a);

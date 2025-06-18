@@ -29,6 +29,7 @@ int	find_position_b(t_list *a, t_list *b)
 	int		max = max_num(b);
 
 	//printf("min=%d max=%d\n", min, max);
+	//printf("val=%d tmp=%d\n", val, tmp->value);
 
 	// case1: val is bigger than all in B -> insert after max
 	if (val > max)
@@ -36,7 +37,7 @@ int	find_position_b(t_list *a, t_list *b)
 		while (tmp)
 		{
 			if (tmp->value == max)
-				return (pos - 1);
+				return (pos);
 			tmp = tmp->next;
 			pos++;
 		}
@@ -195,19 +196,18 @@ void execute_move(t_list **a, t_list **b, t_cheap mv) {
 
     // (3) 最後にプッシュ
     pb(a, b);
-/*
+
 	t_list *tmpa = *a;
 	t_list *tmpb = *b;
 	while (tmpa)
 	{
-		printf("%d,", tmpa->value);
+		//printf("%d,", tmpa->value);
 		tmpa = tmpa->next;
 	}
-	printf("\n");
+	//printf("\n");
 	while (tmpb)
 	{
-		printf("%d,", tmpb->value);
+		//printf("%d,", tmpb->value);
 		tmpb = tmpb->next;
 	}
-*/
 }
