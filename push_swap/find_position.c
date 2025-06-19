@@ -28,44 +28,31 @@ int	find_position_b(t_list *a, t_list *b)
 	int		min = min_num(b);
 	int		max = max_num(b);
 
-	//printf("min=%d max=%d\n", min, max);
-	//printf("val=%d tmp=%d\n", val, tmp->value);
-
-	// case1: val is bigger than all in B -> insert after max
-	if (val > max)
+	////printf("min=%d max=%d\n", min, max);
+if (val > max || val < min)
+{
+	tmp = b;
+	pos = 0;
+	while (tmp)
 	{
-		while (tmp)
-		{
-			if (tmp->value == max)
-				return (pos);
-			tmp = tmp->next;
-			pos++;
-		}
+		if (tmp->value == max)
+			return pos + 1;  // maxの「後」に挿入したいので +1
+		tmp = tmp->next;
+		pos++;
 	}
+}
 
-	// case2: val is smaller than all in B -> insert after max
-	if (val < min)
-	{
-		tmp = b;
-		pos = 0;
-		while (tmp)
-		{
-			if (tmp->value == min)
-				return (pos + 1);
-			tmp = tmp->next;
-			pos++;
-		}
-	}
 
 	// case3: val is between two values in descending order
 	tmp = b;
 	pos = 0;
 	while (tmp && tmp->next)
 	{
-		if (tmp->value > val && val > tmp->next->value)
+		//////printf("value = %d, postion = %d\n", tmp->value, pos);
+		if (tmp->value < val && val < tmp->next->value)
 			return (pos + 1);
-		tmp = tmp->next;
 		pos++;
+		tmp = tmp->next;
 	}
 
 	// fallback
@@ -82,28 +69,23 @@ t_cheap calculate(t_list *a, t_list *b)
 {
 	t_list *tmp = a;
 	t_cheap best = { .cost = INT_MAX };
-	int size_a = count_lists(a);
-	int size_b = count_lists(b);
+	int size_b = count_lists(a);
+	int size_a= count_lists(b);
 	int idx = 0;
 
-	//printf("Entering calculate(): size_a = %d, size_b = %d\n", size_a, size_b);
+	////printf("Entering calculate(): size_a = %d, size_b = %d\n", size_a, size_b);
 
 	while (tmp)
 	{
-		if (tmp->keep) {
-			tmp = tmp->next;
-			idx++;
-			continue;
-		}
-		//printf("  [idx = %d] tmp->value = %d\n", idx, tmp->value);
+		////printf("  [idx = %d] tmp->value = %d\n", idx, tmp->value);
 
-		int position_b = find_position_b(tmp, b);
-		//printf("    position_b = %d\n", position_b);
+		int position_a = find_position_b(tmp, b);
+		////printf("    position_a = %d\n", position_a);
 
-		int ra = idx;
-		int rra = size_a - idx;
-		int rb = position_b;
-		int rrb = size_b - rb;
+		int rb = idx;
+		int rrb = size_b - idx;
+		int ra = position_a;
+		int rra = size_a - ra;
 
 		int c1 = max(ra, rb);
 		int c2 = max(rra, rrb);
@@ -112,7 +94,7 @@ t_cheap calculate(t_list *a, t_list *b)
 		int current_cost = min4(c1, c2, c3, c4);
 		int pat = (current_cost == c1 ? 1 : current_cost == c2 ? 2 : current_cost == c3 ? 3 : 4);
 
-		//printf("    Costs: c1=%d c2=%d c3=%d c4=%d => min=%d (pat=%d)\n", c1, c2, c3, c4, current_cost, pat);
+		////printf("    Costs: c1=%d c2=%d c3=%d c4=%d => min=%d (pat=%d)\n", c1, c2, c3, c4, current_cost, pat);
 
 		if (current_cost < best.cost)
 		{
@@ -122,19 +104,19 @@ t_cheap calculate(t_list *a, t_list *b)
 			best.pat = pat;
 			best.cost = current_cost;
 			best.node = tmp;
-			//printf("    >>> best updated: idx=%d, ra=%d, rb=%d, cost=%d, pat=%d\n", idx, ra, rb, current_cost, pat);
+			////printf("    >>> best updated: idx=%d, ra=%d, rb=%d, cost=%d, pat=%d\n", idx, ra, rb, current_cost, pat);
 		}
 
 		if (best.cost == 1)
 		{
-			//printf("    <<< early break (cost==1)\n");
+			////printf("    <<< early break (cost==1)\n");
 			break;
 		}
 		tmp = tmp->next;
 		idx++;
 	}
 
-	//printf("Leaving calculate(): best.idx=%d, cost=%d, pat=%d\n", best.idx, best.cost, best.pat);
+	////printf("Leaving calculate(): best.idx=%d, cost=%d, pat=%d\n", best.idx, best.cost, best.pat);
 	return best;
 }
 
@@ -170,8 +152,8 @@ void rotate_a_to_max(t_list **b)
 }
 
 void execute_move(t_list **a, t_list **b, t_cheap mv) {
-    int na = count_lists(*a);
-    int nb = count_lists(*b);
+    int na = count_lists(*b);
+    int nb = count_lists(*a);
 
     int rra_a = na - mv.ra;
     int rrb_b = nb - mv.rb;
@@ -180,39 +162,41 @@ void execute_move(t_list **a, t_list **b, t_cheap mv) {
       case 1: // rr
         m = min(mv.ra, mv.rb);
         for (int i=0; i<m; i++) { rr(a, b);}
-        for (int i=m; i<mv.ra; i++) ra(a);
-        for (int i=m; i<mv.rb; i++) rb(b);
+        for (int i=m; i<mv.ra; i++) ra(b);
+        for (int i=m; i<mv.rb; i++) rb(a);
         break;
       case 2: // rrr
         m = min(rra_a, rrb_b);
         for (int i=0; i<m; i++) { rrr(a, b); }
-        for (int i=m; i<rra_a; i++) rra(a);
-        for (int i=m; i<rrb_b; i++) rrb(b);
+        for (int i=m; i<rra_a; i++) rra(b);
+        for (int i=m; i<rrb_b; i++) rrb(a);
         break;
       case 3: // ra + rrb
-        for (int i=0; i<mv.ra;   i++) ra(a);
-        for (int i=0; i<rrb_b;    i++) rrb(b);
+		////printf("rrb_b: %d\n", rrb_b);
+        for (int i=0; i<mv.ra;   i++) ra(b);
+        for (int i=0; i<rrb_b;    i++) rrb(a);
         break;
       case 4: // rra + rb
-        for (int i=0; i<rra_a;    i++) rra(a);
-        for (int i=0; i<mv.rb;    i++) rb(b);
+        for (int i=0; i<rra_a;    i++) rra(b);
+        for (int i=0; i<mv.rb;    i++) rb(a);
         break;
     }
 
     // (3) 最後にプッシュ
-    pb(a, b);
+    pa(b, a);
 
 	t_list *tmpa = *a;
 	t_list *tmpb = *b;
 	while (tmpa)
 	{
-		//printf("%d,", tmpa->value);
+		////printf("%d,", tmpa->value);
 		tmpa = tmpa->next;
 	}
-	//printf("\n");
+	////printf("\n");
 	while (tmpb)
 	{
-		//printf("%d,", tmpb->value);
+		////printf("%d,", tmpb->value);
 		tmpb = tmpb->next;
 	}
+
 }

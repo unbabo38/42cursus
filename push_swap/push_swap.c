@@ -107,7 +107,17 @@ void mark_lis_nodes(t_list *a)
 	free(indexes);
 }
 
-
+int exists_unmarked(t_list *a)
+{
+	while (a)
+	{
+		//////printf("%d\n", a->keep);
+		if (a->keep == 0)
+			return (1);
+		a = a->next;
+	}
+	return (0);
+}
 
 int main(int argc, char **argv)
 {
@@ -122,33 +132,31 @@ int main(int argc, char **argv)
 	mark_lis_nodes(a);
 
 
-	for (int i = 0; i < 2; )
-	{
-		if (a->keep == 0)
-		{
-			pb(&a, &b);
-			i++;
-		}
-		else
-			ra(&a); // keep == 1 なら回して後回し
+int i = 0;
+while (i < 2 && exists_unmarked(a)) {
+	if (a->keep == 0) {
+		pb(&a, &b);
+		i++;
+	} else {
+		ra(&a);
 	}
-	int exists_unmarked(t_list *a)
-	{
-		while (a)
-		{
-			if (a->keep == 0)
-				return (1);
-			a = a->next;
-		}
-		return (0);
+}
 
+int step = 0;
+while (exists_unmarked(a)) {
+	if (step++ > 1000)
+		break; // 念のため無限回避用
+	//////printf("step %d, top = %d, keep = %d\n", step++, a->value, a->keep);
+	if (a->keep == 0)
+		pb(&a, &b);
+	else
+	{
+		//////printf("step %d, top = %d, keep = %d\n", step++, a->value, a->keep);
+		ra(&a);
 	}
-	while (exists_unmarked(a)) {
-		t_cheap mv = calculate(a, b);
-		execute_move(&a, &b, mv);
-	}
+
+}
 	rotate_a_to_min(&a);
-	rotate_a_to_max(&b);
 	//printf("A:\n");
 	for (t_list *tmp = a; tmp; tmp = tmp->next)
 		//printf("%d ", tmp->value); // valueがある構造体前提
@@ -158,15 +166,22 @@ int main(int argc, char **argv)
 	for (t_list *tmp = b; tmp; tmp = tmp->next)
 		//printf("%d ", tmp->value); // valueがある構造体前提
 	//printf("\n");
+	//rotate_a_to_max(&b);
+	while (count_lists(b))
+	{
+		t_cheap mv = calculate(b, a);
+		execute_move(&b, &a, mv);
+	}
 
-	sort_two_or_three(&a);
-	push_back_to_a(&a, &b);
+
+	//sort_two_or_three(&a);
+	//push_back_to_a(&a, &b);
 	rotate_a_to_min(&a);
-/*
+
 	//printf("final A:\n");
 	for (t_list *tmp = a; tmp; tmp = tmp->next)
 		//printf("%d ", tmp->value); // valueがある構造体前提
 	//printf("\n");
 	return 0;
-*/
+
 	}
