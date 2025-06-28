@@ -1,0 +1,6 @@
+105:2025-06-23T12:35:49.103103+09:00 74century kernel: WSL (241) ERROR: CheckConnection: getaddrinfo() failed: -5
+331:2025-06-23T18:48:45.431892+09:00 74century kernel: WSL (241) ERROR: CheckConnection: getaddrinfo() failed: -5
+385:2025-06-23T19:01:14.089880+09:00 74century kernel: WSL (241) ERROR: CheckConnection: getaddrinfo() failed: -5
+428:2025-06-23T20:06:26.778787+09:00 74century kernel: message repeated 2 times: [ WSL (241) ERROR: CheckConnection: getaddrinfo() failed: -5]
+457:2025-06-24T09:46:00.247359+09:00 74century kernel: WSL (241) ERROR: CheckConnection: getaddrinfo() failed: -5
+553:2025-06-24T10:13:14.702986+09:00 74century kernel: message repeated 2 times: [ WSL (241) ERROR: CheckConnection: getaddrinfo() failed: -5]
