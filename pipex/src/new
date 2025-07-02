@@ -1,7 +1,9 @@
 -l
 a.out
+aefa
 awefaf
 bigfiles.txt
+broken_exec
 cat
 error_count.txt
 file
@@ -9,9 +11,12 @@ grep ERROR
 hoge
 infile
 main.c
+new
+noexec
 ok
 outfile
 pipex_bonus.c
+script.sh
 sigpipe
 sigpipe.c
 test
