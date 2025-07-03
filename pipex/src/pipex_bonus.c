@@ -14,7 +14,10 @@ int	get_next_line(char **line)
 		return (-1);
 	r = read(0, &c, 1);
 	if (!r)
+	{
+		free(buffer);
 		return (0);
+	}
 	while (r && c != '\n' && c != '\0')
 	{
 		if (c != '\n' && c != '\0')
@@ -25,7 +28,6 @@ int	get_next_line(char **line)
 	buffer[i] = '\n';
 	buffer[++i] = '\0';
 	*line = buffer;
-	free(buffer);
 	return (r);
 }
 
@@ -91,17 +93,17 @@ int	check_cmd_exist(char *arg)
 	if (access(arg, F_OK) != 0)
 	{
 		perror(arg);
-		return (0);
+		exit(EXIT_FAILURE);
 	}
 	if (access(arg, X_OK) != 0)
 	{
 		perror(arg);
-		return (0);
+		exit(EXIT_FAILURE);
 	}
 	return (1);
 }
 
-void	exec(char *arg, int argc, char **envp)
+void	exec(char *arg, char **envp)
 {
 	char	**cmd_args;
 	char	*cmd_path;
@@ -110,7 +112,7 @@ void	exec(char *arg, int argc, char **envp)
 	if (ft_strchr(arg, '/'))
 	{
 		if (!check_cmd_exist(arg))
-			exit(127);
+			exit(EXIT_FAILURE);
 		cmd_path = arg;
 	}
 	else
@@ -118,70 +120,81 @@ void	exec(char *arg, int argc, char **envp)
 	if (!cmd_path)
 	{
 		perror(cmd_args[0]);
-		exit(127);
+		exit(EXIT_FAILURE);
 	}
 	execve(cmd_path, cmd_args, envp);
 	perror("execve failed");
 	exit(EXIT_FAILURE);
 }
 
-void	here_document(char *limiter, int argc)
+void	put_line(char *limiter, int fd[2])
+{
+	char	*line;
+
+	safe_write(STDOUT_FILENO, "> ", 2);
+	if (!get_next_line(&line))
+	{
+		safe_write(STDOUT_FILENO, "\n", 1);
+		exit(EXIT_SUCCESS);
+	}
+	if (ft_strncmp(limiter, line, ft_strlen(limiter)) == 0)
+	{
+		free(line);
+		exit(EXIT_SUCCESS);
+	}
+	safe_write(fd[1], line, ft_strlen(line));
+	free(line);
+}
+
+void	here_document(char *limiter)
 {
 	int		fd[2];
-	char	*line;
 	int		process;
 
-	if (pipe(fd) == -1)
+	safe_pipe(fd);
+	process = fork();
+	if (process == ERROR)
 	{
-		perror("pipe");
+		perror("fork");
 		exit(EXIT_FAILURE);
 	}
-	process = fork();
 	if (process == 0)
 	{
 		while (1)
-		{
-			write(1, "> ", 2);
-			if (!get_next_line(&line))
-			{
-				write(1, "\n", 1);
-				perror("line");
-				exit(EXIT_SUCCESS);
-			}
-			if (ft_strncmp(limiter, line, ft_strlen(limiter)) == 0)
-				exit(EXIT_SUCCESS);
-			write(fd[1], line, ft_strlen(line));
-		}
+			put_line(limiter, fd);
 	}
 	else
 	{
-		close(fd[1]);
-		dup2(fd[0], STDIN_FILENO);
+		safe_close(fd[1]);
+		safe_dup2(fd[0], STDIN_FILENO);
+		safe_close(fd[0]);
 	}
 }
 
 void	do_pipe(int i, char **argv, int argc, char **envp)
 {
 	int		fd[2];
-	pid_t	pid;
+	pid_t	process;
 
 	while (i < argc - 2)
 	{
-		if (pipe(fd) < 0)
+		if (pipe(fd) == ERROR)
 		{
-			perror("pipe error");
+			perror("pipe");
 		}
-		pid = fork();
-		if (pid == 0)
+		process = fork();
+		if (process == CHILD)
 		{
-			close(fd[0]);
-			dup2(fd[1], STDOUT_FILENO);
-			exec(argv[i], argc, envp);
+			safe_close(fd[0]);
+			safe_dup2(fd[1], STDOUT_FILENO);
+			safe_close(fd[1]);
+			exec(argv[i], envp);
 		}
 		else
 		{
-			close(fd[1]);
-			dup2(fd[0], STDIN_FILENO);
+			safe_close(fd[1]);
+			safe_dup2(fd[0], STDIN_FILENO);
+			safe_close(fd[0]);
 		}
 		i++;
 	}
@@ -196,15 +209,14 @@ void	wait_children(int i, int argc)
 	}
 }
 
-void	last_exec(char *arg, int argc, char **envp, int outfile)
+void	last_exec(char *arg, char **envp, int outfile)
 {
-	if (dup2(outfile, STDOUT_FILENO) == -1)
-		perror(arg);
-	exec(arg, argc, envp);
+	safe_dup2(outfile, STDOUT_FILENO);
+	exec(arg, envp);
 	exit(EXIT_SUCCESS);
 }
 
-int	process_input(char **argv, int argc)
+int	process_input(char **argv)
 {
 	int	infile;
 	int	i;
@@ -214,29 +226,14 @@ int	process_input(char **argv, int argc)
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 	{
 		i = 3;
-		here_document(argv[2], argc);
+		here_document(argv[2]);
 	}
 	else
 	{
 		i = 2;
-		infile = open(argv[1], O_RDONLY);
-		if (infile < 0)
-		{
-			perror(argv[1]);
-			infile = open("/dev/null", O_RDONLY);
-			if (infile < 0)
-			{
-				perror("/dev/null");
-				exit(EXIT_FAILURE);
-			}
-		}
-		if (dup2(infile, STDIN_FILENO) < 0)
-		{
-			perror("dup2 infile");
-			close(infile);
-			exit(EXIT_FAILURE);
-		}
-		close(infile);
+		infile = open_infile(argv[1]);
+		safe_dup2(infile, STDIN_FILENO);
+		safe_close(infile);
 	}
 	return (i);
 }
@@ -248,23 +245,22 @@ int	main(int argc, char **argv, char **envp)
 
 	i = 0;
 	outfile = 0;
-	if (argc >= 5)
+	if (argc < LEAST_ARGS_BONUS)
+		//usage();
+	i = process_input(argv);
+	if (!i)
+		return(0);
+	if (i == 3)
+		outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+	else
+		outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (outfile == ERROR)
 	{
-		i = process_input(argv, argc);
-		if (!i)
-			return (0);
-		if (i == 3)
-			outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
-		else
-			outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		if (outfile < 0)
-		{
-			perror(argv[argc - 1]);
-			return (0);	
-		}
-		do_pipe(i, argv, argc, envp);
-		wait_children(i, argc);
-		last_exec(argv[argc - 2], argc - 2, envp, outfile);
+		perror(argv[argc - 1]);
+		exit(EXIT_FAILURE);
 	}
+	do_pipe(i, argv, argc, envp);
+	wait_children(i, argc);
+	last_exec(argv[argc - 2], envp, outfile);
 	return (0);
 }
