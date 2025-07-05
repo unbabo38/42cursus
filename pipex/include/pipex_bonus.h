@@ -16,6 +16,7 @@
 # define OK 1
 # define CHILD 0
 # define LEAST_ARGS_BONUS 5
+#define INIT_CAPACITY 1024
 
 int		get_next_line(char **line);
 
@@ -32,7 +33,7 @@ void	exec(char *arg, char **envp);
 void	here_document(char *limiter);
 
 // pipex.c
-void	do_pipe(int i, char **argv, int argc, char **envp);
+void	do_pipe_bonus(int i, char **argv, int argc, char **envp);
 void	wait_children(int i, int argc);
 void	last_exec(char *arg, char **envp, int outfile);
 int		process_input(char **argv);

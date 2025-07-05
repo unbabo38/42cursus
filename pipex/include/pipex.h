@@ -32,7 +32,7 @@ void	exec(char *arg, char **envp);
 void	here_document(char *limiter);
 
 // pipex.c
-void	do_pipe(int i, char **argv, int argc, char **envp);
+void	do_pipe(char **argv, char **envp);
 void	wait_children(int i, int argc);
 void	last_exec(char *arg, char **envp, int outfile);
 int		process_input(char **argv);

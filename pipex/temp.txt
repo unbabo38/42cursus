@@ -1,2 +1,0 @@
-write from child
-write from parent
