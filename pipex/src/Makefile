@@ -1,5 +1,13 @@
 # **************************************************************************** #
-#                               PIPEX MAKEFILE                                 #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/07/05 21:43:13 by tmura             #+#    #+#              #
+#    Updated: 2025/07/05 21:43:35 by tmura            ###   ########.fr        #
+#                                                                              #
 # **************************************************************************** #
 
 NAME_MANDATORY = pipex
@@ -7,20 +15,18 @@ NAME_BONUS     = pipex_bonus
 CC             = cc
 CFLAGS         = -Wall -Wextra -Werror
 
-# ---------------------------------------------------------------------------- #
 
-MANDATORY_SRCS = pipex.c utils.c \
+MANDATORY_SRCS = pipex.c utils.c error_massages.c process_exec.c\
                  ../libft/ft_split.c ../libft/ft_strjoin.c \
                  ../libft/ft_strncmp.c ../libft/ft_strlen.c ../libft/ft_strchr.c
 
-BONUS_SRCS     = pipex_bonus.c utils.c \
+BONUS_SRCS     = pipex_bonus.c utils.c error_massages.c here_doc.c process_exec.c\
                  ../libft/ft_split.c ../libft/ft_strjoin.c \
                  ../libft/ft_strncmp.c ../libft/ft_strlen.c ../libft/ft_strchr.c
 
 MANDATORY_OBJS = $(MANDATORY_SRCS:.c=.o)
 BONUS_OBJS     = $(BONUS_SRCS:.c=.o)
 
-# ---------------------------------------------------------------------------- #
 
 all: $(NAME_MANDATORY)
 

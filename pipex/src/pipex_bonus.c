@@ -1,215 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex_bonus.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/05 20:22:35 by tmura             #+#    #+#             */
+/*   Updated: 2025/07/05 20:22:38 by tmura            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/pipex_bonus.h"
-#include <stdlib.h>
-#include <unistd.h>
 
-#define INIT_CAPACITY 16
-
-static char *expand_buffer(char *buffer, int *capacity, int length)
-{
-    int     new_capacity = *capacity * 2;
-    char    *new_buffer = malloc(new_capacity);
-    int     i;
-
-    if (!new_buffer)
-    {
-        free(buffer);
-        return (NULL);
-    }
-    i = 0;
-    while (i < length)
-    {
-        new_buffer[i] = buffer[i];
-        i++;
-    }
-    free(buffer);
-    *capacity = new_capacity;
-    return (new_buffer);
-}
-
-int	get_next_line(char **line)
-{
-	char	*buffer;
-	int		i;
-	int		r;
-	char	c;
-	int     capacity;
-
-	i = 0;
-	r = 0;
-    capacity = INIT_CAPACITY;
-    buffer = malloc(capacity);
-	if (!buffer)
-		return (-1);
-	r = read(STDIN_FILENO, &c, 1);
-	if (!r)
-	{
-		free(buffer);
-		return (0);
-	}
-	while (r && c != '\n' && c != '\0')
-	{
-		if (i + 2 >= capacity)
-        {
-            buffer = expand_buffer(buffer, &capacity, i);
-            if (!buffer)
-                return (-1);
-        }
-        if (c != '\n' && c != '\0')
-			buffer[i] = c;
-		i++;
-		r = read(STDIN_FILENO, &c, 1);
-	}
-	buffer[i] = '\n';
-	buffer[++i] = '\0';
-	*line = buffer;
-	return (r);
-}
-
-void	free_split(char **contents)
-{
-	int	i;
-
-	i = 0;
-	while (contents[i])
-	{
-		free(contents[i]);
-		i++;
-	}
-	free(contents);
-}
-
-char	*resolve_command(char *arg_cmd, char *cmd_env)
-{
-	char	**cmd_paths;
-	int		i;
-	char	*cmd;
-	char	*joined_slash;
-
-	cmd_paths = ft_split(cmd_env, ':');
-	i = 0;
-	while (cmd_paths[i])
-	{
-		cmd = cmd_paths[i];
-		joined_slash = ft_strjoin(cmd, "/");
-		cmd = ft_strjoin(joined_slash, arg_cmd);
-		free(joined_slash);
-		if (access(cmd, F_OK) == 0 && access(cmd, X_OK) == 0)
-		{
-			free_split(cmd_paths);
-			return (cmd);
-		}
-		i++;
-	}
-	free_split(cmd_paths);
-	return (NULL);
-}
-
-char	*get_cmd_path(char *arg_cmd, char **envp)
-{
-	int		i;
-	char	*cmd_env;
-
-	i = 0;
-	while (envp[i])
-	{
-		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
-		{
-			cmd_env = envp[i] + 5;
-			break ;
-		}
-		i++;
-	}
-	return (resolve_command(arg_cmd, cmd_env));
-}
-
-int	check_cmd_exist(char *arg)
-{
-	if (access(arg, F_OK) != 0)
-	{
-		perror(arg);
-		exit(127);
-	}
-	if (access(arg, X_OK) != 0)
-	{
-		perror(arg);
-		exit(126);
-	}
-	return (1);
-}
-
-void	exec(char *arg, char **envp)
-{
-	char	**cmd_args;
-	char	*cmd_path;
-
-	if (arg == NULL || arg[0] == '\0')
-	{
-		command_not_found("\'\'");
-		exit(127);
-	}
-	cmd_args = ft_split(arg, ' ');
-	if (ft_strchr(arg, '/'))
-	{
-		if (check_cmd_exist(arg))
-			cmd_path = arg;
-	}
-	else
-		cmd_path = get_cmd_path(cmd_args[0], envp);
-	if (!cmd_path)
-	{
-		command_not_found(cmd_args[0]);
-		exit(127);
-	}
-	execve(cmd_path, cmd_args, envp);
-	perror("execve failed");
-	exit(EXIT_FAILURE);
-}
-
-void	put_line(char *limiter, int fd[2])
-{
-	char	*line;
-
-	safe_write(STDOUT_FILENO, "> ", 2);
-	if (!get_next_line(&line))
-	{
-		safe_write(STDOUT_FILENO, "\n", 1);
-		exit(EXIT_SUCCESS);
-	}
-	if (ft_strncmp(limiter, line, ft_strlen(limiter)) == 0)
-	{
-		free(line);
-		exit(EXIT_SUCCESS);
-	}
-	safe_write(fd[1], line, ft_strlen(line));
-	free(line);
-}
-
-void	here_document(char *limiter)
-{
-	int		fd[2];
-	int		process;
-
-	safe_pipe(fd);
-	process = fork();
-	if (process == ERROR)
-	{
-		perror("fork");
-		exit(EXIT_FAILURE);
-	}
-	if (process == 0)
-	{
-		while (1)
-			put_line(limiter, fd);
-	}
-	else
-	{
-		safe_close(fd[1]);
-		safe_dup2(fd[0], STDIN_FILENO);
-		safe_close(fd[0]);
-	}
-}
-
-void	do_pipe(int i, char **argv, int argc, char **envp)
+void	do_pipe_bonus(int i, char **argv, int argc, char **envp)
 {
 	int		fd[2];
 	pid_t	process;
@@ -217,16 +20,13 @@ void	do_pipe(int i, char **argv, int argc, char **envp)
 	while (i < argc - 2)
 	{
 		if (pipe(fd) == ERROR)
-		{
 			perror("pipe");
-		}
 		process = fork();
 		if (process == CHILD)
 		{
 			safe_close(fd[0]);
 			safe_dup2(fd[1], STDOUT_FILENO);
 			safe_close(fd[1]);
-
 			exec(argv[i], envp);
 		}
 		else
@@ -251,6 +51,7 @@ void	wait_children(int i, int argc)
 void	last_exec(char *arg, char **envp, int outfile)
 {
 	safe_dup2(outfile, STDOUT_FILENO);
+	safe_close(outfile);
 	exec(arg, envp);
 	exit(EXIT_SUCCESS);
 }
@@ -285,13 +86,12 @@ int	main(int argc, char **argv, char **envp)
 	i = 0;
 	outfile = 0;
 	if (argc < LEAST_ARGS_BONUS)
-	{
 		usage_bonus();
-		exit(EXIT_FAILURE);
-	}
 	i = process_input(argv);
 	if (!i)
-		return(0);
+		return (0);
+	do_pipe_bonus(i, argv, argc, envp);
+	wait_children(i, argc);
 	if (i == 3)
 		outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
 	else
@@ -301,9 +101,6 @@ int	main(int argc, char **argv, char **envp)
 		perror(argv[argc - 1]);
 		exit(EXIT_FAILURE);
 	}
-	do_pipe(i, argv, argc, envp);
-	wait_children(i, argc);
 	last_exec(argv[argc - 2], envp, outfile);
 	return (0);
-
 }

@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../include/pipex.h"
 #include "../include/pipex_bonus.h"
 
 void	safe_write(int fd, const void *buf, size_t count)
@@ -17,7 +18,7 @@ void	safe_write(int fd, const void *buf, size_t count)
 	if (write(fd, buf, count) == ERROR)
 	{
 		perror("write");
-    	exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -27,7 +28,7 @@ void	safe_dup2(int fd, int std_filenum)
 	{
 		perror("dup2");
 		close(fd);
-    	exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -36,7 +37,7 @@ void	safe_pipe(int fd[2])
 	if (pipe(fd) == ERROR)
 	{
 		perror("pipe");
-    	exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 }
 
@@ -65,28 +66,4 @@ void	safe_close(int fd)
 		perror("close");
 		exit(EXIT_FAILURE);
 	}
-}
-
-void	command_not_found(char *cmd)
-{
-	safe_write(STDERR_FILENO, cmd, ft_strlen(cmd));
-	safe_write(STDERR_FILENO, ": command not found\n", 20);
-}
-
-#include <unistd.h>
-#include <stdlib.h>
-
-void	usage(void)
-{
-	safe_write(STDERR_FILENO, "Bad arguments\n", 14);
-	safe_write(STDERR_FILENO, "Ex: ./pipex <file1> <cmd1> <cmd2> <file2>\n", 44);
-	exit(EXIT_FAILURE);
-}
-
-void	usage_bonus(void)
-{
-	safe_write(STDERR_FILENO, "Bad arguments\n", 14);
-	safe_write(STDERR_FILENO, "Ex: ./pipex <file1> <cmd1> <cmd2> <...> <file2>\n", 50);
-	safe_write(STDERR_FILENO, "    ./pipex here_doc <LIMITER> <cmd1> <...> <file2>\n", 56);
-	exit(EXIT_FAILURE);
 }
