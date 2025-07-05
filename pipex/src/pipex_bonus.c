@@ -19,8 +19,7 @@ void	do_pipe_bonus(int i, char **argv, int argc, char **envp)
 
 	while (i < argc - 2)
 	{
-		if (pipe(fd) == ERROR)
-			perror("pipe");
+		safe_pipe(fd);
 		process = fork();
 		if (process == CHILD)
 		{

@@ -1,0 +1,6 @@
+[do_pipe_bonus] pipe opened: fd[0]=3, fd[1]=4 (i=3)
+> [do_pipe_bonus] parent closed write end: fd=4 (i=3)
+[do_pipe_bonus] parent closed read end after dup2: fd=3 (i=3)
+[do_pipe_bonus] child closed read end: fd=3 (i=3)
+[do_pipe_bonus] child closed write end after dup2: fd=4 (i=3)
+> > > [safe_pipe] opened: fd[0]=3, fd[1]=4

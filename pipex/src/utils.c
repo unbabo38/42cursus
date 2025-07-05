@@ -34,11 +34,12 @@ void	safe_dup2(int fd, int std_filenum)
 
 void	safe_pipe(int fd[2])
 {
-	if (pipe(fd) == ERROR)
+if (pipe(fd) == ERROR)
 	{
 		perror("pipe");
 		exit(EXIT_FAILURE);
 	}
+	printf("[safe_pipe] opened: fd[0]=%d, fd[1]=%d\n", fd[0], fd[1]);
 }
 
 int	open_infile(char *arg)
@@ -61,7 +62,7 @@ int	open_infile(char *arg)
 
 void	safe_close(int fd)
 {
-	if (close(fd) == ERROR)
+	if (fd >= 3 && close(fd) == ERROR)
 	{
 		perror("close");
 		exit(EXIT_FAILURE);

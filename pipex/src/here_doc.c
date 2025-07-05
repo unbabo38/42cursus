@@ -94,6 +94,7 @@ void	put_line(char *limiter, int fd[2])
 	if (get_next_line(&line) == 0)
 	{
 		safe_write(STDOUT_FILENO, "\n", 1);
+        free(line);
 		exit(EXIT_SUCCESS);
 	}
 

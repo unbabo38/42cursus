@@ -34,10 +34,7 @@ void	do_pipe(char **argv, char **envp)
 	int		fd[2];
 	pid_t	process;
 
-	if (pipe(fd) == ERROR)
-	{
-		perror("pipe");
-	}
+	safe_pipe(fd);
 	process = fork();
 	if (process == CHILD)
 	{
