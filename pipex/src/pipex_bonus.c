@@ -1,4 +1,30 @@
 #include "../include/pipex_bonus.h"
+#include <stdlib.h>
+#include <unistd.h>
+
+#define INIT_CAPACITY 16
+
+static char *expand_buffer(char *buffer, int *capacity, int length)
+{
+    int     new_capacity = *capacity * 2;
+    char    *new_buffer = malloc(new_capacity);
+    int     i;
+
+    if (!new_buffer)
+    {
+        free(buffer);
+        return (NULL);
+    }
+    i = 0;
+    while (i < length)
+    {
+        new_buffer[i] = buffer[i];
+        i++;
+    }
+    free(buffer);
+    *capacity = new_capacity;
+    return (new_buffer);
+}
 
 int	get_next_line(char **line)
 {
@@ -6,13 +32,15 @@ int	get_next_line(char **line)
 	int		i;
 	int		r;
 	char	c;
+	int     capacity;
 
 	i = 0;
 	r = 0;
-	buffer = (char *)malloc(10000);
+    capacity = INIT_CAPACITY;
+    buffer = malloc(capacity);
 	if (!buffer)
 		return (-1);
-	r = read(0, &c, 1);
+	r = read(STDIN_FILENO, &c, 1);
 	if (!r)
 	{
 		free(buffer);
@@ -20,10 +48,16 @@ int	get_next_line(char **line)
 	}
 	while (r && c != '\n' && c != '\0')
 	{
-		if (c != '\n' && c != '\0')
+		if (i + 2 >= capacity)
+        {
+            buffer = expand_buffer(buffer, &capacity, i);
+            if (!buffer)
+                return (-1);
+        }
+        if (c != '\n' && c != '\0')
 			buffer[i] = c;
 		i++;
-		r = read(0, &c, 1);
+		r = read(STDIN_FILENO, &c, 1);
 	}
 	buffer[i] = '\n';
 	buffer[++i] = '\0';
@@ -93,12 +127,12 @@ int	check_cmd_exist(char *arg)
 	if (access(arg, F_OK) != 0)
 	{
 		perror(arg);
-		exit(EXIT_FAILURE);
+		exit(127);
 	}
 	if (access(arg, X_OK) != 0)
 	{
 		perror(arg);
-		exit(EXIT_FAILURE);
+		exit(126);
 	}
 	return (1);
 }
@@ -108,19 +142,23 @@ void	exec(char *arg, char **envp)
 	char	**cmd_args;
 	char	*cmd_path;
 
+	if (arg == NULL || arg[0] == '\0')
+	{
+		command_not_found("\'\'");
+		exit(127);
+	}
 	cmd_args = ft_split(arg, ' ');
 	if (ft_strchr(arg, '/'))
 	{
-		if (!check_cmd_exist(arg))
-			exit(EXIT_FAILURE);
-		cmd_path = arg;
+		if (check_cmd_exist(arg))
+			cmd_path = arg;
 	}
 	else
 		cmd_path = get_cmd_path(cmd_args[0], envp);
 	if (!cmd_path)
 	{
-		perror(cmd_args[0]);
-		exit(EXIT_FAILURE);
+		command_not_found(cmd_args[0]);
+		exit(127);
 	}
 	execve(cmd_path, cmd_args, envp);
 	perror("execve failed");
@@ -188,6 +226,7 @@ void	do_pipe(int i, char **argv, int argc, char **envp)
 			safe_close(fd[0]);
 			safe_dup2(fd[1], STDOUT_FILENO);
 			safe_close(fd[1]);
+
 			exec(argv[i], envp);
 		}
 		else
@@ -246,7 +285,10 @@ int	main(int argc, char **argv, char **envp)
 	i = 0;
 	outfile = 0;
 	if (argc < LEAST_ARGS_BONUS)
-		//usage();
+	{
+		usage_bonus();
+		exit(EXIT_FAILURE);
+	}
 	i = process_input(argv);
 	if (!i)
 		return(0);
@@ -263,4 +305,5 @@ int	main(int argc, char **argv, char **envp)
 	wait_children(i, argc);
 	last_exec(argv[argc - 2], envp, outfile);
 	return (0);
+
 }

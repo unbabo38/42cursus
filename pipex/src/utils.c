@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 10:49:47 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/03 23:36:11 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/05 15:57:02 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,4 +65,28 @@ void	safe_close(int fd)
 		perror("close");
 		exit(EXIT_FAILURE);
 	}
+}
+
+void	command_not_found(char *cmd)
+{
+	safe_write(STDERR_FILENO, cmd, ft_strlen(cmd));
+	safe_write(STDERR_FILENO, ": command not found\n", 20);
+}
+
+#include <unistd.h>
+#include <stdlib.h>
+
+void	usage(void)
+{
+	safe_write(STDERR_FILENO, "Bad arguments\n", 14);
+	safe_write(STDERR_FILENO, "Ex: ./pipex <file1> <cmd1> <cmd2> <file2>\n", 44);
+	exit(EXIT_FAILURE);
+}
+
+void	usage_bonus(void)
+{
+	safe_write(STDERR_FILENO, "Bad arguments\n", 14);
+	safe_write(STDERR_FILENO, "Ex: ./pipex <file1> <cmd1> <cmd2> <...> <file2>\n", 50);
+	safe_write(STDERR_FILENO, "    ./pipex here_doc <LIMITER> <cmd1> <...> <file2>\n", 56);
+	exit(EXIT_FAILURE);
 }

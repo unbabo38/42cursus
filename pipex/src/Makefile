@@ -1,32 +1,43 @@
 # **************************************************************************** #
-#                               PIPEX BONUS                                    #
+#                               PIPEX MAKEFILE                                 #
 # **************************************************************************** #
 
-NAME        = pipex_bonus
-CC          = cc
-CFLAGS      = -Wall -Wextra -Werror
+NAME_MANDATORY = pipex
+NAME_BONUS     = pipex_bonus
+CC             = cc
+CFLAGS         = -Wall -Wextra -Werror
 
 # ---------------------------------------------------------------------------- #
 
-SRCS        = pipex_bonus.c utils.c \
-              ../libft/ft_split.c ../libft/ft_strjoin.c \
-              ../libft/ft_strncmp.c ../libft/ft_strlen.c ../libft/ft_strchr.c
+MANDATORY_SRCS = pipex.c utils.c \
+                 ../libft/ft_split.c ../libft/ft_strjoin.c \
+                 ../libft/ft_strncmp.c ../libft/ft_strlen.c ../libft/ft_strchr.c
 
-OBJS        = $(SRCS:.c=.o)
+BONUS_SRCS     = pipex_bonus.c utils.c \
+                 ../libft/ft_split.c ../libft/ft_strjoin.c \
+                 ../libft/ft_strncmp.c ../libft/ft_strlen.c ../libft/ft_strchr.c
+
+MANDATORY_OBJS = $(MANDATORY_SRCS:.c=.o)
+BONUS_OBJS     = $(BONUS_SRCS:.c=.o)
 
 # ---------------------------------------------------------------------------- #
 
-all: $(NAME)
+all: $(NAME_MANDATORY)
 
-$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+bonus: $(NAME_BONUS)
+
+$(NAME_MANDATORY): $(MANDATORY_OBJS)
+	$(CC) $(CFLAGS) $(MANDATORY_OBJS) -o $(NAME_MANDATORY)
+
+$(NAME_BONUS): $(BONUS_OBJS)
+	$(CC) $(CFLAGS) $(BONUS_OBJS) -o $(NAME_BONUS)
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(MANDATORY_OBJS) $(BONUS_OBJS)
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(NAME_MANDATORY) $(NAME_BONUS)
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all bonus clean fclean re
