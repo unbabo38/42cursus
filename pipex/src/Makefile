@@ -6,7 +6,7 @@
 #    By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/05 21:43:13 by tmura             #+#    #+#              #
-#    Updated: 2025/07/05 21:43:35 by tmura            ###   ########.fr        #
+#    Updated: 2025/07/06 13:29:32 by tmura            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,9 @@ MANDATORY_SRCS = pipex.c utils.c error_massages.c process_exec.c\
 
 BONUS_SRCS     = pipex_bonus.c utils.c error_massages.c here_doc.c process_exec.c\
                  ../libft/ft_split.c ../libft/ft_strjoin.c \
-                 ../libft/ft_strncmp.c ../libft/ft_strlen.c ../libft/ft_strchr.c
+                 ../libft/ft_strncmp.c ../libft/ft_strlen.c ../libft/ft_strchr.c \
+				 ../libft/ft_strdup.c ../libft/ft_isalnum.c ../libft/ft_memcpy.c\
+				 ../libft/ft_isdigit.c ../libft/ft_isalpha.c
 
 MANDATORY_OBJS = $(MANDATORY_SRCS:.c=.o)
 BONUS_OBJS     = $(BONUS_SRCS:.c=.o)

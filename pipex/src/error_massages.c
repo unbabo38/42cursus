@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 20:47:16 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/05 20:47:18 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/06 11:49:25 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ void	usage_bonus(void)
 {
 	safe_write(STDERR_FILENO, "Bad arguments\n", 14);
 	safe_write(STDERR_FILENO,
-		"./pipex <file1> <cmd1> <cmd2> <...> <file2>\n", 50);
+		"./pipex <file1> <cmd1> <cmd2> <...> <file2>\n", 44);
 	safe_write(STDERR_FILENO,
-		"./pipex here_doc <LIMITER> <cmd1> <...> <file2>\n", 56);
+		"./pipex here_doc <LIMITER> <cmd1> <...> <file2>\n", 48);
 	exit(EXIT_FAILURE);
 }

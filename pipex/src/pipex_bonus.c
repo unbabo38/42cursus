@@ -6,12 +6,12 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 20:22:35 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/05 20:22:38 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/06 13:28:04 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex_bonus.h"
-
+#include <stdbool.h>
 void	do_pipe_bonus(int i, char **argv, int argc, char **envp)
 {
 	int		fd[2];
@@ -55,7 +55,7 @@ void	last_exec(char *arg, char **envp, int outfile)
 	exit(EXIT_SUCCESS);
 }
 
-int	process_input(char **argv)
+int	process_input(char **argv, char **envp)
 {
 	int	infile;
 	int	i;
@@ -65,7 +65,7 @@ int	process_input(char **argv)
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 	{
 		i = 3;
-		here_document(argv[2]);
+		here_document(argv[2], envp);
 	}
 	else
 	{
@@ -86,7 +86,7 @@ int	main(int argc, char **argv, char **envp)
 	outfile = 0;
 	if (argc < LEAST_ARGS_BONUS)
 		usage_bonus();
-	i = process_input(argv);
+	i = process_input(argv, envp);
 	if (!i)
 		return (0);
 	do_pipe_bonus(i, argv, argc, envp);

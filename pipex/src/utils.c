@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 10:49:47 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/05 15:57:02 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/06 02:04:33 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ if (pipe(fd) == ERROR)
 		perror("pipe");
 		exit(EXIT_FAILURE);
 	}
-	printf("[safe_pipe] opened: fd[0]=%d, fd[1]=%d\n", fd[0], fd[1]);
 }
 
 int	open_infile(char *arg)
@@ -62,7 +61,7 @@ int	open_infile(char *arg)
 
 void	safe_close(int fd)
 {
-	if (fd >= 3 && close(fd) == ERROR)
+	if (close(fd) == ERROR)
 	{
 		perror("close");
 		exit(EXIT_FAILURE);

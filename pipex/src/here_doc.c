@@ -6,11 +6,92 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 20:47:57 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/05 20:58:36 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/06 13:27:26 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex_bonus.h"
+
+char *get_env_value(char *name, char **envp)
+{
+    int len;
+    int i;
+
+    len = ft_strlen(name);
+    i = 0;
+    while (envp[i])
+    {
+        if (!ft_strncmp(envp[i], name, len) && envp[i][len] == '=')
+            return (envp[i] + len + 1);
+        i++;
+    }
+    return (NULL);
+}
+
+static char *extract_var_name(const char *line, int *i)
+{
+    int     start;
+    char    save;
+    char    *var;
+
+    start = *i;
+    while (line[*i] && (ft_isalnum(line[*i]) || line[*i] == '_'))
+        (*i)++;
+    save = line[*i];
+    ((char *)line)[*i] = '\0';
+    var = ft_strdup(line + start);
+    ((char *)line)[*i] = save;
+    return (var);
+}
+
+static char *append_value(char *res, char *value)
+{
+    char *tmp;
+
+    tmp = ft_strjoin(res, value);
+    free(res);
+    return (tmp);
+}
+
+char *expand_env(char *line, char **envp)
+{
+    char    *result;
+    char    *var;
+    char    *val;
+    char    tmp[2];
+    int     i;
+
+    result = ft_strdup("");
+    i = 0;
+    while (line[i])
+    {
+        if (line[i] == '\\' && line[i + 1] == '$')
+        {
+            tmp[0] = '$';
+            tmp[1] = '\0';
+            result = append_value(result, tmp);
+            i += 2;
+        }
+        else if (line[i] == '$')
+        {
+            i++;
+            var = extract_var_name(line, &i);
+            val = get_env_value(var, envp);
+            free(var);
+            result = append_value(result, val ? val : "");
+        }
+        else
+        {
+            tmp[0] = line[i++];
+            tmp[1] = '\0';
+            result = append_value(result, tmp);
+        }
+    }
+    return (result);
+}
+
+
+
 
 char	*expand_buffer(char *buffer, int *capacity, int length)
 {
@@ -67,10 +148,8 @@ int	get_next_line(char **line)
 {
 	char	*buffer;
 	int		capacity;
-	int		i;
 	int		read_size;
 
-	i = 0;
 	capacity = INIT_CAPACITY;
 	buffer = malloc(capacity);
 	if (!buffer)
@@ -86,7 +165,9 @@ int	get_next_line(char **line)
 	return (read_size);
 }
 
-void	put_line(char *limiter, int fd[2])
+
+
+void	put_line(char *limiter, int fd[2], char **envp, int expand)
 {
 	char	*line;
 
@@ -103,12 +184,28 @@ void	put_line(char *limiter, int fd[2])
 		free(line);
 		exit(EXIT_SUCCESS);
 	}
-	safe_write(fd[1], line, ft_strlen(line));
-    safe_write(fd[1], "\n", 1);
+	if (expand)
+	{
+		char *expanded = expand_env(line, envp);
+		safe_write(fd[1], expanded, ft_strlen(expanded));
+		free(expanded);
+	}
+	else
+		safe_write(fd[1], line, ft_strlen(line));
+	safe_write(fd[1], "\n", 1);
 	free(line);
 }
 
-void	here_document(char *limiter)
+int detect_expand(const char *limiter)
+{
+    if (!limiter)
+        return (true);
+    if (limiter[0] == '\"' || limiter[0] == '\'')
+        return (false);
+    return (true);  // デフォルト return を追加
+}
+
+void	here_document(char *limiter, char **envp)
 {
 	int	fd[2];
 	int	process;
@@ -122,8 +219,11 @@ void	here_document(char *limiter)
 	}
 	if (process == CHILD)
 	{
+	    int expand;
+
+	    expand = detect_expand(limiter);
 		while (1)
-			put_line(limiter, fd);
+			put_line(limiter, fd, envp, expand);
 	}
 	else
 	{
