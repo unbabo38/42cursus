@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 20:22:35 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/06 13:28:04 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/07 14:26:07 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,66 +40,65 @@ void	do_pipe_bonus(int i, char **argv, int argc, char **envp)
 
 void	wait_children(int i, int argc)
 {
-	while (i < argc - 2)
+	while (i < argc - 1)
 	{
 		wait(NULL);
 		i++;
 	}
 }
 
-void	last_exec(char *arg, char **envp, int outfile)
+void	last_exec_bonus(char **argv, int argc, char **envp, int i)
 {
-	safe_dup2(outfile, STDOUT_FILENO);
-	safe_close(outfile);
-	exec(arg, envp);
-	exit(EXIT_SUCCESS);
+	int outfile;
+	int process = fork();
+	if (process == CHILD)
+	{
+		if (i == 3)
+			outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+		else
+			outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (outfile == ERROR)
+		{
+			perror(argv[argc - 1]);
+			exit(EXIT_FAILURE);
+		}
+		safe_dup2(outfile, STDOUT_FILENO);
+		safe_close(outfile);
+		exec(argv[argc - 2], envp);
+		exit(EXIT_SUCCESS);
+	}
 }
 
-int	process_input(char **argv, char **envp)
+int	process_input_bonus(char **argv, char **envp, int argc)
 {
 	int	infile;
-	int	i;
-
-	i = 0;
 	infile = 0;
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 	{
-		i = 3;
+		if (argc < HERE_DOC_SIZE)
+			usage_here_doc();
 		here_document(argv[2], envp);
+		return (3);
 	}
 	else
 	{
-		i = 2;
 		infile = open_infile(argv[1]);
 		safe_dup2(infile, STDIN_FILENO);
 		safe_close(infile);
+		return (2);
 	}
-	return (i);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
 	int		i;
-	int		outfile;
 
 	i = 0;
-	outfile = 0;
-	if (argc < LEAST_ARGS_BONUS)
-		usage_bonus();
-	i = process_input(argv, envp);
-	if (!i)
-		return (0);
+	if (argc < LEAST_ARGS_MULTI_PIPE)
+		usage_multi_pipe();
+	i = process_input_bonus(argv, envp, argc);
 	do_pipe_bonus(i, argv, argc, envp);
-	wait_children(i, argc);
-	if (i == 3)
-		outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
-	else
-		outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (outfile == ERROR)
-	{
-		perror(argv[argc - 1]);
-		exit(EXIT_FAILURE);
-	}
-	last_exec(argv[argc - 2], envp, outfile);
+	last_exec_bonus(argv, argc, envp, i);
+	while(wait(NULL) > 0);
 	return (0);
 }

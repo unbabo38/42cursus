@@ -15,13 +15,13 @@
 # define ERROR -1
 # define OK 1
 # define CHILD 0
-# define LEAST_ARGS_BONUS 5
+# define LEAST_ARGS 5
 
 int		get_next_line(char **line);
 
 // utils.c
 void	free_split(char **contents);
-int		check_cmd_exist(char *arg);
+int		check_cmd_exist(char **argv);
 char	*get_cmd_path(char *arg_cmd, char **envp);
 char	*resolve_command(char *arg_cmd, char *cmd_env);
 
@@ -29,12 +29,12 @@ char	*resolve_command(char *arg_cmd, char *cmd_env);
 void	exec(char *arg, char **envp);
 
 // heredoc.c
-void	here_document(char *limiter);
+//void	here_document(char *limiter);
 
 // pipex.c
 void	do_pipe(char **argv, char **envp);
 void	wait_children(int i, int argc);
-void	last_exec(char *arg, char **envp, int outfile);
+void	last_exec(char **argv, int argc, char **envp);
 int		process_input(char **argv);
 
 // optional helper (safe wrapper)
@@ -43,7 +43,7 @@ void	safe_dup2(int fd, int std_filenum);
 void	safe_pipe(int fd[2]);
 void	safe_close(int fd);
 int		open_infile(char *arg);
-void	put_line(char *limiter, int fd[2]);
+//void	put_line(char *limiter, int fd[2]);
 void	command_not_found(char *cmd);
 void	usage();
 

@@ -1,29 +1,45 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   process_cmd.c                                      :+:      :+:    :+:   */
+/*   process_exec.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 20:43:39 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/05 20:43:43 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/07 18:53:29 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex.h"
 #include "../include/pipex_bonus.h"
 
-int	check_cmd_exist(char *arg)
+#define _GNU_SOURCE
+#include <malloc.h>
+#include <stdio.h>
+void	free_split(char **contents)
 {
-	if (access(arg, F_OK) != 0)
+	int	i;
+
+	i = 0;
+	while (contents[i])
 	{
-		perror(arg);
-		exit(127);
+		free(contents[i]);
+		i++;
 	}
-	if (access(arg, X_OK) != 0)
+	free(contents);
+}
+
+int	check_cmd_exist(char **cmd_args)
+{
+	if (access(cmd_args[0], F_OK) != 0)
 	{
-		perror(arg);
-		exit(126);
+		perror(cmd_args[0]);
+		return (-1);
+	}
+	if (access(cmd_args[0], X_OK) != 0)
+	{
+		perror(cmd_args[0]);
+		return (-2);
 	}
 	return (1);
 }
@@ -49,8 +65,10 @@ char	*resolve_command(char *arg_cmd, char *cmd_env)
 			return (cmd);
 		}
 		i++;
+		free(cmd);
 	}
 	free_split(cmd_paths);
+
 	return (NULL);
 }
 
@@ -70,20 +88,9 @@ char	*get_cmd_path(char *arg_cmd, char **envp)
 		}
 		i++;
 	}
+	if (!cmd_env)
+		return (NULL);
 	return (resolve_command(arg_cmd, cmd_env));
-}
-
-void	free_split(char **contents)
-{
-	int	i;
-
-	i = 0;
-	while (contents[i])
-	{
-		free(contents[i]);
-		i++;
-	}
-	free(contents);
 }
 
 void	exec(char *arg, char **envp)
@@ -100,17 +107,32 @@ void	exec(char *arg, char **envp)
 	cmd_args = ft_split(arg, ' ');
 	if (ft_strchr(cmd_args[0], '/'))
 	{
-		if (check_cmd_exist(cmd_args[0]))
-			cmd_path = cmd_args[0];
+		if (check_cmd_exist(cmd_args) == -1)
+		{
+			free_split(cmd_args);
+			exit(127);
+		}
+		if (check_cmd_exist(cmd_args) == -2)
+		{
+			free_split(cmd_args);
+			exit(126);
+		}
+		cmd_path = cmd_args[0];
 	}
 	else
+	{
 		cmd_path = get_cmd_path(cmd_args[0], envp);
+	}
 	if (!cmd_path)
 	{
 		command_not_found(cmd_args[0]);
+		free_split(cmd_args);
 		exit(127);
 	}
 	execve(cmd_path, cmd_args, envp);
-	perror("execve failed");
+	perror("execve");
+	//if (cmd_path != cmd_args[0])
+    //	free(cmd_path);
+	free_split(cmd_args);
 	exit(EXIT_FAILURE);
 }

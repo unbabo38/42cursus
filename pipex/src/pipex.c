@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 20:20:42 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/05 20:20:45 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/07 18:10:33 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,30 @@
 
 void	wait_children(int i, int argc)
 {
-	while (i < argc - 2)
+	while (i < argc - 1)
 	{
 		wait(NULL);
 		i++;
 	}
 }
 
-void	last_exec(char *arg, char **envp, int outfile)
+void	last_exec(char **argv, int argc, char **envp)
 {
-	safe_dup2(outfile, STDOUT_FILENO);
-	safe_close(outfile);
-	exec(arg, envp);
-	exit(EXIT_SUCCESS);
+	int outfile;
+	int process = fork();
+	if (process == CHILD)
+	{
+		outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (outfile == ERROR)
+		{
+			perror(argv[argc - 1]);
+			exit(EXIT_FAILURE);
+		}
+		safe_dup2(outfile, STDOUT_FILENO);
+		safe_close(outfile);
+		exec(argv[argc - 2], envp);
+		exit(EXIT_SUCCESS);
+	}
 }
 
 void	do_pipe(char **argv, char **envp)
@@ -51,14 +62,12 @@ void	do_pipe(char **argv, char **envp)
 	}
 }
 
+
 int	main(int argc, char **argv, char **envp)
 {
 	int	infile;
-	int	outfile;
-	int	i;
 
-	i = 0;
-	if (argc != 5)
+	if (argc != LEAST_ARGS)
 	{
 		usage();
 		exit(EXIT_FAILURE);
@@ -67,12 +76,7 @@ int	main(int argc, char **argv, char **envp)
 	safe_dup2(infile, STDIN_FILENO);
 	safe_close(infile);
 	do_pipe(argv, envp);
-	wait_children(i, argc);
-	outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (outfile == ERROR)
-	{
-		perror(argv[argc - 1]);
-		exit(EXIT_FAILURE);
-	}
-	last_exec(argv[argc - 2], envp, outfile);
+	last_exec(argv, argc, envp);
+	while(wait(NULL) > 0);
+	return (0);
 }

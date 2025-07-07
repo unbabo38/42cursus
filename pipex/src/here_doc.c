@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 20:47:57 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/06 13:27:26 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/06 13:32:24 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,9 +89,6 @@ char *expand_env(char *line, char **envp)
     }
     return (result);
 }
-
-
-
 
 char	*expand_buffer(char *buffer, int *capacity, int length)
 {
@@ -178,7 +175,6 @@ void	put_line(char *limiter, int fd[2], char **envp, int expand)
         free(line);
 		exit(EXIT_SUCCESS);
 	}
-
 	if (ft_strncmp(limiter, line, ft_strlen(limiter)) == 0)
 	{
 		free(line);
