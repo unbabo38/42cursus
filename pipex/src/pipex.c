@@ -12,19 +12,12 @@
 
 #include "../include/pipex.h"
 
-void	wait_children(int i, int argc)
-{
-	while (i < argc - 1)
-	{
-		wait(NULL);
-		i++;
-	}
-}
-
 void	last_exec(char **argv, int argc, char **envp)
 {
-	int outfile;
-	int process = fork();
+	int	outfile;
+	int	process;
+
+	process = fork();
 	if (process == CHILD)
 	{
 		outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -62,7 +55,6 @@ void	do_pipe(char **argv, char **envp)
 	}
 }
 
-
 int	main(int argc, char **argv, char **envp)
 {
 	int	infile;
@@ -77,6 +69,7 @@ int	main(int argc, char **argv, char **envp)
 	safe_close(infile);
 	do_pipe(argv, envp);
 	last_exec(argv, argc, envp);
-	while(wait(NULL) > 0);
+	while (wait(NULL) > 0)
+		;
 	return (0);
 }

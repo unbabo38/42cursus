@@ -44,7 +44,7 @@ void	safe_pipe(int fd[2]);
 void	safe_close(int fd);
 int		open_infile(char *arg);
 //void	put_line(char *limiter, int fd[2]);
-void	command_not_found(char *cmd);
+void	command_not_found(char *cmd, char **args);
 void	usage();
 
 #endif

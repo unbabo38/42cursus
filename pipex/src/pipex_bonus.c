@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "../include/pipex_bonus.h"
-#include <stdbool.h>
+
 void	do_pipe_bonus(int i, char **argv, int argc, char **envp)
 {
 	int		fd[2];
@@ -19,6 +19,7 @@ void	do_pipe_bonus(int i, char **argv, int argc, char **envp)
 
 	while (i < argc - 2)
 	{
+
 		safe_pipe(fd);
 		process = fork();
 		if (process == CHILD)
@@ -38,24 +39,17 @@ void	do_pipe_bonus(int i, char **argv, int argc, char **envp)
 	}
 }
 
-void	wait_children(int i, int argc)
+void	last_exec_bonus(char **argv, int argc, char **envp, int start_num)
 {
-	while (i < argc - 1)
-	{
-		wait(NULL);
-		i++;
-	}
-}
+	int	outfile;
+	int	process;
 
-void	last_exec_bonus(char **argv, int argc, char **envp, int i)
-{
-	int outfile;
-	int process = fork();
+	process = fork();
 	if (process == CHILD)
 	{
-		if (i == 3)
+		if (start_num == 3)
 			outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
-		else
+		if (start_num == 2)
 			outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (outfile == ERROR)
 		{
@@ -72,6 +66,7 @@ void	last_exec_bonus(char **argv, int argc, char **envp, int i)
 int	process_input_bonus(char **argv, char **envp, int argc)
 {
 	int	infile;
+
 	infile = 0;
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 	{
@@ -91,14 +86,15 @@ int	process_input_bonus(char **argv, char **envp, int argc)
 
 int	main(int argc, char **argv, char **envp)
 {
-	int		i;
+	int		start_num;
 
-	i = 0;
+	start_num = 0;
 	if (argc < LEAST_ARGS_MULTI_PIPE)
 		usage_multi_pipe();
-	i = process_input_bonus(argv, envp, argc);
-	do_pipe_bonus(i, argv, argc, envp);
-	last_exec_bonus(argv, argc, envp, i);
-	while(wait(NULL) > 0);
+	start_num = process_input_bonus(argv, envp, argc);
+	do_pipe_bonus(start_num, argv, argc, envp);
+	last_exec_bonus(argv, argc, envp, start_num);
+	while (wait(NULL) > 0)
+		;
 	return (0);
 }

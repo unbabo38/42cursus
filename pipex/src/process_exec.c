@@ -13,9 +13,6 @@
 #include "../include/pipex.h"
 #include "../include/pipex_bonus.h"
 
-#define _GNU_SOURCE
-#include <malloc.h>
-#include <stdio.h>
 void	free_split(char **contents)
 {
 	int	i;
@@ -34,12 +31,14 @@ int	check_cmd_exist(char **cmd_args)
 	if (access(cmd_args[0], F_OK) != 0)
 	{
 		perror(cmd_args[0]);
-		return (-1);
+		free_split(cmd_args);
+		exit(127);
 	}
 	if (access(cmd_args[0], X_OK) != 0)
 	{
 		perror(cmd_args[0]);
-		return (-2);
+		free_split(cmd_args);
+		exit(127);
 	}
 	return (1);
 }
@@ -68,7 +67,6 @@ char	*resolve_command(char *arg_cmd, char *cmd_env)
 		free(cmd);
 	}
 	free_split(cmd_paths);
-
 	return (NULL);
 }
 
@@ -98,41 +96,23 @@ void	exec(char *arg, char **envp)
 	char	**cmd_args;
 	char	*cmd_path;
 
-	cmd_path = NULL;
 	if (arg == NULL || arg[0] == '\0')
-	{
-		command_not_found("\'\'");
-		exit(127);
-	}
+		command_not_found("\'\'", NULL);
 	cmd_args = ft_split(arg, ' ');
+	cmd_path = NULL;
 	if (ft_strchr(cmd_args[0], '/'))
 	{
-		if (check_cmd_exist(cmd_args) == -1)
-		{
-			free_split(cmd_args);
-			exit(127);
-		}
-		if (check_cmd_exist(cmd_args) == -2)
-		{
-			free_split(cmd_args);
-			exit(126);
-		}
-		cmd_path = cmd_args[0];
+		if (check_cmd_exist(cmd_args) == OK)
+			cmd_path = cmd_args[0];
 	}
 	else
-	{
 		cmd_path = get_cmd_path(cmd_args[0], envp);
-	}
 	if (!cmd_path)
-	{
-		command_not_found(cmd_args[0]);
-		free_split(cmd_args);
-		exit(127);
-	}
+		command_not_found(cmd_args[0], cmd_args);
 	execve(cmd_path, cmd_args, envp);
 	perror("execve");
-	//if (cmd_path != cmd_args[0])
-    //	free(cmd_path);
+	if (cmd_path != cmd_args[0])
+		free(cmd_path);
 	free_split(cmd_args);
 	exit(EXIT_FAILURE);
 }

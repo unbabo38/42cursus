@@ -46,8 +46,16 @@ void	safe_pipe(int fd[2]);
 void	safe_close(int fd);
 int		open_infile(char *arg);
 void    put_line(char *limiter, int fd[2], char **envp, int expand);
-void	command_not_found(char *cmd);
+void	command_not_found(char *cmd, char **args);
 void	usage_here_doc(void);
 void	usage_multi_pipe(void);
+
+char	*get_env_value(char *name, char **envp);
+char	*extract_var_name(const char *line, int *i);
+char	*append_value(char *res, char *value);
+char	*expand_env(char *line, char **envp);
+char	*expand_buffer(char *buffer, int *capacity, int length);
+char *next_token(const char *line, int *idx, char **envp);
+
 
 #endif

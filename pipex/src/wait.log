@@ -1,9 +1,0 @@
-strace: Process 418550 attached
-> strace: Process 418551 attached
-[pid 418549] wait4(-1, > > >  <unfinished ...>
-[pid 418550] +++ exited with 0 +++
-[pid 418549] <... wait4 resumed>NULL, 0, NULL) = 418550
-[pid 418549] --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=418550, si_uid=1002, si_status=0, si_utime=0, si_stime=0} ---
-[pid 418551] +++ exited with 0 +++
---- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=418551, si_uid=1002, si_status=0, si_utime=0, si_stime=0} ---
-+++ exited with 0 +++

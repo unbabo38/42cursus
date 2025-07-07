@@ -34,7 +34,7 @@ void	safe_dup2(int fd, int std_filenum)
 
 void	safe_pipe(int fd[2])
 {
-if (pipe(fd) == ERROR)
+	if (pipe(fd) == ERROR)
 	{
 		perror("pipe");
 		exit(EXIT_FAILURE);
