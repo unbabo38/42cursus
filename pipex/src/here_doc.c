@@ -6,11 +6,35 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 20:47:57 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/06 13:32:24 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/08 17:33:56 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex_bonus.h"
+
+char	*expand_buffer(char *buffer, int *capacity, int length)
+{
+	int		new_capacity;
+	char	*new_buffer;
+	int		i;
+
+	new_capacity = *capacity * 2;
+	new_buffer = malloc(new_capacity);
+	if (!new_buffer)
+	{
+		free(buffer);
+		return (NULL);
+	}
+	i = 0;
+	while (i < length)
+	{
+		new_buffer[i] = buffer[i];
+		i++;
+	}
+	free(buffer);
+	*capacity = new_capacity;
+	return (new_buffer);
+}
 
 int	read_line(char *buffer, int capacity)
 {
@@ -19,7 +43,8 @@ int	read_line(char *buffer, int capacity)
 	int		i;
 
 	i = 0;
-	while ((size = read(STDIN_FILENO, &c, 1)) > 0)
+	size = read(STDIN_FILENO, &c, 1);
+	while (size > 0)
 	{
 		if (c == '\n')
 			break ;
@@ -30,6 +55,7 @@ int	read_line(char *buffer, int capacity)
 				return (ERROR);
 		}
 		buffer[i++] = c;
+		size = read(STDIN_FILENO, &c, 1);
 	}
 	buffer[i] = '\0';
 	if (size < 0)
@@ -69,12 +95,12 @@ void	put_line(char *limiter, int fd[2], char **envp, int expand)
 	{
 		safe_write(STDOUT_FILENO, "\n", 1);
 		free(line);
-		exit(EXIT_SUCCESS);
+		safe_close_and_exit(fd[1]);
 	}
 	if (ft_strncmp(limiter, line, ft_strlen(limiter)) == 0)
 	{
 		free(line);
-		exit(EXIT_SUCCESS);
+		safe_close_and_exit(fd[1]);
 	}
 	if (expand)
 	{
@@ -86,15 +112,6 @@ void	put_line(char *limiter, int fd[2], char **envp, int expand)
 		safe_write(fd[1], line, ft_strlen(line));
 	safe_write(fd[1], "\n", 1);
 	free(line);
-}
-
-int	detect_expand(const char *limiter)
-{
-	if (!limiter)
-		return (true);
-	if (limiter[0] == '\"' || limiter[0] == '\'')
-		return (false);
-	return (true);
 }
 
 void	here_document(char *limiter, char **envp)
@@ -113,6 +130,7 @@ void	here_document(char *limiter, char **envp)
 	if (process == CHILD)
 	{
 		expand = detect_expand(limiter);
+		safe_close(fd[0]);
 		while (1)
 			put_line(limiter, fd, envp, expand);
 	}

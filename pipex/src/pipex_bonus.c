@@ -6,11 +6,27 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 20:22:35 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/07 14:26:07 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/08 17:33:48 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex_bonus.h"
+
+int	detect_expand(const char *limiter)
+{
+	size_t	len;
+
+	if (!limiter)
+		return (OK);
+	len = ft_strlen(limiter);
+	if (len >= 2
+		&& ((limiter[0] == '\"' && limiter[len - 1] == '\"')
+			|| (limiter[0] == '\'' && limiter[len - 1] == '\'')))
+	{
+		return (false);
+	}
+	return (OK);
+}
 
 void	do_pipe_bonus(int i, char **argv, int argc, char **envp)
 {
@@ -19,7 +35,6 @@ void	do_pipe_bonus(int i, char **argv, int argc, char **envp)
 
 	while (i < argc - 2)
 	{
-
 		safe_pipe(fd);
 		process = fork();
 		if (process == CHILD)
@@ -71,7 +86,7 @@ int	process_input_bonus(char **argv, char **envp, int argc)
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 	{
 		if (argc < HERE_DOC_SIZE)
-			usage_here_doc();
+			usage_bonus();
 		here_document(argv[2], envp);
 		return (3);
 	}
@@ -89,8 +104,8 @@ int	main(int argc, char **argv, char **envp)
 	int		start_num;
 
 	start_num = 0;
-	if (argc < LEAST_ARGS_MULTI_PIPE)
-		usage_multi_pipe();
+	if (argc < LEAST_ARGS)
+		usage_bonus();
 	start_num = process_input_bonus(argv, envp, argc);
 	do_pipe_bonus(start_num, argv, argc, envp);
 	last_exec_bonus(argv, argc, envp, start_num);

@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 20:47:16 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/07 18:51:54 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/08 16:40:09 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,18 +29,12 @@ void	usage(void)
 	exit(EXIT_FAILURE);
 }
 
-void	usage_multi_pipe(void)
+void	usage_bonus(void)
 {
 	safe_write(STDERR_FILENO, "Bad arguments\n", 14);
 	safe_write(STDERR_FILENO,
-		"./pipex_bonus <file1> <cmd1> <cmd2> <...> <file2>\n", 44);
-	exit(EXIT_FAILURE);
-}
-
-void	usage_here_doc(void)
-{
-	safe_write(STDERR_FILENO, "Bad arguments\n", 14);
+		"./pipex here_doc <LIMITER> <cmd1> <...> <file2>\n", 48);
 	safe_write(STDERR_FILENO,
-		"./pipex_bonus here_doc <LIMITER> <cmd1> <...> <file2>\n", 48);
+		"./pipex <file1> <cmd1> <cmd2> <...> <file2>\n", 44);
 	exit(EXIT_FAILURE);
 }

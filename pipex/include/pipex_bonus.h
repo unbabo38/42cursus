@@ -15,7 +15,7 @@
 # define ERROR -1
 # define OK 1
 # define CHILD 0
-# define LEAST_ARGS_MULTI_PIPE 5
+# define LEAST_ARGS 5
 # define HERE_DOC_SIZE 6
 #define INIT_CAPACITY 1024
 
@@ -45,17 +45,18 @@ void	safe_dup2(int fd, int std_filenum);
 void	safe_pipe(int fd[2]);
 void	safe_close(int fd);
 int		open_infile(char *arg);
-void    put_line(char *limiter, int fd[2], char **envp, int expand);
+void	put_line(char *limiter, int fd[2], char **envp, int expand);
 void	command_not_found(char *cmd, char **args);
-void	usage_here_doc(void);
-void	usage_multi_pipe(void);
+void	usage_bonus(void);
 
 char	*get_env_value(char *name, char **envp);
 char	*extract_var_name(const char *line, int *i);
 char	*append_value(char *res, char *value);
 char	*expand_env(char *line, char **envp);
 char	*expand_buffer(char *buffer, int *capacity, int length);
-char *next_token(const char *line, int *idx, char **envp);
+char 	*next_token(const char *line, int *idx, char **envp);
+int		detect_expand(const char *limiter);
+void	safe_close_and_exit(int fd);
 
 
 #endif

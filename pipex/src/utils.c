@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 10:49:47 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/06 02:04:33 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/08 16:52:17 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ int	open_infile(char *arg)
 		infile = open("/dev/null", O_RDONLY);
 		if (infile == ERROR)
 		{
-			perror("/dev/null");
+			perror("open");
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -66,4 +66,10 @@ void	safe_close(int fd)
 		perror("close");
 		exit(EXIT_FAILURE);
 	}
+}
+
+void	safe_close_and_exit(int fd)
+{
+	safe_close(fd);
+	exit(EXIT_SUCCESS);
 }

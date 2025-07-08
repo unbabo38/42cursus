@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 20:20:42 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/07 18:10:33 by tmura            ###   ########.fr       */
+/*   Updated: 2025/07/08 16:26:54 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,10 +60,7 @@ int	main(int argc, char **argv, char **envp)
 	int	infile;
 
 	if (argc != LEAST_ARGS)
-	{
 		usage();
-		exit(EXIT_FAILURE);
-	}
 	infile = open_infile(argv[1]);
 	safe_dup2(infile, STDIN_FILENO);
 	safe_close(infile);
