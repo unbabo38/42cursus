@@ -28,19 +28,19 @@ char	*get_env_value(char *name, char **envp)
 	return (NULL);
 }
 
-char	*extract_var_name(const char *line, int *i)
+char	*extract_var_name(const char *line, int *idx)
 {
 	int		start;
 	char	save;
 	char	*var;
 
-	start = *i;
-	while (line[*i] && (ft_isalnum(line[*i]) || line[*i] == '_'))
-		(*i)++;
-	save = line[*i];
-	((char *)line)[*i] = '\0';
+	start = *idx;
+	while (line[*idx] && (ft_isalnum(line[*idx]) || line[*idx] == '_'))
+		(*idx)++;
+	save = line[*idx];
+	((char *)line)[*idx] = '\0';
 	var = ft_strdup(line + start);
-	((char *)line)[*i] = save;
+	((char *)line)[*idx] = save;
 	return (var);
 }
 
@@ -89,8 +89,8 @@ char	*expand_env(char *line, char **envp)
 	char	*tmp;
 	int		idx;
 
-	result = ft_strdup("");
 	idx = 0;
+	result = ft_strdup("");
 	if (!result)
 		return (NULL);
 	while (line[idx])

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/pipex.h"
+#include "../include/pipex_bonus.h"
 
 void	free_split(char **contents)
 {
@@ -37,7 +37,7 @@ int	check_cmd_exist(char **cmd_args)
 	{
 		perror(cmd_args[0]);
 		free_split(cmd_args);
-		exit(127);
+		exit(126);
 	}
 	return (1);
 }

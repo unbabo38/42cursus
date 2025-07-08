@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex_bonus.h                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/08 19:59:07 by tmura             #+#    #+#             */
+/*   Updated: 2025/07/08 20:00:04 by tmura            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PIPEX_BONUS_H
 # define PIPEX_BONUS_H
 
@@ -17,7 +29,7 @@
 # define CHILD 0
 # define LEAST_ARGS 5
 # define HERE_DOC_SIZE 6
-#define INIT_CAPACITY 1024
+# define INIT_CAPACITY 1024
 
 int		get_next_line(char **line);
 
@@ -35,7 +47,6 @@ void	here_document(char *limiter, char **envp);
 
 // pipex.c
 void	do_pipe_bonus(int i, char **argv, int argc, char **envp);
-void	wait_children(int i, int argc);
 void	last_exec_bonus(char **argv, int argc, char **envp, int i);
 int		process_input_bonus(char **argv, char **envp, int argc);
 
@@ -54,9 +65,7 @@ char	*extract_var_name(const char *line, int *i);
 char	*append_value(char *res, char *value);
 char	*expand_env(char *line, char **envp);
 char	*expand_buffer(char *buffer, int *capacity, int length);
-char 	*next_token(const char *line, int *idx, char **envp);
+char	*next_token(const char *line, int *idx, char **envp);
 int		detect_expand(const char *limiter);
 void	safe_close_and_exit(int fd);
-
-
 #endif

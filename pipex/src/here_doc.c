@@ -107,7 +107,7 @@ void	put_line(char *limiter, int fd[2], char **envp, int expand)
 		expanded = expand_env(line, envp);
 		safe_write(fd[1], expanded, ft_strlen(expanded));
 		free(expanded);
-	}
+	}	
 	else
 		safe_write(fd[1], line, ft_strlen(line));
 	safe_write(fd[1], "\n", 1);

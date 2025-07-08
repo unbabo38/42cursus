@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/pipex.h"
+#include "../include/pipex_bonus.h"
 
 void	command_not_found(char *cmd, char **args)
 {
@@ -21,11 +21,13 @@ void	command_not_found(char *cmd, char **args)
 	exit(127);
 }
 
-void	usage(void)
+void	usage_bonus(void)
 {
 	safe_write(STDERR_FILENO, "Bad arguments\n", 14);
 	safe_write(STDERR_FILENO,
-		"./pipex <file1> <cmd1> <cmd2> <file2>\n", 38);
+		"./pipex here_doc <LIMITER> <cmd1> <...> <file2>\n", 48);
+	safe_write(STDERR_FILENO,
+		"./pipex <file1> <cmd1> <cmd2> <...> <file2>\n", 44);
 	exit(EXIT_FAILURE);
 }
 
