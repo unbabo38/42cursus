@@ -36,22 +36,3 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 	}
 	return (dest);
 }
-/*
-int main()
-{
-	unsigned char buffer1[10] = {1, 2, 3, 4, 5, 0};
-	unsigned char buffer2[10] = {0};
-
-	ft_memmove(buffer2, buffer1, 4); // 修正
-
-	if (memcmp(buffer1, buffer2, 4) == 0)
-	{
-		printf("Test passed!\n");
-	}
-	else
-	{
-		printf("Test failed!\n");
-	}
-	return 0;
-}
-*/

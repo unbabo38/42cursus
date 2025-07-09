@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <stdlib.h>
 
 static int	ft_numlen(int n, long *num)
 {
@@ -54,20 +53,3 @@ char	*ft_itoa(int n)
 	}
 	return (str);
 }
-
-/*
-#include <string.h>
-#include <stdio.h>
-
-int main(void)
-{
-	int values[] = {0, 42, -1234, 2147483647, -2147483648};
-	for (int i = 0; i < 5; i++)
-	{
-		char *s = ft_itoa(values[i]);
-		printf("%d → %s\n", values[i], s);
-		free(s);
-	}
-	return 0;
-}
-*/

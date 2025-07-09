@@ -19,12 +19,3 @@ int	ft_isdigit(int c)
 	else
 		return (0);
 }
-/*
-#include <ctype.h>
-#include <stdio.h>
-int main(void) {
-	printf("%d\n",ft_isdigit(2147483647));
-	//printf("%d\n",isdigit('8'));
-	//printf("%d", ft_isdigit('1'));
-}
-*/

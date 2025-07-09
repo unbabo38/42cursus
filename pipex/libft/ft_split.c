@@ -6,12 +6,11 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:43:20 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/07 12:37:25 by tmura            ###   ########.fr       */
+/*   Updated: 2025/05/05 18:45:59 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <stdlib.h>
 
 static char	**free_array(char **ptr, int i)
 {
@@ -103,22 +102,3 @@ char	**ft_split(char const *s, char c)
 	new_str = ft_split_words(s, c, new_str, num_words);
 	return (new_str);
 }
-
-/*
-#include <string.h>
-#include <stdio.h>
-int main(void)
-{
-	const char *s = "   Hello   World  this is   C ";
-	char **words = ft_split(s, ' ');
-	int i = 0;
-	while (words[i])
-	{
-		printf("word[%d]: '%s'\n", i, words[i]);
-		free(words[i]);
-		i++;
-	}
-	free(words);
-	return 0;
-}
-*/

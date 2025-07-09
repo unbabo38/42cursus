@@ -25,18 +25,3 @@ void	ft_striteri(char *s, void (*f)(unsigned int, char *))
 		i++;
 	}
 }
-/*
-#include <string.h>
-#include <stdio.h>
-void to_upper(unsigned int i, char *str)
-{
-	printf("%d,%s\n", i, str);
-}
-
-int main(void)
-{
-
-	ft_striteri("suzumenooyado", to_upper);
-
-}
-*/

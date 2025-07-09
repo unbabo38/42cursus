@@ -22,7 +22,6 @@
 # include <errno.h>
 # include <string.h>
 # include "../libft/libft.h"
-// get_next_line.c
 
 # define ERROR -1
 # define OK 1

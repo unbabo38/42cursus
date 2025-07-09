@@ -29,23 +29,3 @@ char	*ft_strchr(const char *s, int c)
 		return ((char *)s + i);
 	return (0);
 }
-/*
-#include <string.h>
-#include <stdio.h>
-int main(void)
-{
-    const char *s = "Hello World";
-	//ASSERT_EQ_STR(ft_strrchr(s, 'l' + 256), strrchr(s, 'l' + 256));
-
-    printf("Original strchr: %s\n", strchr(s, 'l' + 256));
-    printf("Your ft_strchr : %s\n", ft_strchr(s, 'l' + 256));
-
-    printf("Original strchr: %s\n", strchr(s, '\0'));
-    printf("Your ft_strchr : %s\n", ft_strchr(s, '\0'));
-
-    printf("Original strchr: %s\n", strchr(s, 'o'));
-    printf("Your ft_strchr : %s\n", ft_strchr(s, 'o'));
-
-    return 0;
-}
-*/

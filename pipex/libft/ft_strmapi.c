@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <stdlib.h>
 
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 {
@@ -32,17 +31,3 @@ char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 	processed_s[i] = '\0';
 	return (processed_s);
 }
-/*
-#include <stdio.h>
-
-int main(void)
-{
-
-	char *result = ft_strmapi("suzumenooyado", to_upper);
-	if (result)
-	{
-		printf("%s\n", result); // 出力: SUZUMENOOYADO
-		free(result);
-	}
-}
-*/

@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <stdlib.h>
 
 char	*ft_strdup(const char *s1)
 {
@@ -25,27 +24,3 @@ char	*ft_strdup(const char *s1)
 	ptr = ft_memcpy(ptr, s1, len);
 	return (ptr);
 }
-/*
-#include <string.h>
-#include <stdio.h>
-#include <assert.h>
-int	main(void)
-{
-	const char *src = "Hello, 42Tokyo!";
-	char *copy = ft_strdup(src);
-
-	// NULLでないか確認
-	assert(copy != NULL);
-
-	// 内容が一致しているか
-	assert(strcmp(copy, src) == 0);
-
-	// アドレスが違う（deep copyされてる）か
-	assert(copy != src);
-
-	printf("All ft_strdup tests passed ✅\n");
-
-	free(copy);
-	return 0;
-}
-*/

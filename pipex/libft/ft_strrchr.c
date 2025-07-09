@@ -31,31 +31,3 @@ char	*ft_strrchr(const char *s, int c)
 		ptr = (char *)(s + i);
 	return (ptr);
 }
-
-/*
-#include <string.h>
-#include <stdio.h>
-int main(void)
-{
-	const char *test_str = "banana";
-	int test_char = 'a';
-
-	// 標準関数との比較
-	char *libc_result = strrchr(test_str, test_char);
-	char *ft_result = ft_strrchr(test_str, test_char);
-
-	printf("Input string: \"%s\"\n", test_str);
-	printf("Character to find: '%c'\n", test_char);
-	printf("strrchr result:    \"%s\"\n", libc_result);
-	printf("ft_strrchr result: \"%s\"\n", ft_result);
-
-	if (libc_result == ft_result)
-		printf("✅ Passed: Same pointer returned.\n");
-	else if (libc_result && ft_result && strcmp(libc_result, ft_result) == 0)
-		printf("✅ Passed: Same string content.\n");
-	else
-		printf("❌ Failed: Different result.\n");
-
-	return 0;
-}
-*/

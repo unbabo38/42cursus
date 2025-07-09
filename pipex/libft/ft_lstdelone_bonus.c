@@ -1,18 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_islower.c                                       :+:      :+:    :+:   */
+/*   ft_lstdelone.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/04 21:30:33 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/04 21:30:55 by tmura            ###   ########.fr       */
+/*   Created: 2025/05/04 21:42:13 by tmura             #+#    #+#             */
+/*   Updated: 2025/05/05 18:39:56 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int	ft_islower(int c)
+void	ft_lstdelone(t_list *lst, void (*del)(void*))
 {
-	return (c >= 'a' && c <= 'z');
+	if (lst && del)
+	{
+		del(lst->content);
+		free(lst);
+	}
 }

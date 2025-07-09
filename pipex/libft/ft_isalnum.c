@@ -18,14 +18,3 @@ int	ft_isalnum(int c)
 		return (8);
 	return (0);
 }
-/*
-#include <ctype.h>
-#include <stdio.h>
-
-int main() {
-	printf("%d\n",isalnum('A'));
-	printf("%d\n",isalnum('#'));
-	printf("%d\n",ft_isalnum('A'));
-	printf("%d\n",ft_isalnum('#'));
-}
-*/

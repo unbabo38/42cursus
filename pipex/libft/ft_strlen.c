@@ -23,14 +23,3 @@ size_t	ft_strlen(const char *s)
 	}
 	return (i);
 }
-/*
-#include <string.h>
-#include <stdio.h>
-int main() {
-	printf("%zu\n",strlen("ABC"));
-	printf("%zu\n",strlen(""));
-	printf("%zu\n",ft_strlen("ABC"));
-	printf("%zu\n",ft_strlen(""));
-	return (0);
-}
-*/

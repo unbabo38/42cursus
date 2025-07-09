@@ -97,7 +97,7 @@ void	put_line(char *limiter, int fd[2], char **envp, int expand)
 		free(line);
 		safe_close_and_exit(fd[1]);
 	}
-	if (ft_strncmp(limiter, line, ft_strlen(limiter)) == 0)
+	if (ft_strcmp(limiter, line) == 0)
 	{
 		free(line);
 		safe_close_and_exit(fd[1]);

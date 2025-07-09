@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libft.h"
-#include <stdlib.h>
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
@@ -40,12 +39,3 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	substr[i] = '\0';
 	return (substr);
 }
-
-/*
-#include <string.h>
-#include <stdio.h>
-int main(void)
-{
-	printf("%s", ft_substr("42tokyo", 2, 3));
-}
-*/

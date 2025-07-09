@@ -21,21 +21,3 @@ int	ft_isalpha(int c)
 	else
 		return (0);
 }
-/*
-
-#include <ctype.h>
-#include <stdio.h>
-#include <assert.h>
-int main() {
-//	printf("Testing 0: ft_isalpha(0) = %d, isalpha(0) = %d\n",
-	ft_isalpha(2147483647), isalpha(2147483647));
-	printf("Testing 0: ft_isalpha(0) = %d", ft_isalpha(2147483647));
-	assert(ft_isalpha('a') == isalpha('a'));
-	assert(ft_isalpha('b') == isalpha('b'));
-
-	assert(ft_isalpha('1') == isalpha('1'));
-
-	printf("All assertions passed.\n");
-	return 0;
-}
-*/
