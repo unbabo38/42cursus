@@ -1,23 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utility.c                                          :+:      :+:    :+:   */
+/*   is_valid_file.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/18 12:21:16 by tmura             #+#    #+#             */
-/*   Updated: 2025/07/18 12:21:22 by tmura            ###   ########.fr       */
+/*   Created: 2025/07/18 12:20:07 by tmura             #+#    #+#             */
+/*   Updated: 2025/07/18 12:20:54 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/so_long.h"
 
-int	ft_strcmp(const char *s1, const char *s2)
+int	has_ber_extension(const char *filename)
 {
-	size_t	i;
+	size_t	len;
 
-	i = 0;
-	while (s1[i] != '\0' && s2[i] != '\0' && s1[i] == s2[i])
-		i++;
-	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+	len = ft_strlen(filename);
+	if (len < 5)
+		return (0);
+	return (ft_strcmp(filename + len - 4, ".ber") == 0);
+}
+
+int	open_file(const char *filename)
+{
+	int	fd;
+
+	fd = open(filename, O_RDONLY);
+	if (fd == -1)
+	{
+		perror("Error opening file");
+		exit(EXIT_FAILURE);
+	}
+	return (fd);
 }
