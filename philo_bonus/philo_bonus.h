@@ -1,0 +1,65 @@
+#ifndef PHILO_BONUS_H
+# define PHILO_BONUS_H
+
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <semaphore.h>
+# include <sys/time.h>
+# include <sys/wait.h>
+# include <signal.h>
+# include <stdbool.h>
+# include <pthread.h>
+# include <fcntl.h>
+
+# define MAX_PHILOS 200
+
+typedef struct s_philo
+{
+	int				id;
+	int				meals_eaten;
+	long long		last_meal_time;
+	pid_t			pid;
+	struct s_data	*data;
+}	t_philo;
+
+typedef struct s_data
+{
+	int				num_philos;
+	int				time_to_die;
+	int				time_to_eat;
+	int				time_to_sleep;
+	int				num_meals;
+	bool			dead_flag;
+	long long		start_time;
+	sem_t			*forks;
+	sem_t			*print_sem;
+	sem_t			*meal_sem;
+	sem_t			*dead_sem;
+	t_philo			philos[MAX_PHILOS];
+	pid_t			*pids;
+}	t_data;
+
+// utils_bonus.c
+long long	get_time(void);
+void		print_action(t_data *data, int id, char *str);
+int			ft_atoi(const char *str);
+int			error_msg(char *str);
+
+// init_bonus.c
+int			init_data(t_data *data, int argc, char **argv);
+int			init_philos(t_data *data);
+int			init_semaphores(t_data *data);
+
+// actions_bonus.c
+void		eat(t_philo *philo);
+void		sleep_think(t_philo *philo);
+
+// monitor_bonus.c
+void		*monitor(void *arg);
+
+// routine_bonus.c
+void		philo_routine(t_philo *philo);
+
+#endif
+
