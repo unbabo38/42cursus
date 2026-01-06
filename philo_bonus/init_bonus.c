@@ -1,0 +1,61 @@
+#include "philo_bonus.h"
+
+int	init_data(t_data *data, int argc, char **argv)
+{
+	data->num_philos = ft_atoi(argv[1]);
+	data->time_to_die = ft_atoi(argv[2]);
+	data->time_to_eat = ft_atoi(argv[3]);
+	data->time_to_sleep = ft_atoi(argv[4]);
+	data->num_meals = -1;
+	if (argc == 6)
+		data->num_meals = ft_atoi(argv[5]);
+	data->dead_flag = false;
+	data->start_time = get_time();
+	data->forks = NULL;
+	data->print_sem = NULL;
+	data->meal_sem = NULL;
+	data->dead_sem = NULL;
+	data->pids = NULL;
+	if (data->num_philos < 1 || data->num_philos > MAX_PHILOS)
+		return (error_msg("Invalid number of philosophers"));
+	if (data->time_to_die < 0 || data->time_to_eat < 0 || data->time_to_sleep < 0)
+		return (error_msg("Invalid time values"));
+	if (argc == 6 && data->num_meals < 1)
+		return (error_msg("Invalid number of meals"));
+	return (0);
+}
+
+int	init_semaphores(t_data *data)
+{
+	sem_unlink("/forks");
+	sem_unlink("/print");
+	sem_unlink("/meal");
+	sem_unlink("/dead");
+	data->forks = sem_open("/forks", O_CREAT, 0644, data->num_philos);
+	data->print_sem = sem_open("/print", O_CREAT, 0644, 1);
+	data->meal_sem = sem_open("/meal", O_CREAT, 0644, 1);
+	data->dead_sem = sem_open("/dead", O_CREAT, 0644, 1);
+	if (data->forks == SEM_FAILED || data->print_sem == SEM_FAILED
+		|| data->meal_sem == SEM_FAILED || data->dead_sem == SEM_FAILED)
+		return (error_msg("Semaphore initialization failed"));
+	return (0);
+}
+
+int	init_philos(t_data *data)
+{
+	int	i;
+
+	i = 0;
+	while (i < data->num_philos)
+	{
+		data->philos[i].id = i + 1;
+		data->philos[i].meals_eaten = 0;
+		data->philos[i].last_meal_time = get_time();
+		data->philos[i].data = data;
+		i++;
+	}
+	data->pids = malloc(sizeof(pid_t) * data->num_philos);
+	if (!data->pids)
+		return (error_msg("Memory allocation failed"));
+	return (0);
+}
