@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/07 13:27:16 by tmura             #+#    #+#             */
+/*   Updated: 2026/01/07 13:27:16 by tmura            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 int	init_data(t_data *data, int argc, char **argv)
@@ -14,7 +26,8 @@ int	init_data(t_data *data, int argc, char **argv)
 	data->start_time = get_time();
 	if (data->num_philos < 1 || data->num_philos > MAX_PHILOS)
 		return (error_msg("Invalid number of philosophers"));
-	if (data->time_to_die < 0 || data->time_to_eat < 0 || data->time_to_sleep < 0)
+	if (data->time_to_die < 0 || data->time_to_eat < 0
+		|| data->time_to_sleep < 0)
 		return (error_msg("Invalid time values"));
 	if (argc == 6 && data->num_meals < 1)
 		return (error_msg("Invalid number of meals"));
@@ -59,4 +72,3 @@ int	init_philos(t_data *data)
 	}
 	return (0);
 }
-
