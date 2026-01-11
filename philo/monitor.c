@@ -1,8 +1,40 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   monitor.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/07 13:27:19 by tmura             #+#    #+#             */
+/*   Updated: 2026/01/07 15:33:45 by tmura            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
+
+int	time_check(long long time, t_data *data, int i)
+{
+	if (time > data->time_to_die)
+	{
+		pthread_mutex_unlock(&data->meal_check);
+		pthread_mutex_lock(&data->print_mutex);
+		pthread_mutex_lock(&data->meal_check);
+		if (!data->dead_flag)
+		{
+			printf("%lld %d died\n", get_time() - data->start_time,
+				data->philos[i].id);
+			data->dead_flag = true;
+		}
+		pthread_mutex_unlock(&data->meal_check);
+		pthread_mutex_unlock(&data->print_mutex);
+		return (1);
+	}
+	return (0);
+}
 
 int	check_death(t_data *data)
 {
-	int	i;
+	int			i;
 	long long	time;
 
 	i = 0;
@@ -15,20 +47,8 @@ int	check_death(t_data *data)
 			return (1);
 		}
 		time = get_time() - data->philos[i].last_meal_time;
-		if (time > data->time_to_die)
-		{
-			pthread_mutex_unlock(&data->meal_check);
-			pthread_mutex_lock(&data->print_mutex);
-			pthread_mutex_lock(&data->meal_check);
-			if (!data->dead_flag)
-			{
-				printf("%lld %d died\n", get_time() - data->start_time, data->philos[i].id);
-				data->dead_flag = true;
-			}
-			pthread_mutex_unlock(&data->meal_check);
-			pthread_mutex_unlock(&data->print_mutex);
+		if (time_check(time, data, i))
 			return (1);
-		}
 		pthread_mutex_unlock(&data->meal_check);
 		i++;
 	}
@@ -78,4 +98,3 @@ void	*monitor(void *arg)
 	}
 	return (NULL);
 }
-
