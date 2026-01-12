@@ -20,6 +20,19 @@ long long	get_time(void)
 	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
+void	precise_usleep(long long time_in_ms, t_data *data)
+{
+	long long	start_time;
+
+	(void)data;
+	start_time = get_time();
+	while (get_time() - start_time < time_in_ms)
+	{
+		if (time_in_ms - (get_time() - start_time) > 1)
+			usleep(100);
+	}
+}
+
 void	print_action(t_data *data, int id, char *str)
 {
 	long long	time;
