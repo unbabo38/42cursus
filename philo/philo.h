@@ -54,6 +54,8 @@ long long	get_time(void);
 void		print_action(t_data *data, int id, char *str);
 int			ft_atoi(const char *str);
 int			error_msg(char *str);
+void		precise_usleep(long long time_in_ms, t_data *data);
+void		debug_log(t_philo *philo, char *fmt, ...);
 
 // init.c
 int			init_data(t_data *data, int argc, char **argv);

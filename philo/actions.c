@@ -106,22 +106,17 @@ void	eat(t_philo *philo)
 
 void	sleep_think(t_philo *philo)
 {
-	t_data				*data;
-	long long			start_time;
+	t_data		*data;
+	long long	think_time;
 
 	data = philo->data;
 	print_action(data, philo->id, "is sleeping");
-	start_time = get_time();
-	while (get_time() - start_time < data->time_to_sleep)
-	{
-		pthread_mutex_lock(&data->meal_check);
-		if (data->dead_flag || data->all_ate)
-		{
-			pthread_mutex_unlock(&data->meal_check);
-			return ;
-		}
-		pthread_mutex_unlock(&data->meal_check);
-		usleep(100);
-	}
+	precise_usleep(data->time_to_sleep, data);
 	print_action(data, philo->id, "is thinking");
+	if (data->num_philos % 2 != 0)
+	{
+		think_time = (data->time_to_eat * 2 - data->time_to_sleep) * 0.4;
+		if (think_time > 0)
+			precise_usleep(think_time, data);
+	}
 }
