@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_bonus.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/12 20:17:45 by tmura             #+#    #+#             */
+/*   Updated: 2026/01/12 20:17:45 by tmura            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo_bonus.h"
 
 int	init_data(t_data *data, int argc, char **argv)
@@ -10,15 +22,14 @@ int	init_data(t_data *data, int argc, char **argv)
 	if (argc == 6)
 		data->num_meals = ft_atoi(argv[5]);
 	data->dead_flag = false;
-	data->start_time = get_time();
 	data->forks = NULL;
 	data->print_sem = NULL;
-	data->meal_sem = NULL;
 	data->dead_sem = NULL;
 	data->pids = NULL;
 	if (data->num_philos < 1 || data->num_philos > MAX_PHILOS)
 		return (error_msg("Invalid number of philosophers"));
-	if (data->time_to_die < 0 || data->time_to_eat < 0 || data->time_to_sleep < 0)
+	if (data->time_to_die < 0 || data->time_to_eat < 0
+		|| data->time_to_sleep < 0)
 		return (error_msg("Invalid time values"));
 	if (argc == 6 && data->num_meals < 1)
 		return (error_msg("Invalid number of meals"));
@@ -29,14 +40,12 @@ int	init_semaphores(t_data *data)
 {
 	sem_unlink("/forks");
 	sem_unlink("/print");
-	sem_unlink("/meal");
 	sem_unlink("/dead");
 	data->forks = sem_open("/forks", O_CREAT, 0644, data->num_philos);
 	data->print_sem = sem_open("/print", O_CREAT, 0644, 1);
-	data->meal_sem = sem_open("/meal", O_CREAT, 0644, 1);
-	data->dead_sem = sem_open("/dead", O_CREAT, 0644, 1);
+	data->dead_sem = sem_open("/dead", O_CREAT, 0644, 0);
 	if (data->forks == SEM_FAILED || data->print_sem == SEM_FAILED
-		|| data->meal_sem == SEM_FAILED || data->dead_sem == SEM_FAILED)
+		|| data->dead_sem == SEM_FAILED)
 		return (error_msg("Semaphore initialization failed"));
 	return (0);
 }
@@ -50,8 +59,9 @@ int	init_philos(t_data *data)
 	{
 		data->philos[i].id = i + 1;
 		data->philos[i].meals_eaten = 0;
-		data->philos[i].last_meal_time = get_time();
 		data->philos[i].data = data;
+		if (pthread_mutex_init(&data->philos[i].meal_lock, NULL) != 0)
+			return (error_msg("Mutex initialization failed"));
 		i++;
 	}
 	data->pids = malloc(sizeof(pid_t) * data->num_philos);
