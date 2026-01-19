@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_bonus.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/12 20:18:10 by tmura             #+#    #+#             */
+/*   Updated: 2026/01/19 14:54:59 by tmura            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo_bonus.h"
 
 void	cleanup(t_data *data)
@@ -8,14 +20,17 @@ void	cleanup(t_data *data)
 		sem_close(data->forks);
 	if (data->print_sem)
 		sem_close(data->print_sem);
-	if (data->meal_sem)
-		sem_close(data->meal_sem);
 	if (data->dead_sem)
 		sem_close(data->dead_sem);
 	sem_unlink("/forks");
 	sem_unlink("/print");
-	sem_unlink("/meal");
 	sem_unlink("/dead");
+	i = 0;
+	while (i < data->num_philos)
+	{
+		pthread_mutex_destroy(&data->philos[i].meal_lock);
+		i++;
+	}
 	if (data->pids)
 		free(data->pids);
 }
@@ -27,23 +42,26 @@ void	kill_all_processes(t_data *data)
 	i = 0;
 	while (i < data->num_philos)
 	{
-		if (data->pids[i] != 0)
-			kill(data->pids[i], SIGTERM);
+		if (data->pids[i] != 0 && kill(data->pids[i], 0) == 0)
+			kill(data->pids[i], SIGKILL);
 		i++;
 	}
 }
 
 int	wait_for_processes(t_data *data)
 {
-	int	i;
-	int	status;
-	int	dead_found;
+	int		i;
+	int		status;
+	int		dead_found;
+	pid_t	pid;
 
 	dead_found = 0;
 	i = 0;
 	while (i < data->num_philos)
 	{
-		waitpid(-1, &status, 0);
+		pid = waitpid(-1, &status, 0);
+		if (pid == -1)
+			break ;
 		if (WIFEXITED(status) && WEXITSTATUS(status) == 1)
 		{
 			if (!dead_found)
@@ -57,19 +75,29 @@ int	wait_for_processes(t_data *data)
 	return (0);
 }
 
+static int	init(t_data	*data, int argc, char **argv)
+{
+	if (argc < 5 || argc > 6)
+		return (error_msg("Usage: ./philo_bonus number_of_philosophers "
+				"time_to_die time_to_eat time_to_sleep "
+				"[number_of_times_each_philosopher_must_eat]"));
+	if (init_data(data, argc, argv) != 0)
+		return (1);
+	if (init_semaphores(data) != 0)
+		return (1);
+	if (init_philos(data) != 0)
+		return (1);
+	return (0);
+}
+
 int	main(int argc, char **argv)
 {
 	t_data		data;
 	int			i;
 
-	if (argc < 5 || argc > 6)
-		return (error_msg("Usage: ./philo_bonus number_of_philosophers time_to_die time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]"));
-	if (init_data(&data, argc, argv) != 0)
+	if (init(&data, argc, argv))
 		return (1);
-	if (init_semaphores(&data) != 0)
-		return (1);
-	if (init_philos(&data) != 0)
-		return (1);
+	data.start_time = get_time();
 	i = 0;
 	while (i < data.num_philos)
 	{
@@ -90,4 +118,3 @@ int	main(int argc, char **argv)
 	cleanup(&data);
 	return (0);
 }
-

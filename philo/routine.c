@@ -41,7 +41,7 @@ void	*philo_routine(void *arg)
 	philo = (t_philo *)arg;
 	data = philo->data;
 	if (philo->id % 2 == 0)
-		usleep(1000);
+		usleep(500);
 	while (1)
 	{
 		if (break_check(data))
