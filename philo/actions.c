@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/07 13:27:12 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/07 15:17:40 by tmura            ###   ########.fr       */
+/*   Updated: 2026/01/19 14:33:09 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static void	take_eat(t_data *data,
 			return ;
 		}
 		pthread_mutex_unlock(&data->meal_check);
-		usleep(100);
+		precise_usleep(100, data);
 	}
 	pthread_mutex_unlock(first_fork);
 	pthread_mutex_unlock(second_fork);
@@ -115,8 +115,9 @@ void	sleep_think(t_philo *philo)
 	print_action(data, philo->id, "is thinking");
 	if (data->num_philos % 2 != 0)
 	{
-		think_time = (data->time_to_eat * 2 - data->time_to_sleep) * 0.4;
+		think_time = (data->time_to_die
+				- (data->time_to_eat + data->time_to_sleep)) / 2;
 		if (think_time > 0)
-			precise_usleep(think_time, data);
+			usleep(think_time * 1000);
 	}
 }
