@@ -52,7 +52,8 @@ int	init_semaphores(t_data *data)
 
 int	init_philos(t_data *data)
 {
-	int	i;
+	int		i;
+	char	name[32];
 
 	i = 0;
 	while (i < data->num_philos)
@@ -60,8 +61,11 @@ int	init_philos(t_data *data)
 		data->philos[i].id = i + 1;
 		data->philos[i].meals_eaten = 0;
 		data->philos[i].data = data;
-		if (pthread_mutex_init(&data->philos[i].meal_lock, NULL) != 0)
-			return (error_msg("Mutex initialization failed"));
+		make_sem_name(name, i + 1);
+		sem_unlink(name);
+		data->philos[i].meal_lock = sem_open(name, O_CREAT, 0644, 1);
+		if (data->philos[i].meal_lock == SEM_FAILED)
+			return (error_msg("Semaphore initialization failed"));
 		i++;
 	}
 	data->pids = malloc(sizeof(pid_t) * data->num_philos);

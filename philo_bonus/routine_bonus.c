@@ -31,13 +31,13 @@ static void	philo_cycle(t_philo *philo)
 	data = philo->data;
 	while (1)
 	{
-		pthread_mutex_lock(&philo->meal_lock);
+		sem_wait(philo->meal_lock);
 		if (data->num_meals != -1 && philo->meals_eaten >= data->num_meals)
 		{
-			pthread_mutex_unlock(&philo->meal_lock);
+			sem_post(philo->meal_lock);
 			break ;
 		}
-		pthread_mutex_unlock(&philo->meal_lock);
+		sem_post(philo->meal_lock);
 		eat(philo);
 		sleep_think(philo);
 	}
@@ -50,9 +50,9 @@ void	philo_routine(t_philo *philo)
 	pthread_t	death_watcher_thread;
 
 	data = philo->data;
-	pthread_mutex_lock(&philo->meal_lock);
+	sem_wait(philo->meal_lock);
 	philo->last_meal_time = data->start_time;
-	pthread_mutex_unlock(&philo->meal_lock);
+	sem_post(philo->meal_lock);
 	if (pthread_create(&monitor_thread, NULL, monitor, philo) != 0)
 		exit(1);
 	if (pthread_create(&death_watcher_thread, NULL, death_watcher, philo) != 0)
