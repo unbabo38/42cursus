@@ -20,7 +20,7 @@ static void	die_check(t_philo *philo, t_data *data)
 	time = get_time() - philo->last_meal_time;
 	if (time > data->time_to_die)
 	{
-		pthread_mutex_unlock(&philo->meal_lock);
+		sem_post(philo->meal_lock);
 		sem_wait(data->print_sem);
 		printf("%lld %d died\n", get_time() - data->start_time, philo->id);
 		i = 0;
@@ -31,7 +31,7 @@ static void	die_check(t_philo *philo, t_data *data)
 		}
 		exit(1);
 	}
-	pthread_mutex_unlock(&philo->meal_lock);
+	sem_post(philo->meal_lock);
 	usleep(500);
 }
 
@@ -44,10 +44,10 @@ void	*monitor(void *arg)
 	data = philo->data;
 	while (1)
 	{
-		pthread_mutex_lock(&philo->meal_lock);
+		sem_wait(philo->meal_lock);
 		if (data->num_meals != -1 && philo->meals_eaten >= data->num_meals)
 		{
-			pthread_mutex_unlock(&philo->meal_lock);
+			sem_post(philo->meal_lock);
 			break ;
 		}
 		die_check(philo, data);

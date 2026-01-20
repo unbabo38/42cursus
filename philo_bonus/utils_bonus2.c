@@ -42,3 +42,30 @@ int	error_msg(char *str)
 	printf("Error: %s\n", str);
 	return (1);
 }
+
+void	make_sem_name(char *name, int id)
+{
+	int		i;
+	int		j;
+	char	*base;
+	char	tmp[12];
+
+	base = "/meal_lock_";
+	i = 0;
+	while (base[i])
+	{
+		name[i] = base[i];
+		i++;
+	}
+	if (id == 0)
+		name[i++] = '0';
+	j = 0;
+	while (id > 0)
+	{
+		tmp[j++] = (id % 10) + '0';
+		id /= 10;
+	}
+	while (j > 0)
+		name[i++] = tmp[--j];
+	name[i] = '\0';
+}

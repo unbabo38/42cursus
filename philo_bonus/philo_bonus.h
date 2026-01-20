@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 20:23:04 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/12 20:23:04 by tmura            ###   ########.fr       */
+/*   Updated: 2026/01/20 16:47:01 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ typedef struct s_philo
 	int				meals_eaten;
 	long long		last_meal_time;
 	pid_t			pid;
-	pthread_mutex_t	meal_lock;
+	sem_t			*meal_lock;
 	struct s_data	*data;
 }	t_philo;
 
@@ -57,8 +57,11 @@ typedef struct s_data
 long long	get_time(void);
 void		precise_usleep(long long time_in_ms, t_data *data);
 void		print_action(t_data *data, int id, char *str);
+
+// utils_bonus2.c
 int			ft_atoi(const char *str);
 int			error_msg(char *str);
+void		make_sem_name(char *name, int id);
 
 // init_bonus.c
 int			init_data(t_data *data, int argc, char **argv);
