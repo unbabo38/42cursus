@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 20:17:41 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/19 14:33:42 by tmura            ###   ########.fr       */
+/*   Updated: 2026/01/19 16:05:34 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,10 @@ void	eat(t_philo *philo)
 	}
 	sem_wait(data->forks);
 	sem_wait(data->forks);
-	pthread_mutex_lock(&philo->meal_lock);
+	sem_wait(philo->meal_lock);
 	philo->last_meal_time = get_time();
 	philo->meals_eaten++;
-	pthread_mutex_unlock(&philo->meal_lock);
+	sem_post(philo->meal_lock);
 	print_action(data, philo->id, "has taken a fork");
 	print_action(data, philo->id, "has taken a fork");
 	print_action(data, philo->id, "is eating");

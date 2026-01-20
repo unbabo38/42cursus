@@ -14,7 +14,8 @@
 
 void	cleanup(t_data *data)
 {
-	int	i;
+	int		i;
+	char	name[32];
 
 	if (data->forks)
 		sem_close(data->forks);
@@ -28,7 +29,12 @@ void	cleanup(t_data *data)
 	i = 0;
 	while (i < data->num_philos)
 	{
-		pthread_mutex_destroy(&data->philos[i].meal_lock);
+		if (data->philos[i].meal_lock)
+		{
+			make_sem_name(name, i + 1);
+			sem_close(data->philos[i].meal_lock);
+			sem_unlink(name);// We will generate the name to unlink it
+		}
 		i++;
 	}
 	if (data->pids)
