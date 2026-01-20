@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 20:18:10 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/19 14:54:59 by tmura            ###   ########.fr       */
+/*   Updated: 2026/01/20 21:47:38 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	cleanup(t_data *data)
 		{
 			make_sem_name(name, i + 1);
 			sem_close(data->philos[i].meal_lock);
-			sem_unlink(name);// We will generate the name to unlink it
+			sem_unlink(name);
 		}
 		i++;
 	}
