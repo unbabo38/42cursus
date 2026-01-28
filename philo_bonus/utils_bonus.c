@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 20:19:59 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/19 16:04:41 by tmura            ###   ########.fr       */
+/*   Updated: 2026/01/28 10:32:15 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,11 @@ static int	put_ll(char *buf, long long n)
 
 long long	get_time(void)
 {
-	struct timeval	tv;
+	struct timeval	time;
 
-	gettimeofday(&tv, NULL);
-	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+	if (gettimeofday(&time, NULL) == -1)
+		write(2, "cannot get time\n", 16);
+	return (time.tv_sec * 1000LL + time.tv_usec / 1000);
 }
 
 void	precise_usleep(long long time_in_ms, t_data *data)
