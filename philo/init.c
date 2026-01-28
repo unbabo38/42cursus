@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/07 13:27:16 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/07 13:27:16 by tmura            ###   ########.fr       */
+/*   Created: 2026/01/27 16:13:55 by tmura             #+#    #+#             */
+/*   Updated: 2026/01/27 16:13:55 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 int	init_data(t_data *data, int argc, char **argv)
 {
+	if (argc != 5 && argc != 6)
+		return (write(2, "Wrong argument count\n", 22), 1);
 	data->num_philos = ft_atoi(argv[1]);
 	data->time_to_die = ft_atoi(argv[2]);
 	data->time_to_eat = ft_atoi(argv[3]);
@@ -21,54 +23,56 @@ int	init_data(t_data *data, int argc, char **argv)
 	data->num_meals = -1;
 	if (argc == 6)
 		data->num_meals = ft_atoi(argv[5]);
-	data->dead_flag = false;
-	data->all_ate = false;
-	data->start_time = get_time();
-	if (data->num_philos < 1 || data->num_philos > MAX_PHILOS)
-		return (error_msg("Invalid number of philosophers"));
-	if (data->time_to_die < 0 || data->time_to_eat < 0
-		|| data->time_to_sleep < 0)
-		return (error_msg("Invalid time values"));
-	if (argc == 6 && data->num_meals < 1)
-		return (error_msg("Invalid number of meals"));
+	data->someone_dead = 0;
+	data->start_time = get_current_time();
+	pthread_mutex_init(&data->death_lock, NULL);
+	pthread_mutex_init(&data->print_lock, NULL);
 	return (0);
 }
 
-int	init_mutexes(t_data *data)
+int	init_forks(t_data *data)
+{
+	int	i;
+
+	data->forks = malloc(sizeof(pthread_mutex_t) * data->num_philos);
+	if (!data->forks)
+		return (1);
+	i = 0;
+	while (i < data->num_philos)
+	{
+		pthread_mutex_init(&data->forks[i], NULL);
+		i++;
+	}
+	return (0);
+}
+
+int	init_philos(t_data *data, t_philo *philo)
 {
 	int	i;
 
 	i = 0;
 	while (i < data->num_philos)
 	{
-		if (pthread_mutex_init(&data->forks[i], NULL) != 0)
-			return (error_msg("Mutex initialization failed"));
+		philo[i].id = i + 1;
+		philo[i].last_meal = data->start_time;
+		philo[i].meal_num = 0;
+		philo[i].data = data;
+		philo[i].left_fork = &data->forks[i];
+		philo[i].right_fork = &data->forks[(i + 1) % data->num_philos];
+		pthread_mutex_init(&philo[i].meal_lock, NULL);
 		i++;
 	}
-	if (pthread_mutex_init(&data->meal_check, NULL) != 0)
-		return (error_msg("Mutex initialization failed"));
-	if (pthread_mutex_init(&data->print_mutex, NULL) != 0)
-		return (error_msg("Mutex initialization failed"));
 	return (0);
 }
 
-int	init_philos(t_data *data)
+int	init_all(t_data *data, int argc, char **argv, t_philo **philos)
 {
-	int	i;
-
-	i = 0;
-	while (i < data->num_philos)
-	{
-		data->philos[i].id = i + 1;
-		data->philos[i].meals_eaten = 0;
-		data->philos[i].last_meal_time = get_time();
-		data->philos[i].data = data;
-		data->philos[i].left_fork = &data->forks[i];
-		if (i == data->num_philos - 1)
-			data->philos[i].right_fork = &data->forks[0];
-		else
-			data->philos[i].right_fork = &data->forks[i + 1];
-		i++;
-	}
+	if (init_data(data, argc, argv))
+		return (1);
+	if (init_forks(data))
+		return (1);
+	*philos = malloc(sizeof(t_philo) * data->num_philos);
+	if (!*philos || init_philos(data, *philos))
+		return (1);
 	return (0);
 }

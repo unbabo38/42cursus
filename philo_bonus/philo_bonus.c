@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 20:18:10 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/20 21:47:38 by tmura            ###   ########.fr       */
+/*   Updated: 2026/01/28 14:40:15 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,6 @@
 
 void	cleanup(t_data *data)
 {
-	int		i;
-	char	name[32];
-
 	if (data->forks)
 		sem_close(data->forks);
 	if (data->print_sem)
@@ -26,17 +23,7 @@ void	cleanup(t_data *data)
 	sem_unlink("/forks");
 	sem_unlink("/print");
 	sem_unlink("/dead");
-	i = 0;
-	while (i < data->num_philos)
-	{
-		if (data->philos[i].meal_lock)
-		{
-			make_sem_name(name, i + 1);
-			sem_close(data->philos[i].meal_lock);
-			sem_unlink(name);
-		}
-		i++;
-	}
+	clean_up_philos(data);
 	if (data->pids)
 		free(data->pids);
 }
