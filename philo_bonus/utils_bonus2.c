@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 20:19:59 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/19 15:16:43 by tmura            ###   ########.fr       */
+/*   Updated: 2026/01/28 14:41:54 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,24 @@ void	make_sem_name(char *name, int id)
 	while (j > 0)
 		name[i++] = tmp[--j];
 	name[i] = '\0';
+}
+
+void	clean_up_philos(t_data *data)
+{
+	int		i;
+	char	name[32];
+
+	i = 0;
+	while (i < data->num_philos)
+	{
+		if (data->philos[i].meal_lock)
+		{
+			make_sem_name(name, i + 1);
+			sem_close(data->philos[i].meal_lock);
+			sem_unlink(name);
+		}
+		i++;
+	}
+	if (data->philos)
+		free(data->philos);
 }

@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 20:17:41 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/19 16:05:34 by tmura            ###   ########.fr       */
+/*   Updated: 2026/01/28 14:56:18 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,14 @@ void	eat(t_philo *philo)
 		exit(1);
 	}
 	sem_wait(data->forks);
+	print_action(data, philo->id, "has taken a fork");
 	sem_wait(data->forks);
+	print_action(data, philo->id, "has taken a fork");
+	print_action(data, philo->id, "is eating");
 	sem_wait(philo->meal_lock);
 	philo->last_meal_time = get_time();
 	philo->meals_eaten++;
 	sem_post(philo->meal_lock);
-	print_action(data, philo->id, "has taken a fork");
-	print_action(data, philo->id, "has taken a fork");
-	print_action(data, philo->id, "is eating");
 	precise_usleep(data->time_to_eat, data);
 	sem_post(data->forks);
 	sem_post(data->forks);

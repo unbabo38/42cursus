@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 20:17:45 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/12 20:17:45 by tmura            ###   ########.fr       */
+/*   Updated: 2026/01/28 11:42:05 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ int	init_data(t_data *data, int argc, char **argv)
 	data->time_to_eat = ft_atoi(argv[3]);
 	data->time_to_sleep = ft_atoi(argv[4]);
 	data->num_meals = -1;
+	data->philos = malloc(sizeof(t_philo) * data->num_philos);
 	if (argc == 6)
 		data->num_meals = ft_atoi(argv[5]);
 	data->dead_flag = false;
@@ -26,7 +27,7 @@ int	init_data(t_data *data, int argc, char **argv)
 	data->print_sem = NULL;
 	data->dead_sem = NULL;
 	data->pids = NULL;
-	if (data->num_philos < 1 || data->num_philos > MAX_PHILOS)
+	if (data->num_philos < 1)
 		return (error_msg("Invalid number of philosophers"));
 	if (data->time_to_die < 0 || data->time_to_eat < 0
 		|| data->time_to_sleep < 0)
@@ -71,5 +72,6 @@ int	init_philos(t_data *data)
 	data->pids = malloc(sizeof(pid_t) * data->num_philos);
 	if (!data->pids)
 		return (error_msg("Memory allocation failed"));
+	memset(data->pids, 0, sizeof(pid_t) * data->num_philos);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 20:23:04 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/20 16:47:01 by tmura            ###   ########.fr       */
+/*   Updated: 2026/01/28 14:40:03 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,7 @@
 # include <stdbool.h>
 # include <pthread.h>
 # include <fcntl.h>
-
-# define MAX_PHILOS 200
+# include <string.h>
 
 typedef struct s_philo
 {
@@ -48,34 +47,23 @@ typedef struct s_data
 	sem_t			*forks;
 	sem_t			*print_sem;
 	sem_t			*dead_sem;
-	sem_t			*waiter_sem;
-	t_philo			philos[MAX_PHILOS];
+	t_philo			*philos;
 	pid_t			*pids;
 }	t_data;
 
-// utils_bonus.c
 long long	get_time(void);
 void		precise_usleep(long long time_in_ms, t_data *data);
 void		print_action(t_data *data, int id, char *str);
-
-// utils_bonus2.c
 int			ft_atoi(const char *str);
 int			error_msg(char *str);
 void		make_sem_name(char *name, int id);
-
-// init_bonus.c
 int			init_data(t_data *data, int argc, char **argv);
 int			init_philos(t_data *data);
 int			init_semaphores(t_data *data);
-
-// actions_bonus.c
 void		eat(t_philo *philo);
 void		sleep_think(t_philo *philo);
-
-// monitor_bonus.c
 void		*monitor(void *arg);
-
-// routine_bonus.c
 void		philo_routine(t_philo *philo);
+void		clean_up_philos(t_data *data);
 
 #endif
