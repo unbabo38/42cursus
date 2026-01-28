@@ -5,76 +5,74 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/07 13:27:26 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/07 13:27:26 by tmura            ###   ########.fr       */
+/*   Created: 2026/01/26 15:49:31 by tmura             #+#    #+#             */
+/*   Updated: 2026/01/26 15:49:31 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-long long	get_time(void)
-{
-	struct timeval	tv;
-
-	gettimeofday(&tv, NULL);
-	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
-}
-
-void	precise_usleep(long long time_in_ms, t_data *data)
-{
-	long long	start_time;
-
-	(void)data;
-	start_time = get_time();
-	while (get_time() - start_time < time_in_ms)
-	{
-		if (time_in_ms - (get_time() - start_time) > 1)
-			usleep(100);
-	}
-}
-
-void	print_action(t_data *data, int id, char *str)
+void	print_status(t_philo *philo, char *msg)
 {
 	long long	time;
-	int			should_print;
 
-	pthread_mutex_lock(&data->meal_check);
-	should_print = !data->dead_flag;
-	pthread_mutex_unlock(&data->meal_check);
-	pthread_mutex_lock(&data->print_mutex);
-	time = get_time() - data->start_time;
-	if (should_print)
-		printf("%lld %d %s\n", time, id, str);
-	pthread_mutex_unlock(&data->print_mutex);
+	pthread_mutex_lock(&philo->data->death_lock);
+	pthread_mutex_lock(&philo->data->print_lock);
+	if (philo->data->someone_dead)
+	{
+		pthread_mutex_unlock(&philo->data->death_lock);
+		pthread_mutex_unlock(&philo->data->print_lock);
+		return ;
+	}
+	pthread_mutex_unlock(&philo->data->death_lock);
+	time = get_current_time() - philo->data->start_time;
+	printf("%lld %d %s\n", time, philo->id, msg);
+	pthread_mutex_unlock(&philo->data->print_lock);
 }
 
-int	ft_atoi(const char *str)
+void	destroy_mutex(t_data *data, t_philo *philos)
 {
 	int	i;
-	int	sign;
-	int	result;
 
 	i = 0;
-	sign = 1;
-	result = 0;
-	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
-		i++;
-	if (str[i] == '-' || str[i] == '+')
+	while (i < data->num_philos)
 	{
-		if (str[i] == '-')
-			sign = -1;
+		pthread_mutex_destroy(&data->forks[i]);
+		pthread_mutex_destroy(&philos[i].meal_lock);
 		i++;
 	}
-	while (str[i] >= '0' && str[i] <= '9')
-	{
-		result = result * 10 + (str[i] - '0');
-		i++;
-	}
-	return (result * sign);
+	pthread_mutex_destroy(&data->death_lock);
+	pthread_mutex_destroy(&data->print_lock);
+	free(philos);
+	free(data->forks);
 }
 
-int	error_msg(char *str)
+int	check_arg_content(char *arg)
 {
-	printf("Error: %s\n", str);
-	return (1);
+	int	i;
+
+	i = 0;
+	while (arg[i] != '\0')
+	{
+		if (arg[i] < '0' || arg[i] > '9')
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
+int	check_input(char **argv)
+{
+	if (ft_atoi(argv[1]) <= 0 || check_arg_content(argv[1]) == 1)
+		return (write(2, "Invalid philosophers number\n", 29), 1);
+	if (ft_atoi(argv[2]) <= 0 || check_arg_content(argv[2]) == 1)
+		return (write(2, "Invalid time to die\n", 21), 1);
+	if (ft_atoi(argv[3]) <= 0 || check_arg_content(argv[3]) == 1)
+		return (write(2, "Invalid time to eat\n", 21), 1);
+	if (ft_atoi(argv[4]) <= 0 || check_arg_content(argv[4]) == 1)
+		return (write(2, "Invalid time to sleep\n", 23), 1);
+	if (argv[5] && (ft_atoi(argv[5]) < 0 || check_arg_content(argv[5]) == 1))
+		return (write(2, "Invalid number of times each philosopher must eat\n",
+				51), 1);
+	return (0);
 }

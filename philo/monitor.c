@@ -5,94 +5,100 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/07 13:27:19 by tmura             #+#    #+#             */
-/*   Updated: 2026/01/07 15:33:45 by tmura            ###   ########.fr       */
+/*   Created: 2026/01/26 16:31:29 by tmura             #+#    #+#             */
+/*   Updated: 2026/01/26 16:31:29 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	time_check(long long time, t_data *data, int i)
+void	philo_died(t_philo *philo)
 {
-	if (time > data->time_to_die)
+	long long	time;
+
+	time = 0;
+	pthread_mutex_lock(&philo->data->death_lock);
+	if (!philo->data->someone_dead)
 	{
-		pthread_mutex_unlock(&data->meal_check);
-		pthread_mutex_lock(&data->print_mutex);
-		pthread_mutex_lock(&data->meal_check);
-		if (!data->dead_flag)
+		philo->data->someone_dead = 1;
+		pthread_mutex_lock(&philo->data->print_lock);
+		time = get_current_time() - philo->data->start_time;
+		printf("%lld %d %s\n", time, philo->id, "died");
+		pthread_mutex_unlock(&philo->data->print_lock);
+		pthread_mutex_unlock(&philo->data->death_lock);
+		return ;
+	}
+	pthread_mutex_unlock(&philo->data->death_lock);
+	return ;
+}
+
+int	dead_check(t_philo *philo)
+{
+	long long	last_meal_time;
+
+	pthread_mutex_lock(&philo->meal_lock);
+	last_meal_time = philo->last_meal;
+	pthread_mutex_unlock(&philo->meal_lock);
+	if (get_current_time() - last_meal_time >= philo->data->time_to_die)
+		return (1);
+	return (0);
+}
+
+int	check_philos(t_philo *philos)
+{
+	int	i;
+
+	i = 0;
+	while (i < philos->data->num_philos)
+	{
+		if (dead_check(&philos[i]))
 		{
-			printf("%lld %d died\n", get_time() - data->start_time,
-				data->philos[i].id);
-			data->dead_flag = true;
+			philo_died(&philos[i]);
+			return (1);
 		}
-		pthread_mutex_unlock(&data->meal_check);
-		pthread_mutex_unlock(&data->print_mutex);
+		i++;
+	}
+	return (0);
+}
+
+int	all_ate(t_philo *philos)
+{
+	int		i;
+	int		finished_philos;
+
+	i = 0;
+	finished_philos = 0;
+	while (i < philos->data->num_philos)
+	{
+		pthread_mutex_lock(&philos[i].meal_lock);
+		if (philos[i].meal_num >= philos->data->num_meals)
+			finished_philos++;
+		pthread_mutex_unlock(&philos[i].meal_lock);
+		i++;
+	}
+	if (finished_philos == philos->data->num_philos)
+	{
+		pthread_mutex_lock(&philos->data->death_lock);
+		philos->data->someone_dead = 1;
+		pthread_mutex_unlock(&philos->data->death_lock);
 		return (1);
 	}
 	return (0);
 }
 
-int	check_death(t_data *data)
-{
-	int			i;
-	long long	time;
-
-	i = 0;
-	while (i < data->num_philos)
-	{
-		pthread_mutex_lock(&data->meal_check);
-		if (data->dead_flag)
-		{
-			pthread_mutex_unlock(&data->meal_check);
-			return (1);
-		}
-		time = get_time() - data->philos[i].last_meal_time;
-		if (time_check(time, data, i))
-			return (1);
-		pthread_mutex_unlock(&data->meal_check);
-		i++;
-	}
-	return (0);
-}
-
-int	check_all_ate(t_data *data)
-{
-	int	i;
-
-	if (data->num_meals == -1)
-		return (0);
-	i = 0;
-	while (i < data->num_philos)
-	{
-		pthread_mutex_lock(&data->meal_check);
-		if (data->philos[i].meals_eaten < data->num_meals)
-		{
-			pthread_mutex_unlock(&data->meal_check);
-			return (0);
-		}
-		pthread_mutex_unlock(&data->meal_check);
-		i++;
-	}
-	return (1);
-}
-
 void	*monitor(void *arg)
 {
-	t_data	*data;
-	int		all_ate_flag;
+	t_philo		*philos;
 
-	data = (t_data *)arg;
+	philos = (t_philo *)arg;
 	while (1)
 	{
-		if (check_death(data))
+		if (check_philos(philos))
 			break ;
-		all_ate_flag = check_all_ate(data);
-		if (all_ate_flag)
+		if (philos->data->num_meals >= 1)
 		{
-			pthread_mutex_lock(&data->meal_check);
-			data->all_ate = true;
-			pthread_mutex_unlock(&data->meal_check);
-			break ;
+			if (all_ate(philos))
+				break ;
 		}
 		usleep(500);
 	}
