@@ -1,12 +1,16 @@
 #include <string>
 
 class Zombie {
-private:
-    std::string _name;
-public:
-    Zombie(); // new[] のために必須！
-    ~Zombie();
-    void announce();
-    void setName(std::string name); // 後から名前を付ける用
+ private:
+  std::string _name;
+
+ public:
+  Zombie();
+  Zombie(const Zombie& src);
+  Zombie& operator=(const Zombie& rhs);
+  ~Zombie();
+
+  void announce() const;
+  void setName(const std::string& name);
 };
-Zombie* zombieHorde( int N, std::string name );
+Zombie *zombieHorde(int N, const std::string& name);
