@@ -1,28 +1,24 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Zombie.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/11 21:47:44 by tmura             #+#    #+#             */
-/*   Updated: 2026/03/11 21:47:44 by tmura            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#ifndef ZOMBIE_HPP
+# define ZOMBIE_HPP
 
-#include <string>
-#include <iostream>
+# include <iostream>
+# include <string>
 
-class Zombie
-{
-	private:
-		std::string _name;
+class Zombie {
+  private:
+    std::string _name;
 
-	public:
-		Zombie(std::string name);
-		~Zombie();
-		void	announce(void) const;
+  public:
+    Zombie();
+    Zombie(const Zombie& name);
+	Zombie& operator=(const Zombie& rhs);
+    ~Zombie();
+
+	Zombie(const std::string& name);
+    void announce(void) const;
 };
 
-Zombie* newZombie(std::string name);
-void randomChump(std::string name);
+Zombie* newZombie(const std::string& name);
+void randomChump(const std::string& name);
+
+#endif

@@ -1,20 +1,26 @@
 #include "Zombie.hpp"
 #include <iostream>
 
-// デフォルトコンストラクタ (new[] の時に呼ばれる)
-Zombie::Zombie() : _name("") {
-    // コンピュータ視点：中身を空にして場所だけ確保
+Zombie::Zombie() : _name("") {}
+
+Zombie::Zombie(const Zombie& src) {
+  std::cout << "Copy constructor called" << std::endl;
+  *this = src;
 }
 
-// デストラクタ (delete[] の時に呼ばれる)
+Zombie& Zombie::operator=(const Zombie& rhs) {
+  std::cout << "Copy assignment operator called" << std::endl;
+  if (this != &rhs) {
+    this->_name = rhs._name;
+  }
+  return *this;
+}
 Zombie::~Zombie() {
-    std::cout << "Zombie " << this->_name << " is destroyed." << std::endl;
+  std::cout << "Zombie " << this->_name << " is destroyed." << std::endl;
 }
 
-void Zombie::announce() {
-    std::cout << this->_name << ": BraiiiiiiinnnzzzZ..." << std::endl;
+void Zombie::announce() const {
+  std::cout << this->_name << ": BraiiiiiiinnnzzzZ..." << std::endl;
 }
 
-void Zombie::setName(std::string name) {
-    this->_name = name;
-}
+void Zombie::setName(const std::string& name) { this->_name = name; }

@@ -3,16 +3,20 @@
 
 # include "Weapon.hpp"
 # include <iostream>
+# include <string>
 
 class HumanA {
-private:
-    std::string _name;
-    Weapon&     _weapon; // 参照メンバ
-public:
-    // 参照は初期化が必要なのでコンストラクタで受け取る
-    HumanA(std::string name, Weapon& weapon);
-    ~HumanA();
-    void attack() const;
+ private:
+  std::string _name;
+  Weapon&     _weapon;
+  HumanA();
+ public:
+  HumanA(const std::string& name, Weapon& weapon);
+  HumanA(const HumanA& src);
+  HumanA& operator=(const HumanA& rhs);
+  ~HumanA();
+
+  void attack(void) const;
 };
 
 #endif
