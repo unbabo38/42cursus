@@ -1,21 +1,12 @@
 #include "Harl.hpp"
 
-Harl::Harl() {
-  // コンストラクタ（空でOK）
+Harl::Harl() {}
+Harl::Harl(const Harl &src) { *this = src; }
+Harl &Harl::operator=(const Harl &rhs) {
+  (void)rhs;
+  return *this;
 }
-Harl::Harl(const Harl& src) {
-    *this = src;
-}
-
-// コピー代入演算子
-Harl& Harl::operator=(const Harl& rhs) {
-    (void)rhs; // メンバ変数がないため、未使用引数の警告を抑制
-    return *this;
-}
-
-Harl::~Harl() {
-  // デストラクタ（空でOK）
-}
+Harl::~Harl() {}
 
 void Harl::debug(void) {
   std::cout << "[ DEBUG ]\nI love having extra bacon... I really do!"
@@ -41,16 +32,13 @@ void Harl::error(void) {
 }
 
 void Harl::complain(std::string level) {
-  // メンバ関数ポインタの配列を作成
   void (Harl::*functions[])(void) = {&Harl::debug, &Harl::info, &Harl::warning,
                                      &Harl::error};
 
-  // 対応するレベル文字列の配列
   std::string levels[] = {"DEBUG", "INFO", "WARNING", "ERROR"};
 
   for (int i = 0; i < 4; i++) {
     if (levels[i] == level) {
-      // 見つかったらその関数を呼び出す
       (this->*functions[i])();
       return;
     }

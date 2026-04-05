@@ -1,14 +1,10 @@
 #include "Harl.hpp"
 
 Harl::Harl() {}
-Harl::Harl(const Harl& src) {
-    *this = src;
-}
-
-// コピー代入演算子
-Harl& Harl::operator=(const Harl& rhs) {
-    (void)rhs; // メンバ変数がないため、未使用引数の警告を抑制
-    return *this;
+Harl::Harl(const Harl &src) { *this = src; }
+Harl &Harl::operator=(const Harl &rhs) {
+  (void)rhs;
+  return *this;
 }
 Harl::~Harl() {}
 

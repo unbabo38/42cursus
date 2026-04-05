@@ -1,3 +1,3 @@
 #include "Zombie.hpp"
 
-Zombie *newZombie(const std::string& name) { return (new Zombie(name)); }
+Zombie *newZombie(const std::string &name) { return (new Zombie(name)); }

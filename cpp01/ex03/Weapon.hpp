@@ -10,7 +10,7 @@ private:
 public:
   Weapon(std::string type);
   ~Weapon();
-  const std::string &getType() const; // 戻り値はstringの定数参照
+  const std::string &getType() const;
   void setType(std::string newType);
 };
 

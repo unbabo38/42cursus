@@ -14,7 +14,7 @@ private:
 public:
   Harl();
   ~Harl();
-  void complain(std::string level); // ここで switch を使う
+  void complain(std::string level);
 };
 
 #endif
