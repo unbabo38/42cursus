@@ -13,11 +13,8 @@ private:
 
 public:
   Harl(void);
-
   Harl(const Harl &src);
-
   Harl &operator=(const Harl &rhs);
-
   ~Harl(void);
   void complain(std::string level);
 };
