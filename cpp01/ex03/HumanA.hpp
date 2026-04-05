@@ -1,19 +1,20 @@
 #ifndef HUMANA_HPP
-# define HUMANA_HPP
+#define HUMANA_HPP
 
-# include "Weapon.hpp"
-# include <iostream>
-# include <string>
+#include "Weapon.hpp"
+#include <iostream>
+#include <string>
 
 class HumanA {
- private:
+private:
   std::string _name;
-  Weapon&     _weapon;
+  Weapon &_weapon;
   HumanA();
- public:
-  HumanA(const std::string& name, Weapon& weapon);
-  HumanA(const HumanA& src);
-  HumanA& operator=(const HumanA& rhs);
+
+public:
+  HumanA(const std::string &name, Weapon &weapon);
+  HumanA(const HumanA &src);
+  HumanA &operator=(const HumanA &rhs);
   ~HumanA();
 
   void attack(void) const;

@@ -1,16 +1,11 @@
-# --- プログラム名 (課題指定の名前) ---
 NAME        = harlFilter
 
-# --- コンパイラとフラグ ---
 CXX         = c++
 CXXFLAGS    = -Wall -Wextra -Werror -std=c++98 -pedantic
 RM          = rm -rf
 
-# --- ファイル構成 ---
 SRCS        = main.cpp Harl.cpp
 OBJS        = $(SRCS:.cpp=.o)
-
-# --- ルール定義 ---
 
 all: $(NAME)
 
@@ -21,10 +16,10 @@ $(NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OBJS)
+	rm -f $(OBJS)
 
 fclean: clean
-	$(RM) $(NAME)
+	rm -f $(NAME)
 
 re: fclean all
 

@@ -1,16 +1,16 @@
 #include <string>
 
 class Zombie {
- private:
+private:
   std::string _name;
 
- public:
+public:
   Zombie();
-  Zombie(const Zombie& src);
-  Zombie& operator=(const Zombie& rhs);
+  Zombie(const Zombie &src);
+  Zombie &operator=(const Zombie &rhs);
   ~Zombie();
 
   void announce() const;
-  void setName(const std::string& name);
+  void setName(const std::string &name);
 };
-Zombie *zombieHorde(int N, const std::string& name);
+Zombie *zombieHorde(int N, const std::string &name);

@@ -7,7 +7,7 @@ int main() {
     zombie1 = newZombie("zombie1");
     zombie1->announce();
     delete zombie1;
-	zombie1 = NULL;
+    zombie1 = NULL;
   } catch (const std::bad_alloc &e) {
     std::cerr << "Error: Memory allocation failed: " << e.what() << std::endl;
     return 1;
