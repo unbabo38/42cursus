@@ -1,19 +1,33 @@
 #include "Fixed.hpp"
-
-/* --- Constructors & Destructor (Orthodox Canonical Form) --- */
+#define MAX_FIXED_INT 8388607
+#define MIN_FIXED_INT -8388608
 
 Fixed::Fixed() : _rawBits(0) {}
 
 Fixed::Fixed(const int n) {
-    this->_rawBits = n << _fractionalBits;
+	if (n > MAX_FIXED_INT || n < MIN_FIXED_INT) {
+         std::cerr << "[Warning] Input int " << n << " is too large!" << std::endl;
+    }
+	this->_rawBits = n << _fractionalBits;
 }
 
 Fixed::Fixed(const float f) {
-    this->_rawBits = roundf(f * (1 << _fractionalBits));
+	if (f > (float)MAX_FIXED_INT || f < (float)MIN_FIXED_INT) {
+        std::cerr << "[Warning] Float value " << f << " is way too big!" << std::endl;
+    }
+    this->_rawBits = (int)roundf(f * (1 << _fractionalBits));
 }
 
 Fixed::Fixed(const Fixed& other) {
     *this = other;
+}
+
+void Fixed::_checkIntegerOverflow(long raw_value, const std::string& op) const {
+	long int_part = raw_value >> _fractionalBits;
+    if (int_part > MAX_FIXED_INT || int_part < MIN_FIXED_INT) {
+        std::cerr << "[Warning] Integer overflow in " << op
+                  << ": " << int_part << " exceeds 24-bit range!" << std::endl;
+    }
 }
 
 Fixed& Fixed::operator=(const Fixed& other) {
@@ -25,7 +39,6 @@ Fixed& Fixed::operator=(const Fixed& other) {
 
 Fixed::~Fixed() {}
 
-/* --- Raw Bits Accessors --- */
 
 int Fixed::getRawBits(void) const {
     return this->_rawBits;
@@ -35,7 +48,6 @@ void Fixed::setRawBits(int const raw) {
     this->_rawBits = raw;
 }
 
-/* --- Type Conversions --- */
 
 float Fixed::toFloat(void) const {
     return (float)this->_rawBits / (1 << _fractionalBits);
@@ -45,7 +57,6 @@ int Fixed::toInt(void) const {
     return this->_rawBits >> _fractionalBits;
 }
 
-/* --- 6 Comparison Operators --- */
 
 bool Fixed::operator>(const Fixed& other) const { return this->_rawBits > other._rawBits; }
 bool Fixed::operator<(const Fixed& other) const { return this->_rawBits < other._rawBits; }
@@ -54,43 +65,40 @@ bool Fixed::operator<=(const Fixed& other) const { return this->_rawBits <= othe
 bool Fixed::operator==(const Fixed& other) const { return this->_rawBits == other._rawBits; }
 bool Fixed::operator!=(const Fixed& other) const { return this->_rawBits != other._rawBits; }
 
-/* --- 4 Arithmetic Operators --- */
 
 Fixed Fixed::operator+(const Fixed& other) const {
     Fixed res;
     res.setRawBits(this->_rawBits + other._rawBits);
+	_checkIntegerOverflow((long)this->_rawBits + (long)other._rawBits, "plus");
     return res;
 }
 
 Fixed Fixed::operator-(const Fixed& other) const {
     Fixed res;
     res.setRawBits(this->_rawBits - other._rawBits);
+	_checkIntegerOverflow((long)this->_rawBits - (long)other._rawBits, "minus");
     return res;
 }
 
-// 掛け算: (A * B) / 256
 Fixed Fixed::operator*(const Fixed& other) const {
     Fixed res;
     res.setRawBits(((long)this->_rawBits * other._rawBits) >> _fractionalBits);
+	_checkIntegerOverflow(((long)this->_rawBits * other._rawBits) >> _fractionalBits, "multi");
     return res;
 }
 
-// 割り算: (A * 256) / B
 Fixed Fixed::operator/(const Fixed& other) const {
     Fixed res;
     res.setRawBits(((long)this->_rawBits << _fractionalBits) / other._rawBits);
+	_checkIntegerOverflow(((long)this->_rawBits << _fractionalBits) / other._rawBits, "division");
     return res;
 }
 
-/* --- 4 Increment/Decrement Operators --- */
-
-// 前置 (++a): 最小単位(1)を足して、自分自身を返す
 Fixed& Fixed::operator++(void) {
     this->_rawBits++;
     return *this;
 }
 
-// 後置 (a++): 増やす前のコピーを返し、自分は増える
 Fixed Fixed::operator++(int) {
     Fixed temp(*this);
     this->_rawBits++;
@@ -108,25 +116,22 @@ Fixed Fixed::operator--(int) {
     return temp;
 }
 
-/* --- 4 Static Min/Max Functions --- */
-
 Fixed& Fixed::min(Fixed& a, Fixed& b) {
-    return (a < b) ? a : b;
+    return (a <= b) ? a : b;
 }
 
 const Fixed& Fixed::min(const Fixed& a, const Fixed& b) {
-    return (a < b) ? a : b;
+    return (a <= b) ? a : b;
 }
 
 Fixed& Fixed::max(Fixed& a, Fixed& b) {
-    return (a > b) ? a : b;
+    return (a >= b) ? a : b;
 }
 
 const Fixed& Fixed::max(const Fixed& a, const Fixed& b) {
-    return (a > b) ? a : b;
+    return (a >= b) ? a : b;
 }
 
-/* --- Ostream Operator Overload --- */
 
 std::ostream& operator<<(std::ostream& os, const Fixed& fixed) {
     os << fixed.toFloat();
