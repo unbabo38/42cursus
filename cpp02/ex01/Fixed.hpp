@@ -27,7 +27,6 @@ public:
     void setRawBits(int const raw);
 };
 
-// クラス外での演算子オーバーロード（std::cout << a 用）
 std::ostream& operator<<(std::ostream& os, const Fixed& fixed);
 
 #endif
