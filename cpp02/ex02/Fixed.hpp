@@ -10,7 +10,6 @@ private:
     static const int _fractionalBits = 8;
 
 public:
-    // --- Orthodox Canonical Form ---
     Fixed();
     Fixed(const int n);
     Fixed(const float f);
@@ -18,43 +17,36 @@ public:
     Fixed& operator=(const Fixed& other);
     ~Fixed();
 
-    // --- Accessors ---
     int getRawBits(void) const;
     void setRawBits(int const raw);
 
-    // --- Conversion ---
     float toFloat(void) const;
     int toInt(void) const;
 
-    // --- 6 Comparison Operators ---
     bool operator>(const Fixed& other) const;
     bool operator<(const Fixed& other) const;
     bool operator>=(const Fixed& other) const;
-    bool operator<<= (const Fixed& other) const;
     bool operator<=(const Fixed& other) const;
     bool operator==(const Fixed& other) const;
     bool operator!=(const Fixed& other) const;
 
-    // --- 4 Arithmetic Operators ---
     Fixed operator+(const Fixed& other) const;
     Fixed operator-(const Fixed& other) const;
     Fixed operator*(const Fixed& other) const;
     Fixed operator/(const Fixed& other) const;
 
-    // --- 4 Increment/Decrement Operators ---
-    Fixed& operator++(void);    // 前置 (++a)
-    Fixed  operator++(int);     // 後置 (a++)
-    Fixed& operator--(void);    // 前置 (--a)
-    Fixed  operator--(int);     // 後置 (a--)
+    Fixed& operator++(void);
+    Fixed  operator++(int);
+    Fixed& operator--(void);
+    Fixed  operator--(int);
 
-    // --- 4 Static Min/Max Functions ---
     static Fixed& min(Fixed& a, Fixed& b);
     static const Fixed& min(const Fixed& a, const Fixed& b);
     static Fixed& max(Fixed& a, Fixed& b);
     static const Fixed& max(const Fixed& a, const Fixed& b);
+	void _checkIntegerOverflow(long raw_value, const std::string& op) const;
 };
 
-// --- Ostream Overload ---
 std::ostream& operator<<(std::ostream& os, const Fixed& fixed);
 
 #endif
