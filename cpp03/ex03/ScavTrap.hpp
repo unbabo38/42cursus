@@ -2,6 +2,7 @@
 #define SCAVTRAP_HPP
 
 #include "ClapTrap.hpp"
+#define ScavTrap_energyPoints 50
 
 class ScavTrap : public virtual ClapTrap {
 public:

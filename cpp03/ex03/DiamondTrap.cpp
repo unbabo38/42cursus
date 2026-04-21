@@ -1,12 +1,27 @@
 #include "DiamondTrap.hpp"
 
+void DiamondTrap::printStatus(void) const {
+    std::cout << std::setw(20) << "NAME";
+    std::cout << std::setw(10) << "HP";
+    std::cout << std::setw(10) << "EP";
+    std::cout << std::setw(10) << "AD" << std::endl;
+    std::cout << std::string(50, '-') << std::endl;
+
+    std::cout << std::setw(20) << _name;
+    std::cout << std::setw(10) << _hitPoints;
+    std::cout << std::setw(10) << _energyPoints;
+    std::cout << std::setw(10) << _attackDamage << std::endl;
+    std::cout << std::endl;
+}
+
 DiamondTrap::DiamondTrap() : ClapTrap("Diamond_clap_name"), ScavTrap(), FragTrap(), _name("Diamond") {
     std::cout << "DiamondTrap " << this->_name << " finally created!" << std::endl;
-    this->_hitPoints = FragTrap::_hitPoints;
-    this->_energyPoints = ScavTrap::_energyPoints;
-    this->_attackDamage = FragTrap::_attackDamage;
+    this->_hitPoints = FragTrap_hitPoints;
+    this->_energyPoints = ScavTrap_energyPoints;
+    this->_attackDamage = FragTrap_attackDamage;
 	printStatus();
 }
+
 
 DiamondTrap::DiamondTrap(const std::string& name) : ClapTrap(name + "_clap_name"), ScavTrap(), FragTrap(), _name(name) {
     std::cout << "DiamondTrap " << this->_name << " finally created!" << std::endl;
@@ -16,19 +31,16 @@ DiamondTrap::DiamondTrap(const std::string& name) : ClapTrap(name + "_clap_name"
 	printStatus();
 }
 
-// デストラクタ
 DiamondTrap::~DiamondTrap() {
     std::cout << "DiamondTrap " << this->_name << " destroyed!" << std::endl;
 }
 
-// コピーコンストラクタ
 DiamondTrap::DiamondTrap(const DiamondTrap& other) : ClapTrap(other), ScavTrap(other), FragTrap(other) {
     std::cout << "DiamondTrap Copy constructor called" << std::endl;
     *this = other;
 	printStatus();
 }
 
-// 代入演算子
 DiamondTrap& DiamondTrap::operator=(const DiamondTrap& other) {
 	std::cout << "DiamondTrap assignment operator called" << std::endl;
     if (this != &other) {
@@ -47,8 +59,8 @@ void  DiamondTrap::attack(const std::string& target){
 
 void  DiamondTrap::takeDamage(unsigned int amount) {
   if (amount > static_cast<unsigned int>(_hitPoints)) {
-	std::cout << "DiamondTrap " << _name << " takes " << _hitPoints << " damage!" << std::endl;
 	std::cout << "DiamondTrap " << _name << " has no hit points" << std::endl;
+	std::cout << "DiamondTrap " << _name << " takes " << _hitPoints << " damage!" << std::endl;
 	_hitPoints = 0;
 	printStatus();
   }

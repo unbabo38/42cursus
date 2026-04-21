@@ -19,6 +19,7 @@ public:
 	void beRepaired(unsigned int amount);
 	void takeDamage(unsigned int amount);
 	void whoAmI();
+    void printStatus(void) const;
 };
 
 #endif
