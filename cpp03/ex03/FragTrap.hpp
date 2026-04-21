@@ -4,6 +4,10 @@
 #include "ClapTrap.hpp"
 #include "ScavTrap.hpp"
 
+#define FragTrap_hitPoints 100
+#define FragTrap_attackDamage 30
+
+
 class FragTrap : public virtual ClapTrap {
 public:
     FragTrap();

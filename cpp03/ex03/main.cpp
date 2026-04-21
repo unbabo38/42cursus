@@ -2,7 +2,7 @@
 
 int main() {
     std::cout << "--- DiamondTrap Birth ---" << std::endl;
-	DiamondTrap dt;
+	DiamondTrap dt("dt");
     // 1. 名前とClapTrap名の確認
     dt.whoAmI();
 

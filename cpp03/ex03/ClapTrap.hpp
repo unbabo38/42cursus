@@ -23,7 +23,7 @@ class ClapTrap {
 	void virtual		attack(const std::string& target);
 	void virtual 		takeDamage(unsigned int amount);
 	void virtual		beRepaired(unsigned int amount);
-	void				printStatus(void) const;
+	void virtual		printStatus(void) const;
 };
 
 #endif
