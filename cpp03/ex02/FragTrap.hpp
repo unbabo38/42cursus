@@ -5,18 +5,23 @@
 #include "ScavTrap.hpp"
 
 class FragTrap : public ClapTrap {
-public:
-    FragTrap();
-	FragTrap(const std::string& name);
-    FragTrap(const FragTrap& other);
-    FragTrap& operator=(const FragTrap& other);
-    virtual ~FragTrap();
+ private:
+  static unsigned int const _initHitPoints = 100;
+  static unsigned int const _initEnergyPoints = 100;
+  static unsigned int const _initAttackDamage = 30;
 
-	void attack(const std::string& target);
-	void beRepaired(unsigned int amount);
-	void takeDamage(unsigned int amount);
+ public:
+  FragTrap();
+  FragTrap(const std::string& name);
+  FragTrap(const FragTrap& other);
+  FragTrap& operator=(const FragTrap& other);
+  virtual ~FragTrap();
 
-	void highFivesGuys(void);
+  void attack(const std::string& target);
+  void beRepaired(unsigned int amount);
+  void takeDamage(unsigned int amount);
+
+  void highFivesGuys(void);
 };
 
 #endif

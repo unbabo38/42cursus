@@ -1,29 +1,38 @@
 #ifndef CLAPTRAP_HPP
 #define CLAPTRAP_HPP
 
-#include <iostream>
-#include <string>
 #include <climits>
 #include <iomanip>
+#include <iostream>
+#include <string>
+
+#define ClapTrap_hitPoints 10
+#define ClapTrap_attackDamage 0
+#define ClapTrap_energyPoints 10
 
 class ClapTrap {
-  protected:
-	std::string					_name;
-	unsigned int  				_hitPoints;
-	unsigned int				_energyPoints;
-	unsigned int				_attackDamage;
+ private:
+  static unsigned int const _initHitPoints = 10;
+  static unsigned int const _initEnergyPoints = 10;
+  static unsigned int const _initAttackDamage = 0;
 
-  public:
-	ClapTrap();
-	ClapTrap(const std::string& name);
-	ClapTrap(const ClapTrap& other);
-	ClapTrap& operator=(const ClapTrap& other);
-	~ClapTrap();
+ protected:
+  std::string _name;
+  unsigned int _hitPoints;
+  unsigned int _energyPoints;
+  unsigned int _attackDamage;
 
-	void 				attack(const std::string& target);
-	void virtual 		takeDamage(unsigned int amount);
-	void virtual		beRepaired(unsigned int amount);
-	void				printStatus(void) const;
+ public:
+  ClapTrap();
+  ClapTrap(const std::string& name);
+  ClapTrap(const ClapTrap& other);
+  ClapTrap& operator=(const ClapTrap& other);
+  virtual ~ClapTrap();
+
+  void attack(const std::string& target);
+  void virtual takeDamage(unsigned int amount);
+  void virtual beRepaired(unsigned int amount);
+  void printStatus(void) const;
 };
 
 #endif
