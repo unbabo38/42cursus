@@ -4,23 +4,24 @@
 #include "ClapTrap.hpp"
 #include "ScavTrap.hpp"
 
-#define FragTrap_hitPoints 100
-#define FragTrap_attackDamage 30
-
-
 class FragTrap : public virtual ClapTrap {
-public:
-    FragTrap();
-	FragTrap(const std::string& name);
-    FragTrap(const FragTrap& other);
-    FragTrap& operator=(const FragTrap& other);
-    virtual ~FragTrap();
+ protected:
+  static unsigned int const _initHitPoints = 100;
+  static unsigned int const _initEnergyPoints = 100;
+  static unsigned int const _initAttackDamage = 30;
 
-	void attack(const std::string& target);
-	void beRepaired(unsigned int amount);
-	void takeDamage(unsigned int amount);
+ public:
+  FragTrap();
+  FragTrap(const std::string& name);
+  FragTrap(const FragTrap& other);
+  FragTrap& operator=(const FragTrap& other);
+  virtual ~FragTrap();
 
-	void highFivesGuys(void);
+  void attack(const std::string& target);
+  void beRepaired(unsigned int amount);
+  void takeDamage(unsigned int amount);
+
+  void highFivesGuys(void);
 };
 
 #endif

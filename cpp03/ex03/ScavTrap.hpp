@@ -2,21 +2,25 @@
 #define SCAVTRAP_HPP
 
 #include "ClapTrap.hpp"
-#define ScavTrap_energyPoints 50
 
 class ScavTrap : public virtual ClapTrap {
-public:
-    ScavTrap();
-    ScavTrap(const std::string& name);
-    ScavTrap(const ScavTrap& other);
-    ScavTrap& operator=(const ScavTrap& other);
-    virtual ~ScavTrap();
+ protected:
+  static unsigned int const _initHitPoints = 100;
+  static unsigned int const _initEnergyPoints = 50;
+  static unsigned int const _initAttackDamage = 20;
 
-    void attack(const std::string& target);
-	void takeDamage(unsigned int amount);
-	void beRepaired(unsigned int amount);
+ public:
+  ScavTrap();
+  ScavTrap(const std::string& name);
+  ScavTrap(const ScavTrap& other);
+  ScavTrap& operator=(const ScavTrap& other);
+  virtual ~ScavTrap();
 
-    void guardGate();
+  void attack(const std::string& target);
+  void takeDamage(unsigned int amount);
+  void beRepaired(unsigned int amount);
+
+  void guardGate();
 };
 
 #endif
