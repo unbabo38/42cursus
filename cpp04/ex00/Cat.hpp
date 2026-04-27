@@ -5,7 +5,7 @@
 #include <string>
 #include "Animal.hpp"
 
-class Cat : public virtual Animal{
+class Cat : public Animal{
   public:
     Cat();
 	Cat(const Cat& other);
