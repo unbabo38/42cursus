@@ -1,0 +1,27 @@
+Animal default is born !
+Brain created.
+Cat is born!
+Animal default is born !
+Brain created.
+Dog is born!
+--- Cat's Idea 0 ---
+catsidea
+Shallow copy cat : catsidea
+Shallow address: 0x5bf3cfddb2b0 cat address : 0x5bf3cfddb2b0
+--- Deep Copy Test ---
+Brain created.
+Brain destroyed.
+Brain copy constructor called.
+Brain assignment operator called.
+Deep address: 0x7ffcdb13dde0 cat address : 0x5bf3cfddb2b0
+Original cat idea 0: catsidea
+Copied cat idea 0: Updated idea
+Brain destroyed.
+Cat is dead.
+Animal is dead.
+Brain destroyed.
+Dog is dead.
+Animal is dead.
+Brain destroyed.
+Cat is dead.
+Animal is dead.
