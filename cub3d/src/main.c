@@ -81,8 +81,8 @@ int	initialization(t_data *data)
 {
 
 	ft_bzero(data, sizeof(t_data));
-	//map_init(data);
-	debug_make_map(data);
+	map_init(data);
+	//debug_make_map(data);
 	data->posX = 3.0;
 	data->posY = 3.0;
 	//default_dir(orientation, data);

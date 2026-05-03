@@ -98,8 +98,11 @@ int	render_frame(t_data *data)
 				mapY += stepY;
 				side = 1;
 			}
-			if (data->map[mapX][mapY] == '1')
-				hit = 1;
+			if (mapX >= 0 && mapX < data->map_width && mapY >= 0 && mapY < data->map_height) {
+				if (data->map[mapX][mapY] == '1') hit = 1;
+			} else {
+				hit = 1; // 範囲外に出たらループを抜ける
+			}
 		}
 
 		// この時点でhitしている、ここから描画処理

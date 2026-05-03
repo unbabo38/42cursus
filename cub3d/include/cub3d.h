@@ -32,6 +32,15 @@ typedef struct s_flg {
 	int	key_esc;
 } t_flg;
 
+typedef struct s_texture {
+	char    *no_path;
+    char    *so_path;
+    char    *we_path;
+    char    *ea_path;
+    int     floor_color;
+    int     ceiling_color;
+} t_texture;
+
 typedef struct cub3d {
 	void 	*mlx;
 	void 	*win;
@@ -48,6 +57,7 @@ typedef struct cub3d {
 	double 	dirX, dirY;
 	double 	planeX, planeY;
 	t_flg 	flg;
+	t_texture txture;
 } t_data;
 
 
@@ -64,8 +74,11 @@ int	initialization(t_data *data);
 
 int	map_init(t_data *data);
 void fill_space(char *dst, char *tmp, t_data *data);
-void make_map(char ***map, int fd, t_data *data);
+void make_map(int fd, t_data *data);
 
+void	default_dir(char orientation, t_data *data);
+int	check_characters(t_data *data);
+int	check_wall(t_data *data, char **map, int h, int w);
 
 
 #define mapWidth 24
