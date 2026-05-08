@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   rendering.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/05/06 16:46:21 by tmura             #+#    #+#             */
+/*   Updated: 2026/05/06 16:46:21 by tmura            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/cub3d.h"
 
 void check_death(t_data *data)
@@ -8,37 +20,24 @@ void check_death(t_data *data)
 
     if (dist < 0.4) // 接触範囲
     {
-        printf("\a"); // ビープ音（Linux/Mac環境による）
+        printf("\a");
         printf("KILLED BY BARREL!\n");
-
-        // とりあえず初期位置に戻してゲーム継続させる
-        data->posX = 2.0;
-        data->posY = 2.0;
 		exit(0);
-        // あるいは exit(0); で終了
     }
 }
 
 void move_sprite(t_data *data)
 {
-    double enemySpeed = 0.0035; // 速すぎると即死するのでこのくらいから
-    double buffer = 0.2;       // 壁やドアとの距離を保つバッファ
-
-    // --- X軸の移動 ---
+    double enemySpeed = 0.0035;
+    double buffer = 0.2;
     double nextX = data->sprite.x;
     if (data->sprite.x < data->posX)
         nextX += enemySpeed;
     else
         nextX -= enemySpeed;
-
-    // 移動先が壁('1')でも閉じたドア('D')でもなければ移動
     if (data->map[(int)data->sprite.y][(int)(nextX + (nextX > data->sprite.x ? buffer : -buffer))] != '1' &&
         data->map[(int)data->sprite.y][(int)(nextX + (nextX > data->sprite.x ? buffer : -buffer))] != 'D')
-    {
-        data->sprite.x = nextX;
-    }
-
-    // --- Y軸の移動 ---
+    	data->sprite.x = nextX;
     double nextY = data->sprite.y;
     if (data->sprite.y < data->posY)
         nextY += enemySpeed;
@@ -111,19 +110,14 @@ int mouse_move(int x, int y, t_data *data)
     // static変数で前回のマウス位置を記憶しておく
     static int last_x = -1;
     double rotSpeed;
-
     // 初回呼び出し時は、現在の位置を保存して終了（回転させない）
     if (last_x == -1)
     {
         last_x = x;
         return (0);
     }
-
-    // 前回の位置との差分を計算
     // x - last_x が正なら右移動、負なら左移動
     rotSpeed = (x - last_x) * 0.01;
-
-    // 回転処理
     double oldDirX = data->dirX;
     data->dirX = data->dirX * cos(rotSpeed) - data->dirY * sin(rotSpeed);
     data->dirY = oldDirX * sin(rotSpeed) + data->dirY * cos(rotSpeed);
@@ -131,10 +125,7 @@ int mouse_move(int x, int y, t_data *data)
     double oldPlaneX = data->planeX;
     data->planeX = data->planeX * cos(rotSpeed) - data->planeY * sin(rotSpeed);
     data->planeY = oldPlaneX * sin(rotSpeed) + data->planeY * cos(rotSpeed);
-
-    // 今回のxを保存
     last_x = x;
-
     return (0);
 }
 
@@ -149,7 +140,6 @@ void    draw_square(t_data *data, int x, int y, int size, int color)
         j = 0;
         while (j < size)
         {
-            // 画面外への書き込みを防止
             if (x + i >= 0 && x + i < SCREEN_WIDTH && y + j >= 0 && y + j < SCREEN_HEIGHT)
             {
                 my_mlx_pixel_put(data, x + i, y + j, color);
@@ -164,7 +154,6 @@ void draw_minimap(t_data *data)
 {
     int x, y;
     int size = 5; // 1マスの大きさ（ピクセル）
-
     y = 0;
     while (y < data->map_height)
     {
@@ -172,13 +161,11 @@ void draw_minimap(t_data *data)
         while (x < data->map_width)
         {
             int color = (data->map[y][x] == '1') ? 0xFFFFFF : 0x000000;
-            // 指定した範囲（例：(x*size, y*size)）を塗りつぶす
             draw_square(data, x * size + 20, y * size + 20, size, color);
             x++;
         }
         y++;
     }
-    // プレイヤーの現在地を点として描く
     draw_square(data, data->posX * size + 20, data->posY * size + 20, 3, 0xFF0000);
 }
 
@@ -198,7 +185,7 @@ void load_textures(t_data *data)
 {
     int w, h;
     char *paths[6];
-
+	printf("loading textures\n");
     // パスを配列にまとめてループで回すとスッキリします
     paths[0] = data->texture.no_path;
     paths[1] = data->texture.so_path;
@@ -206,34 +193,26 @@ void load_textures(t_data *data)
     paths[3] = data->texture.ea_path;
 	paths[4] = "textures/door.xpm";
 	paths[5] = "textures/barrel.xpm";
-	// for (int i = 0; i < 4; i++) {
-	// 	if (paths[i]) {
-	// 		//printf("Path[%d]: |%s|\n", i, paths[i]);
-	// 		// 1文字ずつ16進数で出して、目に見えない文字がないか確認
-	// 		for (int j = 0; paths[i][j]; j++)
-	// 			//printf("%02x ", (unsigned char)paths[i][j]);
-	// 		//printf("\n");
-	// 	} else {
-	// 		//printf("Path[%d] is NULL!\n", i);
-	// 	}
-	// }
+	printf("path has set\n");
+
     for (int i = 0; i < 6; i++)
     {
-        // 1. 画像ファイルを読み込む
-
+		printf("in the roop %d times\n", i);
         data->tex[i].img = mlx_xpm_file_to_image(data->mlx, paths[i], &w, &h);
         if (!data->tex[i].img)
         {
-            ///printf("Error: Failed to load texture %s\n", paths[i]);
-            exit(1); // 本当はもっと綺麗にfreeして終わるべき
+// 					printf("in the roop %d times\n", i);
+// printf("Path to load: [%s]\n", paths[i]);
+// 			//free_and_reset()
+			free_exit(data, 1, "invalid texture file");
+            // exit(1); // 本当はもっと綺麗にfreeして終わるべき
         }
-        // 2. 画像の生データへのアドレスを取得する
+				printf("in the roop %d times\n", i);
+
         data->tex[i].addr = mlx_get_data_addr(data->tex[i].img,
                                               &data->tex[i].bits_per_pixel,
                                               &data->tex[i].line_length,
                                               &data->tex[i].endian);
-        // 画像のサイズも後で使うので保存しておくと楽です
-        // (t_img 構造体に width/height を追加している場合)
     }
 }
 
@@ -248,169 +227,168 @@ void	my_mlx_pixel_put(t_data *data, int x, int y, int color)
 	*(unsigned int*)dst = color;
 }
 
-
-int	render_frame(t_data *data)
+void	put_sail_floor(t_data *data)
 {
-	//printf("DEBUG: addr = %p, width = %d, height = %d\n", data->addr, SCREEN_WIDTH, SCREEN_HEIGHT);
 	int i = 0;
 	while (i < SCREEN_WIDTH) {
 		int j = 0;
 		while (j < SCREEN_HEIGHT) {
 			if (j < SCREEN_HEIGHT / 2)
-				my_mlx_pixel_put(data, i, j, data->texture.ceiling_color); // 天井（グレー）
+				my_mlx_pixel_put(data, i, j, data->texture.ceiling_color);
 			else
-				my_mlx_pixel_put(data, i, j, data->texture.floor_color); // 床（明るいグレー）
+				my_mlx_pixel_put(data, i, j, data->texture.floor_color);
 			j++;
 		}
 		i++;
 	}
-	//data->posX = 12.0, data->posY = 12.0;
-	//data->planeX = 0, data->planeY = 0.66;
+}
 
+void	set_dir(t_data *data, const int x)
+{
+	data->dda.cameraX = 2 * x / (double)SCREEN_WIDTH - 1;
+	// dirXという方向を向いてて、視野がplaneXほどある
+	// 視野のcameraXという地点へrayDirXは向いている
+	data->dda.rayDirX = data->dirX + data->planeX * data->dda.cameraX;
+	data->dda.rayDirY = data->dirY + data->planeY * data->dda.cameraX;
+	data->dda.deltaDistX = (data->dda.rayDirX == 0) ? 1e30 : fabs(1 / data->dda.rayDirX);
+	data->dda.deltaDistY = (data->dda.rayDirY == 0) ? 1e30 : fabs(1 / data->dda.rayDirY);
+	data->dda.mapX = (int)data->posX;
+	data->dda.mapY = (int)data->posY;
+}
+
+void	describe_wall1(t_data *data)
+{
+	if (data->dda.side == 0)
+		data->dda.perpWallDist = (data->dda.sideDistX - data->dda.deltaDistX);
+	else
+		data->dda.perpWallDist = (data->dda.sideDistY - data->dda.deltaDistY);
+	data->dda.lineHeight = (int)(SCREEN_HEIGHT / data->dda.perpWallDist);
+	data->dda.drawStart = -data->dda.lineHeight / 2 + SCREEN_HEIGHT /2;
+	if (data->dda.drawStart < 0)
+		data->dda.drawStart = 0;
+	data->dda.drawEnd = data->dda.lineHeight / 2 + SCREEN_HEIGHT / 2;
+	if (data->dda.drawEnd >= SCREEN_HEIGHT)
+		data->dda.drawEnd = SCREEN_HEIGHT - 1;
+	if (data->dda.side == 0) // X軸（左右方向）の壁に当たった ＝ 北か南
+	{
+		if (data->dda.rayDirX < 0) data->dda.tex_num = 0; // 北面(NO)
+		else data->dda.tex_num = 1;             // 南面(SO)
+	}
+	else // Y軸（上下方向）の壁に当たった ＝ 東か西
+	{
+		if (data->dda.rayDirY < 0) data->dda.tex_num = 2; // 西面(WE)
+		else data->dda.tex_num = 3;             // 東面(EA)
+	}
+	if (data->dda.hit == 2)
+		data->dda.tex_num = 4;
+}
+
+void	describe_wall2(t_data *data)
+{
+	if (data->dda.side == 0)
+		data->dda.wallX = data->posY + data->dda.perpWallDist * data->dda.rayDirY;
+	else
+		data->dda.wallX = data->posX + data->dda.perpWallDist * data->dda.rayDirX;
+	data->dda.wallX -= floor(data->dda.wallX); // 小数点以下だけを取り出す（これが壁内の位置になる）
+
+	// テクスチャ上のX座標を計算（テクスチャ幅が64ピクセルの場合）
+	data->dda.texX = (int)(data->dda.wallX * (double)64);
+
+	if (data->dda.side == 0 && data->dda.rayDirX > 0) data->dda.texX = 64 - data->dda.texX - 1;
+	if (data->dda.side == 1 && data->dda.rayDirY < 0) data->dda.texX = 64 - data->dda.texX - 1;
+	data->dda.step = 1.0 * 64 / data->dda.lineHeight; // テクスチャの1ピクセルあたりのステップ幅
+	data->dda.texPos = (data->dda.drawStart - SCREEN_HEIGHT / 2 + data->dda.lineHeight / 2) * data->dda.step;
+}
+
+void describe_wall3(t_data *data, const int x)
+{
+	int y = data->dda.drawStart;
+	while (y < data->dda.drawEnd)
+	{
+		// texY の計算（ここも重要！）
+		data->dda.texY = (int)data->dda.texPos & (64 - 1); // 64ピクセルの場合
+		data->dda.texPos += data->dda.step;
+		if (data->dda.texY < 0) data->dda.texY = 0;
+		// ここで修正した関数と配列を使う！
+		int color = get_pixel_color(&data->tex[data->dda.tex_num], data->dda.texX, data->dda.texY);
+		// 東西南北で少し色を変えると、角がはっきりしてカッコよくなります
+		if (data->dda.side == 1) color = (color >> 1) & 8355711; // 影をつける演出
+		my_mlx_pixel_put(data, x, y, color);
+		y++;
+	}
+	data->z_buffer[x] = data->dda.perpWallDist;
+}
+
+void	dda(t_data *data)
+{
+	data->dda.hit = 0;
+	while(data->dda.hit == 0)
+	{
+		if (data->dda.sideDistX < data->dda.sideDistY)
+		{
+			data->dda.sideDistX += data->dda.deltaDistX;
+			data->dda.mapX += data->dda.stepX;
+			data->dda.side = 0;
+		}
+		else
+		{
+			data->dda.sideDistY += data->dda.deltaDistY;
+			data->dda.mapY += data->dda.stepY;
+			data->dda.side = 1;
+		}
+		if (data->dda.mapX >= 0 && data->dda.mapX < data->map_width && data->dda.mapY >= 0 && data->dda.mapY < data->map_height) {
+			if (data->map[data->dda.mapY][data->dda.mapX] == '1')
+				data->dda.hit = 1;
+			else if (data->map[data->dda.mapY][data->dda.mapX] == 'D')
+    			data->dda.hit = 2;
+		} else {
+			data->dda.hit = 1;
+		}
+	}
+}
+
+void	calc_dist_to_wall(t_data *data)
+{
+	if (data->dda.rayDirX < 0)
+	{
+		data->dda.stepX = -1;
+		data->dda.sideDistX = (data->posX - data->dda.mapX) * data->dda.deltaDistX;
+	}
+	else
+	{
+		data->dda.stepX = 1;
+		data->dda.sideDistX = (data->dda.mapX + 1.0 - data->posX) * data->dda.deltaDistX;
+	}
+
+	if (data->dda.rayDirY < 0)
+	{
+		data->dda.stepY = -1;
+		data->dda.sideDistY = (data->posY - data->dda.mapY) * data->dda.deltaDistY;
+	}
+	else
+	{
+		data->dda.stepY = 1;
+		data->dda.sideDistY = (data->dda.mapY + 1.0 - data->posY) * data->dda.deltaDistY;
+	}
+}
+
+int	render_frame(t_data *data)
+{
+	put_sail_floor(data);
 	int	x = 0;
 	while (x < SCREEN_WIDTH)
 	{
-
-		double cameraX = 2 * x / (double)SCREEN_WIDTH - 1;
-
-		// dirXという方向を向いてて、視野がplaneXほどある
-		// 視野のcameraXという地点へrayDirXは向いている
-		double rayDirX = data->dirX + data->planeX * cameraX;
-		double rayDirY = data->dirY + data->planeY * cameraX;
-
-
-		double deltaDistX = (rayDirX == 0) ? 1e30 : fabs(1 / rayDirX);
-		double deltaDistY = (rayDirY == 0) ? 1e30 : fabs(1 / rayDirY);
-
-		int 	mapX = (int)data->posX;
-		int 	mapY = (int)data->posY;
-
-		double 	sideDistX, sideDistY;
-		int 	stepX, stepY;
-
-		//　初期位置から、最初の壁に当たるまでの距離の計算
-		if (rayDirX < 0)
-		{
-			stepX = -1;
-			sideDistX = (data->posX - mapX) * deltaDistX;
-		}
-		else
-		{
-			stepX = 1;
-			sideDistX = (mapX + 1.0 - data->posX) * deltaDistX;
-		}
-
-		if (rayDirY < 0)
-		{
-			stepY = -1;
-			sideDistY = (data->posY - mapY) * deltaDistY;
-		}
-		else
-		{
-			stepY = 1;
-			sideDistY = (mapY + 1.0 - data->posY) * deltaDistY;
-		}
-
-		int hit = 0;
-		int side;
-		// DDA本体
-		// if (mapX < 0 || mapY < 0 || mapX >= 7 || mapY >= 5) {
-		// 	printf("OUT OF BOUNDS: x:%d, x:%d\n", mapX, mapY);
-		// 	return (0);
-		// }
-		//printf("Raycast Start: pos(%.2f, %.2f)\n", data->posX, data->posY);
-		while(hit == 0)
-		{
-			//printf("Checking map[%d][%d]\n", mapY, mapX);
-			if (sideDistX < sideDistY)
-			{
-				sideDistX += deltaDistX;
-				mapX += stepX;
-				side = 0;
-			}
-			else
-			{
-				sideDistY += deltaDistY;
-				mapY += stepY;
-				side = 1;
-			}
-			if (mapX >= 0 && mapX < data->map_width && mapY >= 0 && mapY < data->map_height) {
-				if (data->map[mapY][mapX] == '1')
-					hit = 1;
-				else if (data->map[mapY][mapX] == 'D')
-        			hit = 2;
-			} else {
-				hit = 1; // 範囲外に出たらループを抜ける
-			}
-		}
-		// この時点でhitしている、ここから描画処理
-		double perpWallDist;
-		if (side == 0) 	perpWallDist = (sideDistX - deltaDistX);
-		else			perpWallDist = (sideDistY - deltaDistY);
-
-		int	lineHeight = (int)(SCREEN_HEIGHT / perpWallDist);
-
-		int drawStart = -lineHeight / 2 + SCREEN_HEIGHT /2;
-		if (drawStart < 0) drawStart = 0;
-		int drawEnd = lineHeight / 2 + SCREEN_HEIGHT / 2;
-		if (drawEnd >= SCREEN_HEIGHT) drawEnd = SCREEN_HEIGHT - 1;
-
-		// int drawStart = 100;
-		// int drawEnd = 300;
-		// for (int x = drawStart; x < drawEnd; x++)
-		// 	my_mlx_pixel_put(data, x, x, 0x00FF00);
-		int tex_num; // 0:NO, 1:SO, 2:WE, 3:EA
-
-		if (side == 0) // X軸（左右方向）の壁に当たった ＝ 北か南
-		{
-			if (rayDirX < 0) tex_num = 0; // 北面(NO)
-			else tex_num = 1;             // 南面(SO)
-		}
-		else // Y軸（上下方向）の壁に当たった ＝ 東か西
-		{
-			if (rayDirY < 0) tex_num = 2; // 西面(WE)
-			else tex_num = 3;             // 東面(EA)
-		}
-		if (hit == 2)
-			tex_num = 4;
-		int y = drawStart;
-		double wallX; // 壁のヒットした場所（0.0 〜 1.0）
-		if (side == 0)
-			wallX = data->posY + perpWallDist * rayDirY;
-		else
-			wallX = data->posX + perpWallDist * rayDirX;
-		wallX -= floor(wallX); // 小数点以下だけを取り出す（これが壁内の位置になる）
-
-		// テクスチャ上のX座標を計算（テクスチャ幅が64ピクセルの場合）
-		int texX = (int)(wallX * (double)64);
-
-		if (side == 0 && rayDirX > 0) texX = 64 - texX - 1;
-		if (side == 1 && rayDirY < 0) texX = 64 - texX - 1;
-		double step = 1.0 * 64 / lineHeight; // テクスチャの1ピクセルあたりのステップ幅
-		double texPos = (drawStart - SCREEN_HEIGHT / 2 + lineHeight / 2) * step;
-		while (y < drawEnd)
-		{
-			// texY の計算（ここも重要！）
-			int texY = (int)texPos & (64 - 1); // 64ピクセルの場合
-			texPos += step;
-			if (texY < 0) texY = 0;
-
-			// ここで修正した関数と配列を使う！
-			int color = get_pixel_color(&data->tex[tex_num], texX, texY);
-
-			// 東西南北で少し色を変えると、角がはっきりしてカッコよくなります
-			if (side == 1) color = (color >> 1) & 8355711; // 影をつける演出
-
-			my_mlx_pixel_put(data, x, y, color);
-			y++;
-		}
-		data->z_buffer[x] = perpWallDist;
+		set_dir(data, x);
+		calc_dist_to_wall(data);
+		dda(data);
+		describe_wall1(data);
+		describe_wall2(data);
+		describe_wall3(data, x);
 		x++;
 	}
-	// ("Now at: map[%d][%d] = '%c', maxwidth= %d, maxheight = %d\n",printf
-    // 	(int)data->posY, (int)data->posX, data->map[(int)data->posY][(int)data->posX], data->map_width, data->map_height);
 	draw_minimap(data);
-	render_sprites(data);
+	if (data->sprite.exist)
+		render_sprites(data);
 	mlx_put_image_to_window(data->mlx, data->win, data->img, 0, 0);
 	return 0;
 }
