@@ -10,8 +10,10 @@ SRCS      = src/main.c \
             src/rendering.c \
             src/map.c \
             src/key_press.c \
-            ./include/gnl/get_next_line.c \
+            src/utils.c \
+			./include/gnl/get_next_line.c \
             ./include/gnl/get_next_line_utils.c
+
 OBJS    = $(SRCS:.c=.o)
 
 all:

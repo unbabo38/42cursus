@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/04 21:43:20 by tmura             #+#    #+#             */
-/*   Updated: 2025/05/07 12:37:25 by tmura            ###   ########.fr       */
+/*   Updated: 2026/05/06 22:29:13 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,8 @@ char	**ft_split(char const *s, char c)
 	if (!s)
 		return (NULL);
 	num_words = ft_count_words(s, c);
+	if (num_words != 3)
+		return (NULL);
 	new_str = (char **)malloc(sizeof(char *) * (num_words + 1));
 	if (!new_str)
 		return (NULL);

@@ -23,6 +23,32 @@
 #define K_RIGHT 65363
 #define K_ESC 65307
 
+typedef struct s_dda {
+	double 	cameraX;
+	double 	rayDirX;
+	double 	rayDirY;
+	double 	deltaDistX;
+	double 	deltaDistY;
+	int	   	mapX;
+	int		mapY;
+	double	sideDistX;
+	double	sideDistY;
+	int		stepX;
+	int		stepY;
+	int		side;
+	int		hit;
+	double perpWallDist;
+	int		lineHeight;
+	int 	drawStart;
+	int 	drawEnd;
+	int tex_num;
+	double wallX;
+	int		texX;
+	int		texY;
+	double	step;
+	double	texPos;
+} 	t_dda;
+
 typedef struct s_img {
     void    *img;
     char    *addr;
@@ -54,12 +80,14 @@ typedef struct s_texture {
 
 typedef struct s_sprite
 {
-    double x;      // マップ上の座標
-    double y;
-    int    tex_id; // どのテクスチャを使うか
+    double 	x;      // マップ上の座標
+    double 	y;
+    int    	tex_id; // どのテクスチャを使うか
+	int		exist;
 } t_sprite;
 
 typedef struct cub3d {
+	char 	*filename;
 	void 	*mlx;
 	void 	*win;
 	void 	*img;
@@ -74,11 +102,14 @@ typedef struct cub3d {
 	double 	posX, posY;
 	double 	dirX, dirY;
 	double 	planeX, planeY;
+	double  dx, dy;
+
 	t_flg 	flg;
 	t_texture texture;
 	t_img   tex[6];
 	double z_buffer[SCREEN_WIDTH];
 	t_sprite sprite;
+	t_dda	dda;
 } t_data;
 
 
@@ -111,6 +142,9 @@ int	mouse_move(int x, int y, t_data *data);
 unsigned int get_pixel_color(t_img *img, int x, int y);
 void move_sprite(t_data *data);
 void check_death(t_data *data);
+void	dda(t_data *data);
+int	free_exit(t_data *data, int status, char *error_msg);
+void	free_map(t_data *data);
 
 #define mapWidth 24
 #define mapHeight 24
