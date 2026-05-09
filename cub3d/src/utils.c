@@ -29,13 +29,45 @@ void	free_map(t_data *data)
 	}
 }
 
+int	is_space(char c)
+{
+	if (c == 32 || c == '\t' || c == '\v' || c == '\f')
+		return (1);
+	return (0);
+}
 
+int	ft_is_space(char *str)
+{
+	int		i;
 
-int	free_exit(t_data *data, int status, char *error_msg)
+	i = 0;
+	while (str[i])
+	{
+		if (is_space(str[i]))
+			i++;
+		else
+			return (0);
+	}
+	return (1);
+}
+
+void	free_exit(t_data *data, int status, char *error_msg)
 {
 	int	i;
 
 	// 1. エラーメッセージの出力（statusが0以外の場合）
+	if (status == PARSE_FAILED)
+	{
+		write(2, "Error\n", 6);
+		write(2, error_msg, ft_strlen(error_msg));
+		write(2, "is not proper usage!\n", 21);
+	}
+	if (status == EMPTY_LINE)
+	{
+		free(data->map_info.line);
+		write(2, "Error\n", 6);
+		write(2, error_msg, ft_strlen(error_msg));
+	}
 	if (status != 0 && error_msg)
 	{
 		write(2, "Error\n", 6);
@@ -60,7 +92,11 @@ int	free_exit(t_data *data, int status, char *error_msg)
 			mlx_destroy_image(data->mlx, data->tex[i].img);
 		i++;
 	}
-
+	// if (data->map_info.line)
+	// 	free(data->map_info.line);
+	char *tmp;
+	while ((tmp = get_next_line(data->fd)))
+        free(tmp);
 	// 4. メインフレームバッファ(img)の解放
 	if (data->img)
 		mlx_destroy_image(data->mlx, data->img);
@@ -78,5 +114,5 @@ int	free_exit(t_data *data, int status, char *error_msg)
 
 	// 7. 終了
 	exit(status);
-	return (0);
+	return ;
 }

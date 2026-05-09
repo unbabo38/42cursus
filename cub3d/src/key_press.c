@@ -26,6 +26,33 @@ char *skip_whitespace(char *line)
     return (line);
 }
 
+void debug_binary(void *ptr, size_t size)
+{
+    unsigned char *p = (unsigned char *)ptr;
+    size_t i = 0;
+
+    printf("Addr: %p | Data: ", ptr);
+    while (i < size)
+    {
+        // 16進数で表示（02x は、1桁でも 05 のように 2桁で表示する設定）
+        printf("%02x ", p[i]);
+        i++;
+    }
+    printf("| ");
+
+    // おまけ：文字として読める場合は文字も表示（ASCII確認）
+    i = 0;
+    while (i < size)
+    {
+        if (p[i] >= 32 && p[i] <= 126)
+            printf("%c", p[i]);
+        else
+            printf("."); // 読めない文字はドット
+        i++;
+    }
+    printf("\n");
+}
+
 int parse_rgb(char *str)
 {
     char **colors;
@@ -34,21 +61,16 @@ int parse_rgb(char *str)
     // 1. カンマで分割
     colors = ft_split(str, ',');
     if (!colors || !colors[0] || !colors[1] || !colors[2])
-	{
-		printf("nullあるよ\n");
-		return (-1); // エラー処理
-	}
-
-	for (int i = 0; i < 3; i++)
-	{
-
-		printf("colors[%d]= %s\n",i, colors[i]);
-	}
-
+		return (-1);
+	if (ft_is_space(colors[0]) || ft_is_space(colors[1]) || ft_is_space(colors[2]))
+		return (-1);
     // 2. 数値に変換
     r = ft_atoi(colors[0]);
     g = ft_atoi(colors[1]);
     b = ft_atoi(colors[2]);
+
+	printf("b=%d\n", b);
+
 
     // 3. 範囲チェック（0-255）
     if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255)
