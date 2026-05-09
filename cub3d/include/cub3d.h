@@ -23,6 +23,15 @@
 #define K_RIGHT 65363
 #define K_ESC 65307
 
+#define PARSE_SUCCESS 0
+#define	PARSE_FAILED 2
+#define	EMPTY_LINE 3
+#define IS_SPACE 1
+#define IS_NOT_SPACE 0
+
+#define FINISHED 1
+#define FALSE 0
+
 typedef struct s_dda {
 	double 	cameraX;
 	double 	rayDirX;
@@ -86,6 +95,18 @@ typedef struct s_sprite
 	int		exist;
 } t_sprite;
 
+typedef struct s_map_info
+{
+	char 	*line;
+	int		in_map;
+	int		parse_result;
+	int		tmp;
+	int		is_empty;
+	int		map_finished;
+	int		tmp_width;
+
+}	t_map_info;
+
 typedef struct cub3d {
 	char 	*filename;
 	void 	*mlx;
@@ -110,6 +131,8 @@ typedef struct cub3d {
 	double z_buffer[SCREEN_WIDTH];
 	t_sprite sprite;
 	t_dda	dda;
+	t_map_info map_info;
+	int		fd;
 } t_data;
 
 
@@ -125,7 +148,7 @@ int	main_loop(t_data *data);
 int	initialization(t_data *data);
 
 int	map_init(t_data *data);
-void fill_space(char *dst, char *tmp, t_data *data);
+void copy_line(char *dst, char *tmp, t_data *data);
 void make_map(int fd, t_data *data);
 
 void	default_dir(char orientation, t_data *data);
@@ -143,8 +166,11 @@ unsigned int get_pixel_color(t_img *img, int x, int y);
 void move_sprite(t_data *data);
 void check_death(t_data *data);
 void	dda(t_data *data);
-int	free_exit(t_data *data, int status, char *error_msg);
+void	free_exit(t_data *data, int status, char *error_msg);
 void	free_map(t_data *data);
+int	ft_is_space(char *character);
+int	is_space(char c);
+void	check_and_get_map_info(t_data *data);
 
 #define mapWidth 24
 #define mapHeight 24

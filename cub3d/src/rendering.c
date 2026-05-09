@@ -173,8 +173,6 @@ unsigned int get_pixel_color(t_img *img, int x, int y)
 {
     char    *dst;
 
-    // 画像のサイズ（通常64）を超えないようにガード
-    // もし img 構造体に width/height がなければ 64 などの固定値
     if (x < 0 || x >= 64 || y < 0 || y >= 64)
         return (0);
     dst = img->addr + (y * img->line_length + x * (img->bits_per_pixel / 8));
@@ -185,30 +183,19 @@ void load_textures(t_data *data)
 {
     int w, h;
     char *paths[6];
-	printf("loading textures\n");
-    // パスを配列にまとめてループで回すとスッキリします
     paths[0] = data->texture.no_path;
     paths[1] = data->texture.so_path;
     paths[2] = data->texture.we_path;
     paths[3] = data->texture.ea_path;
 	paths[4] = "textures/door.xpm";
 	paths[5] = "textures/barrel.xpm";
-	printf("path has set\n");
-
     for (int i = 0; i < 6; i++)
     {
-		printf("in the roop %d times\n", i);
         data->tex[i].img = mlx_xpm_file_to_image(data->mlx, paths[i], &w, &h);
         if (!data->tex[i].img)
         {
-// 					printf("in the roop %d times\n", i);
-// printf("Path to load: [%s]\n", paths[i]);
-// 			//free_and_reset()
 			free_exit(data, 1, "invalid texture file");
-            // exit(1); // 本当はもっと綺麗にfreeして終わるべき
         }
-				printf("in the roop %d times\n", i);
-
         data->tex[i].addr = mlx_get_data_addr(data->tex[i].img,
                                               &data->tex[i].bits_per_pixel,
                                               &data->tex[i].line_length,
