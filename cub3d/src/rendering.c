@@ -183,6 +183,7 @@ void load_textures(t_data *data)
 {
     int w, h;
     char *paths[6];
+
     paths[0] = data->texture.no_path;
     paths[1] = data->texture.so_path;
     paths[2] = data->texture.we_path;
@@ -193,9 +194,7 @@ void load_textures(t_data *data)
     {
         data->tex[i].img = mlx_xpm_file_to_image(data->mlx, paths[i], &w, &h);
         if (!data->tex[i].img)
-        {
 			free_exit(data, 1, "invalid texture file");
-        }
         data->tex[i].addr = mlx_get_data_addr(data->tex[i].img,
                                               &data->tex[i].bits_per_pixel,
                                               &data->tex[i].line_length,
