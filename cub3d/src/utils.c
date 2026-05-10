@@ -36,6 +36,13 @@ int	is_space(char c)
 	return (0);
 }
 
+int	is_space_and_crlf(char c)
+{
+	if (c == 32 || c == '\t' || c == '\v' || c == '\f' || c == '\r' || c == '\n')
+		return (1);
+	return (0);
+}
+
 int	ft_is_space(char *str)
 {
 	int		i;
@@ -43,13 +50,25 @@ int	ft_is_space(char *str)
 	i = 0;
 	while (str[i])
 	{
-		if (is_space(str[i]))
+		if (is_space_and_crlf(str[i]))
 			i++;
 		else
 			return (0);
 	}
 	return (1);
 }
+
+// void	free_textures(t_data *data)
+// {
+// 	// if (data->texture.no_path)
+// 	// 	free(data->texture.no_path);
+// 	// if (data->texture.so_path)
+// 	// 	free(data->texture.so_path);
+// 	// if (data->texture.we_path)
+// 	// 	free(data->texture.we_path);
+// 	// if (data->texture.ea_path)
+// 	// 	free(data->texture.ea_path);
+// }
 
 void	free_exit(t_data *data, int status, char *error_msg)
 {
@@ -68,11 +87,19 @@ void	free_exit(t_data *data, int status, char *error_msg)
 		write(2, "Error\n", 6);
 		write(2, error_msg, ft_strlen(error_msg));
 	}
-	if (status != 0 && error_msg)
+	if (status == FILENAME_WRONG)
 	{
 		write(2, "Error\n", 6);
+		write(2, "filename format wrong!\n", 23);
 		write(2, error_msg, ft_strlen(error_msg));
 		write(2, "\n", 1);
+		exit(1);
+	}
+	if (status == PATH_DUP)
+	{
+		write(2, "Error\npath:", 11);
+		write(2, error_msg, ft_strlen(error_msg));
+		write(2, "\nalready set!\n", 14);
 	}
 	if (data->texture.no_path)
 		free(data->texture.no_path);
@@ -82,6 +109,20 @@ void	free_exit(t_data *data, int status, char *error_msg)
 		free(data->texture.we_path);
 	if (data->texture.ea_path)
 		free(data->texture.ea_path);
+
+	// free_textures(data);
+
+
+	if (status == FAILED)
+	{
+		write(2, "Error\n", 6);
+		write(2, error_msg, ft_strlen(error_msg));
+		write(2, "\n", 1);
+	}
+	if (data->copy_map)
+		free_stab(data->copy_map);
+	if (data->trimmed)
+		free(data->trimmed);
 	if (data->map)
 		free_map(data);
 	// 3. テクスチャ画像の解放 (t_img tex[6] のループ)
@@ -92,8 +133,10 @@ void	free_exit(t_data *data, int status, char *error_msg)
 			mlx_destroy_image(data->mlx, data->tex[i].img);
 		i++;
 	}
-	// if (data->map_info.line)
-	// 	free(data->map_info.line);
+	if (data->map_info.line)
+	{
+		free(data->map_info.line);
+	}
 	char *tmp;
 	while ((tmp = get_next_line(data->fd)))
         free(tmp);
