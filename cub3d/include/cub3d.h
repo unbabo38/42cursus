@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/10 10:01:42 by t.mura            #+#    #+#             */
-/*   Updated: 2026/05/10 22:42:13 by tmura            ###   ########.fr       */
+/*   Updated: 2026/05/11 11:38:54 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,10 @@ typedef struct s_sprite
 	int		tex_id;
 	// どのテクスチャを使うか
 	int	exist;
+	double	enemySpeed;
+	double	buffer;
+	double	nextX;
+	double	nextY;
 }	t_sprite;
 
 typedef struct s_map_info
@@ -143,6 +147,7 @@ typedef struct s_pointer
 	int	cnt;
 }	t_pointer;
 
+
 typedef struct s_cub3d
 {
 	char	*filename;
@@ -155,7 +160,7 @@ typedef struct s_cub3d
 	int		endian;
 
 	char	**map;
-	char 	**copy_map;
+	char	**copy_map;
 	int		map_height;
 	int		map_width;
 	double	posX, posY;
@@ -174,7 +179,7 @@ typedef struct s_cub3d
 	int			file_rows;
 	int			i;
 	int			idx;
-	char 		*trimmed;
+	char		*trimmed;
 	t_pointer	pointer;
 }	t_data;
 

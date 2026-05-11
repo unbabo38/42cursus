@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/06 23:21:45 by tmura             #+#    #+#             */
-/*   Updated: 2026/05/06 23:21:45 by tmura            ###   ########.fr       */
+/*                                                       :::      ::::::::    */
+/*   utils.c                                           :+:      :+:    :+:    */
+/*                                                   +:+ +:+         +:+      */
+/*   By: t.mura <t.mura@student.42tokyo.jp>        #+#  +:+       +#+         */
+/*                                               +#+#+#+#+#+   +#+            */
+/*   Created: 2026/05/06 23:21:45 by t.mura           #+#    #+#              */
+/*   Updated: 2026/05/11 00:17:32 by t.mura          ###   ########.fr        */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	is_space_and_crlf(char c)
 
 int	ft_is_space(char *str)
 {
-	int		i;
+	int	i;
 
 	i = 0;
 	while (str[i])
@@ -58,23 +58,13 @@ int	ft_is_space(char *str)
 	return (1);
 }
 
-// void	free_textures(t_data *data)
-// {
-// 	// if (data->texture.no_path)
-// 	// 	free(data->texture.no_path);
-// 	// if (data->texture.so_path)
-// 	// 	free(data->texture.so_path);
-// 	// if (data->texture.we_path)
-// 	// 	free(data->texture.we_path);
-// 	// if (data->texture.ea_path)
-// 	// 	free(data->texture.ea_path);
-// }
+
 
 void	free_exit(t_data *data, int status, char *error_msg)
 {
-	int	i;
+	int		i;
+	char	*tmp;
 
-	// 1. エラーメッセージの出力（statusが0以外の場合）
 	if (status == PARSE_FAILED)
 	{
 		write(2, "Error\n", 6);
@@ -93,7 +83,6 @@ void	free_exit(t_data *data, int status, char *error_msg)
 		write(2, "filename format wrong!\n", 23);
 		write(2, error_msg, ft_strlen(error_msg));
 		write(2, "\n", 1);
-		exit(1);
 	}
 	if (status == PATH_DUP)
 	{
@@ -109,23 +98,16 @@ void	free_exit(t_data *data, int status, char *error_msg)
 		free(data->texture.we_path);
 	if (data->texture.ea_path)
 		free(data->texture.ea_path);
-
-	// free_textures(data);
-
-
 	if (status == FAILED)
 	{
 		write(2, "Error\n", 6);
 		write(2, error_msg, ft_strlen(error_msg));
 		write(2, "\n", 1);
 	}
-	if (data->copy_map)
-		free_stab(data->copy_map);
 	if (data->trimmed)
 		free(data->trimmed);
 	if (data->map)
 		free_map(data);
-	// 3. テクスチャ画像の解放 (t_img tex[6] のループ)
 	i = 0;
 	while (i < 6)
 	{
@@ -137,25 +119,22 @@ void	free_exit(t_data *data, int status, char *error_msg)
 	{
 		free(data->map_info.line);
 	}
-	char *tmp;
 	while ((tmp = get_next_line(data->fd)))
-        free(tmp);
-	// 4. メインフレームバッファ(img)の解放
+		free(tmp);
+	if (status == 0)
+	{
+		write(2, error_msg, ft_strlen(error_msg));
+		write(2, "\n", 1);
+	}
 	if (data->img)
 		mlx_destroy_image(data->mlx, data->img);
-
-	// 5. ウィンドウの破壊
 	if (data->win)
 		mlx_destroy_window(data->mlx, data->win);
-
-	// 6. MLXポインタの解放 (環境によっては必要ないが、Linux版等では推奨)
 	if (data->mlx)
 	{
-		mlx_destroy_display(data->mlx); // これが重要！
-		free(data->mlx);               // mlx_initで確保されたポインタ自体をfree
+		mlx_destroy_display(data->mlx);
+		free(data->mlx);
 	}
-
-	// 7. 終了
 	exit(status);
 	return ;
 }

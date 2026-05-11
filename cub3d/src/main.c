@@ -127,6 +127,8 @@ int	main(int argc, char **argv)
 	mlx_hook(data.win, 17, 0, close_window, &data);
 	load_textures(&data);
 	mlx_loop_hook(data.mlx, main_loop, &data);
+	printf("mlx loop");
+	fflush(stdout);
 	mlx_loop(data.mlx);
 	free_exit(&data, 0, "propery game stoped");
 	return (0);
