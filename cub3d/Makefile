@@ -11,6 +11,20 @@ SRCS      = src/main.c \
             src/map.c \
             src/key_press.c \
             src/utils.c \
+			src/door.c \
+			src/set_texture_dir.c \
+			src/set_floor_ceiling.c \
+			src/move.c \
+			src/set_position.c \
+			src/check_and_get_map.c \
+			src/check_map.c \
+			src/set_camera_dir.c \
+			src/minimap.c \
+			src/render_sprites.c \
+			src/describe_wall.c \
+			src/dda.c \
+			src/error_exit.c \
+			src/move_sprite.c \
 			./include/gnl/get_next_line.c \
             ./include/gnl/get_next_line_utils.c
 

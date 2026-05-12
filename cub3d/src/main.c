@@ -12,13 +12,6 @@
 
 #include "../include/cub3d.h"
 
-int	close_window(t_data *data)
-{
-	free_exit(data, 0, "user closed window");
-	exit(0);
-	return (0);
-}
-
 int	handle_expose(void *param)
 {
 	t_data	*data;
@@ -35,50 +28,6 @@ int	main_loop(t_data *data)
 	move_sprite(data);
 	render_frame(data);
 	return (0);
-}
-
-void	set_orientation_north(t_data *data)
-{
-	data->dirX = 0;
-	data->dirY = -1;
-	data->planeX = 0.66;
-	data->planeY = 0;
-}
-
-void	set_orientation_south(t_data *data)
-{
-	data->dirX = 0;
-	data->dirY = 1;
-	data->planeX = -0.66;
-	data->planeY = 0;
-}
-
-void	set_orientation_west(t_data *data)
-{
-	data->dirX = -1;
-	data->dirY = 0;
-	data->planeX = 0;
-	data->planeY = -0.66;
-}
-
-void	set_orientation_east(t_data *data)
-{
-	data->dirX = 1;
-	data->dirY = 0;
-	data->planeX = 0;
-	data->planeY = 0.66;
-}
-
-void	default_dir(char orientation, t_data *data)
-{
-	if (orientation == 'N')
-		set_orientation_north(data);
-	else if (orientation == 'S')
-		set_orientation_south(data);
-	else if (orientation == 'W')
-		set_orientation_west(data);
-	else if (orientation == 'E')
-		set_orientation_east(data);
 }
 
 int	initialization(t_data *data)
