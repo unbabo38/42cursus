@@ -34,16 +34,16 @@ void	describe_wall2(t_data *data)
 	if (data->dda.side == 0)
 	{
 		if (data->dda.ray_dir_x < 0)
-			data->dda.tex_num = 0;
+			data->dda.tex_num = 2;
 		else
-			data->dda.tex_num = 1;
+			data->dda.tex_num = 3;
 	}
 	else
 	{
 		if (data->dda.ray_dir_y < 0)
-			data->dda.tex_num = 2;
+			data->dda.tex_num = 0;
 		else
-			data->dda.tex_num = 3;
+			data->dda.tex_num = 1;
 	}
 	if (data->dda.hit == 2)
 		data->dda.tex_num = 4;
@@ -59,9 +59,9 @@ void	describe_wall3(t_data *data)
 			= data->pos_x + data->dda.perp_wall_dist * data->dda.ray_dir_x;
 	data->dda.wall_x -= floor(data->dda.wall_x);
 	data->dda.tex_x = (int)(data->dda.wall_x * (double) 64);
-	if (data->dda.side == 0 && data->dda.ray_dir_x > 0)
+	if (data->dda.side == 0 && data->dda.ray_dir_x < 0)
 		data->dda.tex_x = 64 - data->dda.tex_x - 1;
-	if (data->dda.side == 1 && data->dda.ray_dir_y < 0)
+	if (data->dda.side == 1 && data->dda.ray_dir_y > 0)
 		data->dda.tex_x = 64 - data->dda.tex_x - 1;
 	data->dda.step = 1.0 * 64 / data->dda.line_height;
 	data->dda.tex_pos = (data->dda.draw_start - SCREEN_HEIGHT

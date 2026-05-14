@@ -45,7 +45,6 @@ void	set_north_path(t_data *data, char *trimmed)
 {
 	if (data->texture.no_path)
 		free_exit(data, PATH_DUP, data->texture.no_path);
-	printf("%s\n", trimmed);
 	data->texture.no_path = ft_strtrim(trimmed + 3, " \f\n\r\t\v");
 }
 
