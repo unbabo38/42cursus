@@ -27,16 +27,28 @@ void	free_stab(char **tab)
 	free(tab);
 }
 
+void	free_stab_exit(t_data *data, char **map, int num, char *msg)
+{
+	free_stab(map);
+	free_exit(data, num, msg);
+}
+
 void	check_wall(t_data *data, char **map, int h, int w)
 {
+	printf("\nmaxh=%d, maxw=%d", data->map_height, data->map_width);
+	printf("\nh=%d, w=%d", h, w);
 	if (h < 0 || h >= data->map_height)
-		free_exit(data, FAILED, "Map is open (out of height)!");
-	if (w < 0 || !map[h] || w >= (int)ft_strlen(map[h]))
-		free_exit(data, FAILED, "Map is open (out of width)!");
+		free_stab_exit(data, map, FAILED, "Map is open");
 	if (!map[h])
-		free_exit(data, FAILED, "map does not exist!");
+		free_stab_exit(data, map, FAILED, "Map does not exitst!");
+	data->map_info.tmp_width = (int)ft_strlen(map[h]);
+	if (w < 0 || !map[h] || w >= data->map_info.tmp_width)
+		free_stab_exit(data, map, FAILED, "Map is open!");
 	if (is_space(map[h][w]))
-		free_exit(data, FAILED, "space in the map!");
+		free_stab_exit(data, map, FAILED, "space in the map!");
+	if (!(map[h][w] == 'v' || map[h][w] == '1'
+		|| map[h][w] == 'D' || map[h][w] == '0'))
+		free_stab_exit(data, map, FAILED, "Unreachable area!");
 	if (map[h][w] == '1' || map[h][w] == 'v')
 		return ;
 	map[h][w] = 'v';
@@ -75,13 +87,27 @@ int	check_characters(t_data *data)
 
 int	check_character_and_wall(t_data *data)
 {
+	int	x;
+	int	y;
+
 	if (check_characters(data) != 0)
 	{
-		free_exit(data, FAILED, "check_characters failed\n");
+		free_exit(data, FAILED, "check_characters failed!");
 		return (1);
 	}
 	data->cmap = copy_map(data);
-	check_wall(data, data->cmap, (int) data->pos_y, (int) data->pos_x);
+	x = 0;
+	y = 0;
+	while (y < data->map_height)
+	{
+		while (x < (int)ft_strlen(data->map[y]))
+		{
+			if (data->map[y][x] != '1')
+				check_wall(data, data->cmap, y, x);
+			x++;
+		}
+		y++;
+	}
 	free_stab(data->cmap);
 	return (0);
 }

@@ -1,4 +1,4 @@
-NAME    = cub3d
+NAME    = cub3D
 LIBFT_DIR = ./include/libft
 LIBFT   = $(LIBFT_DIR)/libft.a
 

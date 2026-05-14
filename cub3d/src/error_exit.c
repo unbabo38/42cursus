@@ -14,6 +14,7 @@
 
 void	put_config_error(t_data *data, int status, char *error_msg)
 {
+	(void)data;
 	if (status == PARSE_FAILED)
 	{
 		write(2, "Error\n", 6);
@@ -22,7 +23,6 @@ void	put_config_error(t_data *data, int status, char *error_msg)
 	}
 	if (status == EMPTY_LINE)
 	{
-		free(data->map_info.line);
 		write(2, "Error\n", 6);
 		write(2, error_msg, ft_strlen(error_msg));
 	}
@@ -53,17 +53,18 @@ void	free_fail(t_data *data)
 		free(data->texture.we_path);
 	if (data->texture.ea_path)
 		free(data->texture.ea_path);
-	if (data->trimmed)
-		free(data->trimmed);
 	if (data->map)
 		free_map(data);
 	if (data->map_info.line)
+	{
 		free(data->map_info.line);
+		data->map_info.line = NULL;
+	}
 	tmp = get_next_line(data->fd);
 	while (tmp)
 	{
-		tmp = get_next_line(data->fd);
 		free(tmp);
+		tmp = get_next_line(data->fd);
 	}
 }
 

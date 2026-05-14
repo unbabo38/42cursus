@@ -44,16 +44,15 @@ int	initialization(t_data *data)
 void	check_map_file(t_data *data, char *filename)
 {
 	int	size;
-	int	fd;
 
-	size = ft_strlen(filename);
+	data->fd = -1;
 	size = ft_strlen(filename);
 	if (size < 5 || ft_strncmp(&filename[size - 4], ".cub", 4) != 0)
 		free_exit(data, FILENAME_WRONG, filename);
-	fd = open(filename, O_RDONLY);
-	if (fd < 0)
+	data->fd = open(filename, O_RDONLY);
+	if (data->fd < 0)
 		free_exit(data, FILENAME_WRONG, "Could not open file");
-	close(fd);
+	close(data->fd);
 	data->filename = filename;
 }
 
@@ -76,7 +75,6 @@ int	main(int argc, char **argv)
 	mlx_hook(data.win, 17, 0, close_window, &data);
 	load_textures(&data);
 	mlx_loop_hook(data.mlx, main_loop, &data);
-	printf("mlx loop");
 	fflush(stdout);
 	mlx_loop(data.mlx);
 	free_exit(&data, 0, "propery game stoped");

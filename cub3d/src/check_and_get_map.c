@@ -25,20 +25,16 @@ int	all_dir_texture_is_valid(t_data *data)
 		cnt++;
 	if (data->texture.ea_path)
 		cnt++;
-	if (data->texture.floor_color)
+	if (data->fc_check[0] == 1)
 		cnt++;
-	if (data->texture.ceiling_color)
+	if (data->fc_check[1] == 1)
 		cnt++;
 	return (cnt);
 }
 
 void	get_config_info(t_data *data)
 {
-	data->map_info.parse_result = parse_config_line(data->map_info.line, data);
-	if (data->map_info.parse_result == PARSE_SUCCESS)
-		data->map_info.in_map = 1;
-	else if (data->map_info.parse_result == PARSE_FAILED)
-		free_exit(data, PARSE_FAILED, data->map_info.line);
+	parse_config_line(data->map_info.line, data);
 }
 
 void	get_map_info(t_data *data)
@@ -49,11 +45,16 @@ void	get_map_info(t_data *data)
 		return ;
 	}
 	if (data->map_info.map_finished == FINISHED)
+	{
 		free_exit(data, EMPTY_LINE, "empty line found in the map!\n");
+	}
 	data->map_info.tmp_width = ft_strlen(data->map_info.line);
-	if (data->map_info.tmp_width > 0
-		&& data->map_info.line[data->map_info.tmp_width - 1] == '\n')
+	while (data->map_info.tmp_width > 0
+		&& is_space_and_crlf(data->map_info.line[data->map_info.tmp_width - 1]))
+	{
+		data->map_info.line[data->map_info.tmp_width - 1] = '\0';
 		data->map_info.tmp_width--;
+	}
 	if (data->map_width < data->map_info.tmp_width)
 		data->map_width = data->map_info.tmp_width;
 	if (!data->map_info.map_finished)
@@ -63,6 +64,8 @@ void	get_map_info(t_data *data)
 void	get_info(t_data *data)
 {
 	data->map_info.line = get_next_line(data->fd);
+	if (!data->map_info.line)
+		free_exit(data, FAILED, "map empty!");
 	while (data->map_info.line)
 	{
 		data->map_info.is_empty = is_empty_line(data->map_info.line);
