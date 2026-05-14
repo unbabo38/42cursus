@@ -35,18 +35,20 @@ void	put_sail_floor(t_data *data)
 
 void	set_floor_color(t_data *data, char *trimmed)
 {
-	if (data->texture.floor_color != 0)
+	if (data->fc_check[0] == 1)
 		free_exit(data, PATH_DUP, "FLOOR");
 	data->texture.floor_color = parse_rgb(trimmed + 2);
 	if (data->texture.floor_color == -1)
 		free_exit(data, FAILED, data->map_info.line);
+	data->fc_check[0] = 1;
 }
 
 void	set_ceiling_color(t_data *data, char *trimmed)
 {
-	if (data->texture.ceiling_color != 0)
+	if (data->fc_check[1] == 1)
 		free_exit(data, PATH_DUP, "CEILING");
 	data->texture.ceiling_color = parse_rgb(trimmed + 2);
 	if (data->texture.ceiling_color == -1)
 		free_exit(data, PARSE_FAILED, data->map_info.line);
+	data->fc_check[1] = 1;
 }

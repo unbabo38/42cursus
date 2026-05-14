@@ -15,8 +15,6 @@
 void	load_textures(t_data *data)
 {
 	char	*paths[6];
-	int		w;
-	int		h;
 	int		i;
 
 	i = 0;
@@ -28,12 +26,16 @@ void	load_textures(t_data *data)
 	paths[5] = "textures/barrel.xpm";
 	while (i < 6)
 	{
-		data->tex[i].img = mlx_xpm_file_to_image(data->mlx, paths[i], &w, &h);
+		data->fd = open(paths[i], O_RDONLY);
+		if (data->fd < 0)
+			free_exit(data, FAILED, "Texture file not found or inaccessible");
+		close(data->fd);
+		data->tex[i].img = mlx_xpm_file_to_image(data->mlx,
+				paths[i], &data->w, &data->h);
 		if (!data->tex[i].img)
-			free_exit(data, 1, "invalid texture file");
+			free_exit(data, FAILED, "invalid file path");
 		data->tex[i].addr = mlx_get_data_addr(data->tex[i].img,
-				&data->tex[i].bits_per_pixel,
-				&data->tex[i].line_length,
+				&data->tex[i].bits_per_pixel, &data->tex[i].line_length,
 				&data->tex[i].endian);
 		i++;
 	}
@@ -43,6 +45,7 @@ void	set_north_path(t_data *data, char *trimmed)
 {
 	if (data->texture.no_path)
 		free_exit(data, PATH_DUP, data->texture.no_path);
+	printf("%s\n", trimmed);
 	data->texture.no_path = ft_strtrim(trimmed + 3, " \f\n\r\t\v");
 }
 

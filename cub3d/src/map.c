@@ -81,7 +81,7 @@ int	map_init(t_data *data)
 	}
 	get_info(data);
 	if (all_dir_texture_is_valid(data) != 6)
-		free_exit(data, LACK_OF_INFO, "lack of info\n");
+		free_exit(data, FAILED, "lack of info");
 	if (data->map_info.tmp == 2)
 		free_exit(data, 1, "config error\n");
 	close(data->fd);

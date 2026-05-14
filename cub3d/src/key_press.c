@@ -40,6 +40,14 @@ int	parse_rgb(char *str)
 	return (r << 16 | g << 8 | b);
 }
 
+int	in_map(t_data *data)
+{
+	if (*data->trimmed == '1' || *data->trimmed == '0'
+		|| *data->trimmed == 'D')
+		return (1);
+	return (0);
+}
+
 int	parse_config_line(char *line, t_data *data)
 {
 	data->trimmed = line;
@@ -60,13 +68,11 @@ int	parse_config_line(char *line, t_data *data)
 		set_floor_color(data, data->trimmed);
 	else if (ft_strncmp(data->trimmed, "C ", 2) == 0)
 		set_ceiling_color(data, data->trimmed);
+	else if (in_map(data))
+		data->map_info.in_map = 1;
 	else
-	{
-		if (*data->trimmed == '1' || *data->trimmed == '0')
-			return (0);
-		return (1);
-	}
-	return (1);
+		free_exit(data, PARSE_FAILED, data->map_info.line);
+	return (0);
 }
 
 int	key_press(int keycode, t_data *data)

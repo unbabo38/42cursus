@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/10 10:01:42 by t.mura            #+#    #+#             */
-/*   Updated: 2026/05/12 23:18:47 by tmura            ###   ########.fr       */
+/*   Updated: 2026/05/14 22:12:12 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 # define K_ESC 65307
 
 # define PARSE_SUCCESS 0
-# define PARSE_FAILED 2
+# define PARSE_FAILED 1
 
 # define EMPTY_LINE 3
 # define IS_SPACE 1
@@ -195,6 +195,9 @@ typedef struct s_cub3d
 	t_flg					flg;
 	t_texture				texture;
 	t_img					tex[6];
+	int						w;
+	int						h;
+	int						fc_check[2];
 	double					z_buffer[SCREEN_WIDTH];
 	t_sprite				sprite;
 	t_dda					dda;
@@ -294,5 +297,6 @@ void						type_of_content(t_data *data);
 void						free_fail(t_data *data);
 void						move_to_camera(t_data *data, int *tmp, int *tmp_y);
 void						set_start_to_end(t_data *data);
+int							in_map(t_data *data);
 
 #endif

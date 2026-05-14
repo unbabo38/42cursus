@@ -19,11 +19,7 @@ void	check_death(t_data *data)
 	dist = sqrt(pow(data->pos_x - data->sprite.x, 2)
 			+ pow(data->pos_y - data->sprite.y, 2));
 	if (dist < 0.4)
-	{
-		printf("\a");
-		printf("KILLED BY BARREL!\n");
-		exit(0);
-	}
+		free_exit(data, FAILED, "KILLED BY BARREL!\n");
 }
 
 void	move_to_camera(t_data *data, int *tmp, int *tmp_y)
