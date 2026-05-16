@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   move_sprite.c                                      :+:      :+:    :+:   */
+/*   move_sprite_bonus.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/12 23:16:36 by tmura             #+#    #+#             */
-/*   Updated: 2026/05/12 23:16:36 by tmura            ###   ########.fr       */
+/*   Created: 2026/05/16 17:01:57 by tmura             #+#    #+#             */
+/*   Updated: 2026/05/16 17:01:57 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/cub3d.h"
+#include "../include/cub3d_bonus.h"
 
 void	update_sprite_animation(t_data *data)
 {
