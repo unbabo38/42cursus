@@ -64,7 +64,7 @@ void	put_sprite_pixel(t_data *data, int x)
 		data->sprite.tex_y = ((data->sprite.d * 64)
 				/ data->sprite.spr_height) / 256;
 		data->sprite.color = get_pixel_color(
-				&data->tex[5], data->sprite.tex_x, data->sprite.tex_y);
+				&data->tex[5 + data->sprite.current_frame], data->sprite.tex_x, data->sprite.tex_y);
 		if ((data->sprite.color & 0x00FFFFFF) != 0)
 			my_mlx_pixel_put(data, x, y, data->sprite.color);
 		y++;

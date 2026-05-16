@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/10 10:01:42 by t.mura            #+#    #+#             */
-/*   Updated: 2026/05/14 22:12:12 by tmura            ###   ########.fr       */
+/*   Updated: 2026/05/16 14:39:16 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,8 @@ typedef struct s_sprite
 	int						d;
 	int						tex_y;
 	int						color;
+	int						current_frame;
+	int						frame_counter;
 }	t_sprite;
 
 typedef struct s_map_info
@@ -194,7 +196,7 @@ typedef struct s_cub3d
 	double					dy;
 	t_flg					flg;
 	t_texture				texture;
-	t_img					tex[6];
+	t_img					tex[15];
 	int						w;
 	int						h;
 	int						fc_check[2];
