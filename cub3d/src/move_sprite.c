@@ -12,6 +12,18 @@
 
 #include "../include/cub3d.h"
 
+void update_sprite_animation(t_data *data)
+{
+	data->sprite.frame_counter++;
+	if (data->sprite.frame_counter >= 15)
+	{
+		data->sprite.frame_counter = 0;
+		data->sprite.current_frame++;
+		if (data->sprite.current_frame >= 15)
+			data->sprite.current_frame = 0;
+	}
+}
+
 void	check_death(t_data *data)
 {
 	double	dist;

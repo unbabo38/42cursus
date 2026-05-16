@@ -12,9 +12,23 @@
 
 #include "../include/cub3d.h"
 
+void	set_sprite_tex(char **paths)
+{
+	paths[5] = "textures/sprite1.xpm";
+	paths[6] = "textures/sprite2.xpm";
+	paths[7] = "textures/sprite3.xpm";
+	paths[8] = "textures/sprite4.xpm";
+	paths[9] = "textures/sprite5.xpm";
+	paths[10] = "textures/sprite6.xpm";
+	paths[11] = "textures/sprite7.xpm";
+	paths[12] = "textures/sprite8.xpm";
+	paths[13] = "textures/sprite9.xpm";
+	paths[14] = "textures/sprite10.xpm";
+}
+
 void	load_textures(t_data *data)
 {
-	char	*paths[6];
+	char	*paths[15];
 	int		i;
 
 	i = 0;
@@ -23,8 +37,8 @@ void	load_textures(t_data *data)
 	paths[2] = data->texture.we_path;
 	paths[3] = data->texture.ea_path;
 	paths[4] = "textures/door.xpm";
-	paths[5] = "textures/barrel.xpm";
-	while (i < 6)
+	set_sprite_tex(paths);
+	while (i < 15)
 	{
 		data->fd = open(paths[i], O_RDONLY);
 		if (data->fd < 0)
