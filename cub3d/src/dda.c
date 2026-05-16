@@ -40,7 +40,7 @@ void	type_of_content(t_data *data)
 			data->dda.hit = 2;
 	}
 	else
-		data->dda.hit = 1;
+		data->dda.hit = 0;
 }
 
 void	dda(t_data *data)
