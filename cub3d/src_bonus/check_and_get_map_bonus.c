@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   check_and_get_map.c                                :+:      :+:    :+:   */
+/*   check_and_get_map_bonus.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/16 17:03:58 by tmura             #+#    #+#             */
-/*   Updated: 2026/05/16 17:03:58 by tmura            ###   ########.fr       */
+/*   Created: 2026/05/16 17:03:21 by tmura             #+#    #+#             */
+/*   Updated: 2026/05/16 17:03:21 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/cub3d.h"
+#include "../include/cub3d_bonus.h"
 
 int	all_dir_texture_is_valid(t_data *data)
 {
