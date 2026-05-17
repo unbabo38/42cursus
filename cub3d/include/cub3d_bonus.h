@@ -6,14 +6,14 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/10 10:01:42 by t.mura            #+#    #+#             */
-/*   Updated: 2026/05/16 16:59:15 by tmura            ###   ########.fr       */
+/*   Updated: 2026/05/17 12:34:00 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB3D_BONUS_H
 # define CUB3D_BONUS_H
 
-# include "../mlx/mlx.h"
+# include "../minilibx-linux/mlx.h"
 # include "libft/libft.h"
 # include "gnl/get_next_line.h"
 
@@ -232,7 +232,7 @@ void						load_textures(t_data *data);
 int							parse_config_line(char *line, t_data *data);
 void						my_mlx_pixel_put(t_data *data,
 								int x, int y, int color);
-int							mouse_move(int x, t_data *data);
+int							mouse_move(int x, int y, t_data *data);
 unsigned int				get_pixel_color(t_img *img, int x, int y);
 void						move_sprite(t_data *data);
 void						check_death(t_data *data);

@@ -12,14 +12,14 @@
 
 #include "../include/cub3d.h"
 
-int	mouse_move(int x, t_data *data)
+int	mouse_move(int x, int y, t_data *data)
 {
 	double		rot_speed;
 	double		old_dir_x;
 	double		old_planet_x;
-	static int	last_x;
+	static int	last_x = -1;
 
-	last_x = -1;
+	(void)y;
 	if (last_x == -1)
 	{
 		last_x = x;

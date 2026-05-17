@@ -1,10 +1,25 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2026/05/17 12:45:16 by tmura             #+#    #+#              #
+#    Updated: 2026/05/17 12:45:16 by tmura            ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME      = cub3D
 LIBFT_DIR = ./include/libft
 LIBFT     = $(LIBFT_DIR)/libft.a
 
+MLX_DIR   = ./minilibx-linux
+MLX_LIB   = $(MLX_DIR)/libmlx.a
+
 CC        = cc
-CFLAGS    = -Wall -Wextra -Werror -I ./include -I $(LIBFT_DIR) -I ./include/gnl
-MLX       = -L ./mlx -lmlx -lXext -lX11 -lm
+CFLAGS    = -Wall -Wextra -Werror -I ./include -I $(LIBFT_DIR) -I ./include/gnl -I $(MLX_DIR)
+MLX       = -L $(MLX_DIR) -lmlx -lXext -lX11 -lm
 
 SRCS      = src/main.c src/rendering.c src/map.c src/key_press.c src/utils.c \
             src/door.c src/set_texture_dir.c src/set_floor_ceiling.c src/move.c \
@@ -33,6 +48,7 @@ all: $(NAME)
 
 $(NAME): $(TARGET_OBJS)
 	@make -C $(LIBFT_DIR)
+	@make -C $(MLX_DIR)
 	$(CC) $(TARGET_OBJS) $(LIBFT) $(MLX) -o $(NAME)
 
 bonus:
@@ -43,6 +59,7 @@ bonus:
 
 clean:
 	@make clean -C $(LIBFT_DIR)
+	@make clean -C $(MLX_DIR)
 	rm -f $(SRCS:.c=.o) $(BONUS_SRCS:.c=.o)
 
 fclean: clean

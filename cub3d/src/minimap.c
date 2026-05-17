@@ -56,6 +56,17 @@ void	draw_point(t_data *data, int x, int y, int color)
 	}
 }
 
+void	draw_width(t_data *data, int x, int y, int color)
+{
+	while (x < data->map_width)
+	{
+		color = 0x000000;
+		draw_square(data, x * data->minimap.size + 20,
+			y * data->minimap.size + 20, color);
+		x++;
+	}
+}
+
 void	draw_minimap(t_data *data)
 {
 	int	color;
@@ -67,7 +78,7 @@ void	draw_minimap(t_data *data)
 	while (y < data->map_height)
 	{
 		x = 0;
-		while (x < data->map_width)
+		while (x < data->map_width && data->map[y][x] != '\0')
 		{
 			if (data->map[y][x] == '1')
 				color = 0xFFFFFF;
@@ -77,6 +88,7 @@ void	draw_minimap(t_data *data)
 				y * data->minimap.size + 20, color);
 			x++;
 		}
+		draw_width(data, x, y, color);
 		y++;
 	}
 	draw_point(data, data->pos_x * data->minimap.size + 20,
