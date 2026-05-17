@@ -6,7 +6,7 @@
 /*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/10 10:01:42 by t.mura            #+#    #+#             */
-/*   Updated: 2026/05/17 12:33:48 by tmura            ###   ########.fr       */
+/*   Updated: 2026/05/17 21:30:36 by tmura            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -302,5 +302,7 @@ void						set_start_to_end(t_data *data);
 int							in_map(t_data *data);
 void						update_sprite_animation(t_data *data);
 void						set_sprite_tex(char **paths);
+void						free_stab_exit(t_data *data, char **map,
+								int num, char *msg);
 
 #endif

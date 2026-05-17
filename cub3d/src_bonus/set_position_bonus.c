@@ -42,3 +42,24 @@ void	set_sprite_tex(char **paths)
 	paths[13] = "textures/sprite9.xpm";
 	paths[14] = "textures/sprite10.xpm";
 }
+
+void	free_stab(char **tab)
+{
+	int	i;
+
+	if (!tab)
+		return ;
+	i = 0;
+	while (tab[i])
+	{
+		free(tab[i]);
+		i++;
+	}
+	free(tab);
+}
+
+void	free_stab_exit(t_data *data, char **map, int num, char *msg)
+{
+	free_stab(map);
+	free_exit(data, num, msg);
+}
