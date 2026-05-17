@@ -12,30 +12,8 @@
 
 #include "../include/cub3d_bonus.h"
 
-void	free_stab(char **tab)
-{
-	int	i;
-
-	if (!tab)
-		return ;
-	i = 0;
-	while (tab[i])
-	{
-		free(tab[i]);
-		i++;
-	}
-	free(tab);
-}
-
-void	free_stab_exit(t_data *data, char **map, int num, char *msg)
-{
-	free_stab(map);
-	free_exit(data, num, msg);
-}
-
 void	check_wall(t_data *data, char **map, int h, int w)
 {
-	printf("h=%d, w=%d\n", h, w);
 	if (h < 0 || h >= data->map_height)
 		free_stab_exit(data, map, FAILED, "Map is open");
 	if (!map[h])
@@ -85,6 +63,27 @@ int	check_characters(t_data *data)
 		return (0);
 }
 
+void	check_valid_letter(t_data *data, char **map)
+{
+	int	x;
+	int	y;
+
+	x = 0;
+	y = 0;
+	while (y < data->map_height)
+	{
+		x = 0;
+		while (x < (int)ft_strlen(data->map[y]))
+		{
+			if (!(map[y][x] == '0' || is_space_and_crlf(map[y][x])
+					|| map[y][x] == '1' || map[y][x] == 'D'))
+				free_stab_exit(data, map, FAILED, "invalid letter!");
+			x++;
+		}
+		y++;
+	}
+}
+
 int	check_character_and_wall(t_data *data)
 {
 	if (check_characters(data) != 0)
@@ -93,6 +92,7 @@ int	check_character_and_wall(t_data *data)
 		return (1);
 	}
 	data->cmap = copy_map(data);
+	check_valid_letter(data, data->cmap);
 	check_wall(data, data->cmap,
 		data->pos_y, data->pos_x);
 	free_stab(data->cmap);
