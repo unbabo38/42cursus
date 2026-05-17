@@ -35,6 +35,7 @@ void	free_stab_exit(t_data *data, char **map, int num, char *msg)
 
 void	check_wall(t_data *data, char **map, int h, int w)
 {
+	printf("h=%d, w=%d\n", h, w);
 	if (h < 0 || h >= data->map_height)
 		free_stab_exit(data, map, FAILED, "Map is open");
 	if (!map[h])
@@ -86,27 +87,14 @@ int	check_characters(t_data *data)
 
 int	check_character_and_wall(t_data *data)
 {
-	int	x;
-	int	y;
-
 	if (check_characters(data) != 0)
 	{
 		free_exit(data, FAILED, "check_characters failed!");
 		return (1);
 	}
 	data->cmap = copy_map(data);
-	y = 0;
-	while (y < data->map_height)
-	{
-		x = 0;
-		while (x < (int)ft_strlen(data->map[y]))
-		{
-			if (data->cmap[y][x] == '0' || data->cmap[y][x] == 'D')
-				check_wall(data, data->cmap, y, x);
-			x++;
-		}
-		y++;
-	}
+	check_wall(data, data->cmap,
+		data->pos_y, data->pos_x);
 	free_stab(data->cmap);
 	return (0);
 }
