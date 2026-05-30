@@ -42,7 +42,7 @@ void AForm::execute(Bureaucrat const &executor) const {
     if (executor.getGrade() > this->getGradeToExecute()) {
         throw AForm::GradeTooLowException();
     }
-    this->executeAction(executor);
+    this->executeAction();
 }
 
 void AForm::_checkGrades() const {
