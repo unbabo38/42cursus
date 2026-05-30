@@ -7,19 +7,19 @@
 #include "AForm.hpp"
 
 class RobotomyRequestForm : public AForm {
-  private:
-    std::string _target;
+private:
+  std::string _target;
 
-	RobotomyRequestForm();
+  RobotomyRequestForm();
 
-  public:
-    RobotomyRequestForm(const std::string &target);
-    RobotomyRequestForm(const RobotomyRequestForm &other);
-    RobotomyRequestForm &operator=(const RobotomyRequestForm &other);
-    virtual ~RobotomyRequestForm();
+public:
+  RobotomyRequestForm(const std::string &target);
+  RobotomyRequestForm(const RobotomyRequestForm &other);
+  RobotomyRequestForm &operator=(const RobotomyRequestForm &other);
+  virtual ~RobotomyRequestForm();
 
-    virtual void executeAction() const;
-    const std::string &getTarget() const;
+  virtual void executeAction() const;
+  const std::string &getTarget() const;
 };
 
 #endif
