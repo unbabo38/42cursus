@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-// 1. Bureaucrat Instantiation Tests
+// 1. Instantiation Tests
 void test_bureaucrat_initialization_with_minimum_valid_grade() {
     try {
         Bureaucrat valid_low_bureaucrat("LowLevel", 150);
@@ -77,7 +77,7 @@ void test_form_initialization_with_sign_grade_too_low() {
 void test_form_signing_by_bureaucrat_with_insufficient_grade() {
     try {
         Form high_tier_form("TopSecretPaper", 10, 10);
-        Bureaucrat low_grade_bureaucrat("Staff Tanaka", 50);
+        Bureaucrat low_grade_bureaucrat("Staff T", 50);
 
         low_grade_bureaucrat.signForm(high_tier_form);
     } catch (const std::exception &e) {
@@ -88,7 +88,7 @@ void test_form_signing_by_bureaucrat_with_insufficient_grade() {
 void test_form_signing_by_bureaucrat_with_sufficient_grade() {
     try {
         Form low_tier_form("PublicPaper", 50, 50);
-        Bureaucrat high_grade_bureaucrat("Elite Sato", 1);
+        Bureaucrat high_grade_bureaucrat("Elite S", 1);
 
         high_grade_bureaucrat.signForm(low_tier_form);
     } catch (const std::exception &e) {

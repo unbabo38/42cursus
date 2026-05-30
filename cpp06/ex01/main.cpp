@@ -3,7 +3,7 @@
 
 int main() {
     Data value;
-    value.k = 42; // C++98なのでここで初期化
+    value.k = 42;
 
     std::cout << "--- Original Pointer ---" << std::endl;
     std::cout << "Address of value : " << &value << std::endl;

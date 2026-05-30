@@ -4,11 +4,10 @@
 #include "RobotomyRequestForm.hpp"
 #include "ShrubberyCreationForm.hpp"
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 
-// ========================================================
 // 1. ShrubberyCreationForm Tests (Sign: 145, Exec: 137)
-// ========================================================
-
 void test_shrubbery_execution_success() {
     try {
         Bureaucrat elite_bureaucrat("EliteSato", 1);
@@ -23,7 +22,7 @@ void test_shrubbery_execution_success() {
 
 void test_shrubbery_execution_failure_not_signed() {
     try {
-        Bureaucrat elite_bureaucrat("EliteSato", 1);
+        Bureaucrat elite_bureaucrat("EliteSato2", 1);
         ShrubberyCreationForm unsigned_shrubbery("garden");
 
         elite_bureaucrat.executeForm(unsigned_shrubbery);
@@ -32,17 +31,14 @@ void test_shrubbery_execution_failure_not_signed() {
     }
 }
 
-// ========================================================
 // 2. RobotomyRequestForm Tests (Sign: 72, Exec: 45)
-// ========================================================
-
 void test_robotomy_execution_success() {
     try {
-        Bureaucrat mid_bureaucrat("ManagerTanaka", 40);
+        Bureaucrat manager_bureaucrat("ManagerTanaka", 40);
         RobotomyRequestForm valid_robotomy("Bender");
 
-        mid_bureaucrat.signForm(valid_robotomy);
-        mid_bureaucrat.executeForm(valid_robotomy);
+        manager_bureaucrat.signForm(valid_robotomy);
+        manager_bureaucrat.executeForm(valid_robotomy);
     } catch (const std::exception &e) {
         std::cout << "FAILURE: " << e.what() << std::endl;
     }
@@ -60,10 +56,7 @@ void test_robotomy_execution_failure_low_grade() {
     }
 }
 
-// ========================================================
 // 3. PresidentialPardonForm Tests (Sign: 25, Exec: 5)
-// ========================================================
-
 void test_presidential_execution_success() {
     try {
         Bureaucrat boss_bureaucrat("ThePresident", 1);
@@ -88,10 +81,8 @@ void test_presidential_execution_failure_insufficient_execute_grade() {
     }
 }
 
-// ========================================================
-// Main Test Runner
-// ========================================================
 int main() {
+	std::srand(std::time(NULL));
     test_shrubbery_execution_success();
     test_shrubbery_execution_failure_not_signed();
 

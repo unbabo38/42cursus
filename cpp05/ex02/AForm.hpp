@@ -50,7 +50,7 @@ class AForm {
 
     bool beSigned(Bureaucrat &obj);
     void execute(Bureaucrat const & executor) const;
-    virtual void executeAction(Bureaucrat const & executor) const = 0;
+    virtual void executeAction() const = 0;
 };
 
 #endif

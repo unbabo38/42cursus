@@ -12,11 +12,9 @@ class Bureaucrat {
     const std::string _name;
     int               _grade;
 
-    // 💡 グレードチェック用のプライベート関数を追加
     void              _checkGrade() const;
 
   public:
-    // 💡 デフォルトコンストラクタをコメントアウト
     // Bureaucrat();
 
     Bureaucrat(const std::string &name, int grade);
@@ -24,7 +22,6 @@ class Bureaucrat {
     Bureaucrat &operator=(const Bureaucrat &other);
     ~Bureaucrat();
 
-    // 💡 戻り値の型を.cpp側の実装と完全に一致させました
     const std::string &getName() const;
     int                getGrade() const;
 

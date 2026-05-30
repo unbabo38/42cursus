@@ -63,7 +63,6 @@ std::ostream &operator<<(std::ostream &os, const Bureaucrat &obj) {
     return os;
 }
 
-// 💡 追加したプライベート・バリデーション関数
 void Bureaucrat::_checkGrade() const {
     if (this->_grade < 1) {
         throw Bureaucrat::GradeTooHighException();

@@ -1,5 +1,4 @@
 #include "Base.hpp"
-#include "math.h"
 
 Base::~Base() {}
 
