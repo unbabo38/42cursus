@@ -12,7 +12,7 @@ private:
   bool _sign;
   const int _gradeToSign;
   const int _gradeToExecute;
-  void              _checkGrades() const;
+  void _checkGrades() const;
 
   Form();
 
