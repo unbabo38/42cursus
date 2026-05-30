@@ -1,0 +1,43 @@
+#ifndef BUREAUCRAT_HPP
+#define BUREAUCRAT_HPP
+
+#include <exception>
+#include <iostream>
+#include <string>
+
+class Bureaucrat {
+private:
+  const std::string _name;
+  int _grade;
+  Bureaucrat();
+
+public:
+  Bureaucrat(const std::string &_name, int _grade);
+  Bureaucrat(const Bureaucrat &other);
+  Bureaucrat &operator=(const Bureaucrat &other);
+  ~Bureaucrat();
+
+  const std::string getName() const;
+  int getGrade() const;
+
+  void incrementGrade();
+  void decrementGrade();
+
+  class GradeTooHighException : public std::exception {
+  public:
+    virtual const char *what() const throw() {
+      return "grade out of range(too high).";
+    }
+  };
+
+  class GradeTooLowException : public std::exception {
+  public:
+    virtual const char *what() const throw() {
+      return "grade out of range(too low).";
+    }
+  };
+};
+
+std::ostream &operator<<(std::ostream &os, const Bureaucrat &obj);
+
+#endif
