@@ -172,7 +172,6 @@ int main(int argc, char const *argv[])
 		std::stringstream stream_binding;
 		stream_binding << istrm.rdbuf();
 		std::string file = stream_binding.str();
-		//std::cout << stream_binding.str();
 
 		std::cout << "beforsplit" << std::endl;
 
