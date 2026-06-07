@@ -1,4 +1,10 @@
+#ifndef CONFIG_PARSER_HPP
+#define CONFIG_PARSER_HPP
+
+#include <iostream>
+#include <fstream>
 #include <string>
+#include <filesystem>
 #include <vector>
 #include "ConfigServer.hpp"
 
@@ -12,7 +18,7 @@ class ConfigParser{
 	size_t findStartServer(size_t start, std::string &content);
 	size_t findEndServer(size_t start, std::string &content);
 	void splitConfToServers(std::string &content, ConfigServer *confserv);
-
+	void parseListenLine(const std::string& line, ConfigServer *confserv);
 };
 
 // typedef struct {
@@ -64,3 +70,4 @@ class ConfigParser{
 
 //     char                     *err;
 // ‌} wserv_url_t;
+#endif

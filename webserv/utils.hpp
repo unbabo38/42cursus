@@ -1,21 +1,10 @@
-#ifndef CONFIG_SERVER_HPP
-#define CONFIG_SERVER_HPP
-
 #include <string>
 #include <vector>
-#include <stdint.h>
+#include "ConfigServer.hpp"
+#include <iostream>
 #include <sstream>
 
-class ConfigServer{
-  private:
-	uint16_t 	_port;
-  public:
-    ConfigServer();
-	~ConfigServer();
-	const uint16_t	getPort() const;
-	void	setPort(uint16_t portNum);
-
-};
+int ft_stoi(std::string str);
 
 // typedef struct {
 //     size_t      	len;
@@ -66,5 +55,3 @@ class ConfigServer{
 
 //     char                     *err;
 // ‌} wserv_url_t;
-
-#endif
