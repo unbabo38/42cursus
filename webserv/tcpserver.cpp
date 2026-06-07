@@ -12,7 +12,9 @@
 #include <string>
 #include <filesystem>
 
-#include "config.hpp"
+#include "ConfigParser.hpp"
+#include "ConfigServer.hpp"
+
 
 #define PORT 8080
 #define MAX_EVENTS 10
@@ -24,118 +26,30 @@ ConfigParser::ConfigParser()
 
 ConfigParser::~ConfigParser() { }
 
-// void ConfigParser::createServer(std::string &config, ServerConfig &server)
-// {
-// 	std::vector<std::string>	parametrs;
-// 	std::vector<std::string>	error_codes;
-// 	int		flag_loc = 1;
-// 	bool	flag_autoindex = false;
-// 	bool	flag_max_size = false;
+ConfigServer::ConfigServer()
+{
+	this->_port = 0;
+}
 
-// 	parametrs = splitParametrs(config += ' ', std::string(" \n\t"));
-// 	if (parametrs.size() < 3)
-// 		throw  ErrorException("Failed server validation");
-// 	for (size_t i = 0; i < parametrs.size(); i++)
-// 	{
-// 		if (parametrs[i] == "listen" && (i + 1) < parametrs.size() && flag_loc)
-// 		{
-// 			if (server.getPort())
-// 				throw  ErrorException("Port is duplicated");
-// 			server.setPort(parametrs[++i]);
-// 		}
-// 		else if (parametrs[i] == "location" && (i + 1) < parametrs.size())
-// 		{
-// 			std::string	path;
-// 			i++;
-// 			if (parametrs[i] == "{" || parametrs[i] == "}")
-// 				throw  ErrorException("Wrong character in server scope{}");
-// 			path = parametrs[i];
-// 			std::vector<std::string> codes;
-// 			if (parametrs[++i] != "{")
-// 				throw  ErrorException("Wrong character in server scope{}");
-// 			i++;
-// 			while (i < parametrs.size() && parametrs[i] != "}")
-// 				codes.push_back(parametrs[i++]);
-// 			server.setLocation(path, codes);
-// 			if (i < parametrs.size() && parametrs[i] != "}")
-// 				throw  ErrorException("Wrong character in server scope{}");
-// 			flag_loc = 0;
-// 		}
-// 		else if (parametrs[i] == "host" && (i + 1) < parametrs.size() && flag_loc)
-// 		{
-// 			if (server.getHost())
-// 				throw  ErrorException("Host is duplicated");
-// 			server.setHost(parametrs[++i]);
-// 		}
-// 		else if (parametrs[i] == "root" && (i + 1) < parametrs.size() && flag_loc)
-// 		{
-// 			if (!server.getRoot().empty())
-// 				throw  ErrorException("Root is duplicated");
-// 			server.setRoot(parametrs[++i]);
-// 		}
-// 		else if (parametrs[i] == "error_page" && (i + 1) < parametrs.size() && flag_loc)
-// 		{
-// 			while (++i < parametrs.size())
-// 			{
-// 				error_codes.push_back(parametrs[i]);
-// 				if (parametrs[i].find(';') != std::string::npos)
-// 					break ;
-// 				if (i + 1 >= parametrs.size())
-// 					throw ErrorException("Wrong character out of server scope{}");
-// 			}
-// 		}
-// 		else if (parametrs[i] == "client_max_body_size" && (i + 1) < parametrs.size() && flag_loc)
-// 		{
-// 			if (flag_max_size)
-// 				throw  ErrorException("Client_max_body_size is duplicated");
-// 			server.setClientMaxBodySize(parametrs[++i]);
-// 			flag_max_size = true;
-// 		}
-// 		else if (parametrs[i] == "server_name" && (i + 1) < parametrs.size() && flag_loc)
-// 		{
-// 			if (!server.getServerName().empty())
-// 				throw  ErrorException("Server_name is duplicated");
-// 			server.setServerName(parametrs[++i]);
-// 		}
-// 		else if (parametrs[i] == "index" && (i + 1) < parametrs.size() && flag_loc)
-// 		{
-// 			if (!server.getIndex().empty())
-// 				throw  ErrorException("Index is duplicated");
-// 			server.setIndex(parametrs[++i]);
-// 		}
-// 		else if (parametrs[i] == "autoindex" && (i + 1) < parametrs.size() && flag_loc)
-// 		{
-// 			if (flag_autoindex)
-// 				throw ErrorException("Autoindex of server is duplicated");
-// 			server.setAutoindex(parametrs[++i]);
-// 			flag_autoindex = true;
-// 		}
-// 		else if (parametrs[i] != "}" && parametrs[i] != "{")
-// 		{
-// 			if (!flag_loc)
-// 				throw  ErrorException("Parametrs after location");
-// 			else
-// 				throw  ErrorException("Unsupported directive");
-// 		}
-// 	}
-// 	if (server.getRoot().empty())
-// 		server.setRoot("/;");
-// 	if (server.getHost() == 0)
-// 		server.setHost("localhost;");
-// 	if (server.getIndex().empty())
-// 		server.setIndex("index.html;");
-// 	if (ConfigFile::isFileExistAndReadable(server.getRoot(), server.getIndex()))
-// 		throw ErrorException("Index from config file not found or unreadable");
-// 	if (server.checkLocaitons())
-// 		throw ErrorException("Locaition is duplicated");
-// 	if (!server.getPort())
-// 		throw ErrorException("Port not found");
-// 	server.setErrorPages(error_codes);
-// 	if (!server.isValidErrorPages())
-// 		throw ErrorException("Incorrect path for error page or number of error");
-// }
+ConfigServer::~ConfigServer() { }
 
-static void parseListenLine(const std::string& line) {
+static int ft_stoi(std::string str)
+{
+    std::stringstream ss(str);
+    if (str.length() > 10)
+        throw std::runtime_error("too long");
+    // for (size_t i = 0; i < str.length(); ++i)
+    // {
+    //     if(!isdigit(str[i])){
+	// 		std::cout << "str[i]=" << str[i] << std::endl;
+    //         throw std::runtime_error("out of digit");
+	// 	}
+    // }
+    int res;
+    ss >> res;
+    return (res);
+}
+static void parseListenLine(const std::string& line, ConfigServer *confserv) {
     std::stringstream ss(line);
     std::string word;
     std::vector<std::string> tokens;
@@ -145,39 +59,13 @@ static void parseListenLine(const std::string& line) {
         tokens.push_back(word);
 		std::cout << word << std::endl;
     }
+	for (int i = 0; i < tokens.size(); i++) {
+	  if (tokens[i] == "listen" && i + 1 < tokens.size())
+	    // int temp_port = ft_stoi(tokens[i + 1]);
+		confserv->setPort(static_cast<uint16_t>(ft_stoi(tokens[i + 1])));
+		std::cout << "inlisten" << confserv->getPort() << std::endl;
+	}
 
-    // 例: "listen 8080 8080 80808;"
-    // tokens[0] = "listen"
-    // tokens[1] = "8080"
-    // tokens[2] = "8080"
-    // tokens[3] = "80808;" (末尾にセミコロンが残る)
-
-    // 🛑 弾くべきチェック1：引数の数が絶対におかしい
-    // 正しい listen は ["listen", "ポート番号;"] の2つだけのはず
-
-    // // 🛑 弾くべきチェック2：末尾にちゃんとセミコロンがあるか？
-    // std::string port_str = tokens[1];
-    // if (port_str.empty() || port_str[port_str.length() - 1] != ';') {
-    //     throw std::runtime_error("Error: missing ';' at the end of directive");
-    // }
-
-    // // セミコロンを切り落として純粋な数字にする
-    // port_str = port_str.substr(0, port_str.length() - 1);
-
-    // // 🛑 弾くべきチェック3：数字以外が混ざってないか？（"80a80" 対策）
-    // for (size_t i = 0; i < port_str.length(); i++) {
-    //     if (!isdigit(port_str[i])) {
-    //         throw std::runtime_error("Error: host not found in listen directive");
-    //     }
-    // }
-
-    // // 最後に int に変換してポート範囲内（0〜65535）かチェック
-    // int port = std::stoi(port_str); // C++98なら atoi(port_str.c_str())
-    // if (port < 0 || port > 65535) {
-    //     throw std::runtime_error("Error: invalid port range");
-    // }
-
-    // std::cout << "SUCCESS: Port is " << port << std::endl;
 }
 
 size_t ConfigParser::findStartServer (size_t start, std::string &content)
@@ -225,8 +113,9 @@ size_t ConfigParser::findEndServer (size_t start, std::string &content)
 	}
 	return (start);
 }
-void ConfigParser::splitServers(std::string &content)
+void ConfigParser::splitConfToServers(std::string &content, ConfigServer *confserv)
 {
+	std::cout << "insplit" << std::endl;
 	size_t start = 0;
 	size_t end = 1;
 
@@ -243,12 +132,20 @@ void ConfigParser::splitServers(std::string &content)
 		//std::string con = static_cast<std::string> (content);
 		this->_server_config.push_back(content.substr(start, end - start + 1));
 		std::cout << this->_server_config[this->_nb_server] << std::endl;
-		parseListenLine(this->_server_config[this->_nb_server]);
+		parseListenLine(this->_server_config[this->_nb_server], confserv);
 
 		this->_nb_server++;
 		start = end + 1;
 	}
 }
+const uint16_t	ConfigServer::getPort() const {
+  return this->_port;
+}
+
+void	ConfigServer::setPort(uint16_t portNum) {
+  this->_port = portNum;
+}
+
 
 int main(int argc, char const *argv[])
 {
@@ -263,7 +160,8 @@ int main(int argc, char const *argv[])
     //char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 
     // Creating socket file descriptor
-
+	ConfigParser conf_parse;
+	ConfigServer conf_serv;
   	std::ifstream istrm(argv[1], std::ios::binary);
 	if (!istrm.is_open()) {
     	std::cout << "failed to open " << argv[1] << '\n';
@@ -276,8 +174,10 @@ int main(int argc, char const *argv[])
 		std::string file = stream_binding.str();
 		//std::cout << stream_binding.str();
 
-		ConfigParser conf;
-		conf.splitServers(file);
+		std::cout << "beforsplit" << std::endl;
+
+		conf_parse.splitConfToServers(file, &conf_serv);
+
 
 
 		// 3. 1行ずつファイル終端まで読み込む
@@ -297,7 +197,8 @@ int main(int argc, char const *argv[])
 
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
-    addr.sin_port = htons( PORT );
+	std::cout << conf_serv.getPort() << std::endl;
+    addr.sin_port = htons( conf_serv.getPort() );
 
     memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
 
