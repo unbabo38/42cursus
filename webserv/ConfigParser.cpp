@@ -1,5 +1,6 @@
 #include "ConfigParser.hpp"
-
+#include "Location.hpp"
+#include "utils.cpp"
 
 
 ConfigParser::ConfigParser()
@@ -9,22 +10,6 @@ ConfigParser::ConfigParser()
 
 ConfigParser::~ConfigParser() { }
 
-static int ft_stoi(std::string str)
-{
-    std::stringstream ss(str);
-    if (str.length() > 10)
-        throw std::runtime_error("too long");
-    // for (size_t i = 0; i < str.length(); ++i)
-    // {
-    //     if(!isdigit(str[i])){
-	// 		std::cout << "str[i]=" << str[i] << std::endl;
-    //         throw std::runtime_error("out of digit");
-	// 	}
-    // }
-    int res;
-    ss >> res;
-    return (res);
-}
 
 size_t ConfigParser::findStartServer (size_t start, std::string &content)
 {
@@ -72,21 +57,66 @@ size_t ConfigParser::findEndServer (size_t start, std::string &content)
 	return (start);
 }
 
-void ConfigParser::parseListenLine(const std::string& line, ConfigServer *confserv) {
-    std::stringstream ss(line);
+
+
+size_t ConfigParser::getBlockSize(const std::vector<std::string>& tokens, size_t start_pos) {
+    size_t brace_count = 0;
+    size_t pos = start_pos;
+
+    while (pos < tokens.size()) {
+        if (tokens[pos] == "{") {
+            brace_count++;
+        } else if (tokens[pos] == "}") {
+            brace_count--;
+            if (brace_count == 0) {
+                return pos - start_pos + 1;
+            }
+        }
+        pos++;
+    }
+    throw std::runtime_error("Error: Unclosed curly brace '{'");
+}
+
+void ConfigParser::parseServer(const std::string& line, ConfigServer *confserv) {
+    std::string formatted_line = "";
+	for (size_t i = 0; i < line.length(); i++) {
+        if (line[i] == ';' || line[i] == '{' || line[i] == '}') {
+            formatted_line += " ";
+            formatted_line += line[i];
+            formatted_line += " ";
+        } else {
+            formatted_line += line[i];
+        }
+    }
+	std::stringstream ss(formatted_line);
     std::string word;
     std::vector<std::string> tokens;
 
-    // 空白（スペースやタブ）で単語をバラバラにして vector に詰める
-    while (ss >> word) {
+    while (ss >> word)
+	{
         tokens.push_back(word);
 		//std::cout << word << std::endl;
-    }
-	for (int i = 0; i < tokens.size(); i++) {
-	  if (tokens[i] == "listen" && i + 1 < tokens.size())
-	    // int temp_port = ft_stoi(tokens[i + 1]);
+	}
+	for (size_t i = 0; i < tokens.size(); i++) {
+	  if (tokens[i] == "listen" && i + 1 < tokens.size()) {
 		confserv->setPort(static_cast<uint16_t>(ft_stoi(tokens[i + 1])));
-		std::cout << "inlisten" << confserv->getPort() << std::endl;
+		i++;
+	  }
+
+	  if (tokens[i] == "server_name" && i + 1 < tokens.size()) {
+		confserv->setServerName(tokens[i + 1]);
+		i++;
+	  }
+	  if (tokens[i] == "root" && i + 1 < tokens.size()) {
+		confserv->setRoot(tokens[i + 1]);
+		i++;
+	  }
+	  if (tokens[i] == "location" && i + 1 < tokens.size())
+	  {
+		size_t len = getBlockSize(tokens, i);
+		Location::parseLocation(tokens, i, i + len, confserv);
+		i+=len;
+	  }
 	}
 }
 
@@ -109,9 +139,10 @@ void ConfigParser::splitConfToServers(std::string &content, ConfigServer *confse
 		//throw std::runtime_error("problem with scope");
 		//std::string con = static_cast<std::string> (content);
 		this->_server_config.push_back(content.substr(start, end - start + 1));
-		std::cout << this->_server_config[this->_nb_server] << std::endl;
-		parseListenLine(this->_server_config[this->_nb_server], confserv);
-
+		parseServer(this->_server_config[this->_nb_server], confserv);
+        //confserv->printServerConfig();
+		this->_servers.push_back(*confserv);
+		this->_servers.back().printServerConfig();
 		this->_nb_server++;
 		start = end + 1;
 	}

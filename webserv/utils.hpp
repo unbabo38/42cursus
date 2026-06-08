@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 
-int ft_stoi(std::string str);
+static int ft_stoi(std::string str);
 
 // typedef struct {
 //     size_t      	len;

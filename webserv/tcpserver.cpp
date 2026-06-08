@@ -6,7 +6,6 @@
 #include <string.h>
 #include <sys/epoll.h>
 
-// 自作のC++ヘッダはシステムヘッダの後に読み込むのが安全です
 #include "ConfigParser.hpp"
 #include "ConfigServer.hpp"
 
@@ -40,11 +39,12 @@ int main(int argc, char const *argv[])
 		std::string file = stream_binding.str();
 		//std::cout << stream_binding.str();
 
-		std::cout << "beforsplit" << std::endl;
 
 		conf_parse.splitConfToServers(file, &conf_serv);
-
-
+		std::vector<Location> loc;
+		loc = conf_serv.getLocation();
+		std::cout << loc[0].getRoot() << std::endl;
+		std::cout << "autoindex" << loc[0].getAutoindex() << std::endl;
 
 		// 3. 1行ずつファイル終端まで読み込む
 		// while (std::getline(istrm, line)) {
@@ -65,6 +65,8 @@ int main(int argc, char const *argv[])
     addr.sin_addr.s_addr = INADDR_ANY;
 	std::cout << conf_serv.getPort() << std::endl;
     addr.sin_port = htons( conf_serv.getPort() );
+	std::cout << "servername:" << conf_serv.getServerName() << std::endl;
+	//conf_serv.printServerConfig();
 
     memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
 
