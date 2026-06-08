@@ -14,6 +14,7 @@ void ConfigServer::printServerConfig() const {
     std::cout << "  Port:        " << this->getPort() << std::endl;
     std::cout << "  Server Name: " << this->getServerName() << std::endl;
     std::cout << "  Root:        " << this->getRoot() << std::endl;
+
     std::cout << "=================================" << std::endl;
 
     // 配下の Location ブロックをすべてループで回して出力
@@ -91,4 +92,8 @@ void ConfigServer::addLocation(const Location& loc) {
 
 const std::vector<Location> &ConfigServer::getLocation() const {
 	return this->_locations;
+}
+
+void ConfigServer::addErrorPage(const short &code, const std::string &path) {
+    this->_error_pages[code] = path;
 }

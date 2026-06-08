@@ -10,7 +10,7 @@
 
 class ConfigServer{
   private:
-	uint16_t 	_port;
+	uint16_t 						_port;
 	std::string						_server_name;
 	std::string						_root;
 	unsigned long					_client_max_body_size;
@@ -18,7 +18,7 @@ class ConfigServer{
 	bool							_autoindex;
 	std::map<short, std::string>	_error_pages;
 	std::vector<Location> 			_locations;
-    // struct sockaddr_in 				_server_address;
+    //struct sockaddr_in 				_server_address;
     int     						_listen_fd;
   public:
     ConfigServer();
@@ -30,6 +30,8 @@ class ConfigServer{
 	const std::string &getRoot() const;
 	void	setRoot(std::string root);
 	void addLocation(const Location& loc);
+	void addErrorPage(const short &code, const std::string &path);
+
 	const std::vector<Location>  &getLocation() const;
 	void printServerConfig() const;
 };
