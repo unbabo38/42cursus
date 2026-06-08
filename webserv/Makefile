@@ -2,7 +2,7 @@ NAME        = webserv
 CXX         = c++
 CXXFLAGS    = -std=c++11
 
-SRCS        = tcpserver.cpp ConfigParser.cpp ConfigServer.cpp
+SRCS        = tcpserver.cpp ConfigParser.cpp ConfigServer.cpp Location.cpp
 OBJS        = $(SRCS:.cpp=.o)
 
 all: $(NAME)

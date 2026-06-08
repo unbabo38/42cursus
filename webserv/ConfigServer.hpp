@@ -5,16 +5,33 @@
 #include <vector>
 #include <stdint.h>
 #include <sstream>
+#include <map>
+#include "Location.hpp"
 
 class ConfigServer{
   private:
 	uint16_t 	_port;
+	std::string						_server_name;
+	std::string						_root;
+	unsigned long					_client_max_body_size;
+	std::string						_index;
+	bool							_autoindex;
+	std::map<short, std::string>	_error_pages;
+	std::vector<Location> 			_locations;
+    // struct sockaddr_in 				_server_address;
+    int     						_listen_fd;
   public:
     ConfigServer();
 	~ConfigServer();
-	const uint16_t	getPort() const;
+	const uint16_t	&getPort() const;
 	void	setPort(uint16_t portNum);
-
+	const std::string &getServerName() const;
+	void	setServerName(std::string serverName);
+	const std::string &getRoot() const;
+	void	setRoot(std::string root);
+	void addLocation(const Location& loc);
+	const std::vector<Location>  &getLocation() const;
+	void printServerConfig() const;
 };
 
 // typedef struct {
