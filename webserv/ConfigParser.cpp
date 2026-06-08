@@ -101,21 +101,22 @@ void ConfigParser::parseServer(const std::string& line, ConfigServer *confserv) 
 	  if (tokens[i] == "listen" && i + 1 < tokens.size()) {
 		confserv->setPort(static_cast<uint16_t>(ft_stoi(tokens[i + 1])));
 		i++;
-	  }
-
-	  if (tokens[i] == "server_name" && i + 1 < tokens.size()) {
+	  } else if (tokens[i] == "server_name" && i + 1 < tokens.size()) {
 		confserv->setServerName(tokens[i + 1]);
 		i++;
-	  }
-	  if (tokens[i] == "root" && i + 1 < tokens.size()) {
+	  } else if (tokens[i] == "root" && i + 1 < tokens.size()) {
 		confserv->setRoot(tokens[i + 1]);
 		i++;
-	  }
-	  if (tokens[i] == "location" && i + 1 < tokens.size())
+	  } else if (tokens[i] == "location" && i + 1 < tokens.size())
 	  {
 		size_t len = getBlockSize(tokens, i);
 		Location::parseLocation(tokens, i, i + len, confserv);
 		i+=len;
+	  } else if (tokens[i] == "error_page" && i + 2 < tokens.size()) {
+	  	short code = static_cast<short>(ft_stoi(tokens[i + 1]));
+	  	std::string path = tokens[i + 2];
+	  	confserv->addErrorPage(code, path);
+	  	i += 3;
 	  }
 	}
 }
