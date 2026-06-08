@@ -12,13 +12,17 @@ class ConfigParser{
   private:
 	std::vector<std::string>	_server_config;
 	size_t						_nb_server;
+	std::vector<ConfigServer>   _servers;
+
   public:
     ConfigParser();
 	~ConfigParser();
 	size_t findStartServer(size_t start, std::string &content);
 	size_t findEndServer(size_t start, std::string &content);
 	void splitConfToServers(std::string &content, ConfigServer *confserv);
-	void parseListenLine(const std::string& line, ConfigServer *confserv);
+	void parseServer(const std::string& line, ConfigServer *confserv);
+	size_t getBlockSize(const std::vector<std::string>& tokens, size_t start_pos);
+	const std::vector<ConfigServer>& getServers() const { return this->_servers; };
 };
 
 // typedef struct {
