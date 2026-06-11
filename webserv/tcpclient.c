@@ -7,13 +7,13 @@
 #include <string.h>
 #include <arpa/inet.h>
 
-#define PORT 8080
+#define PORT 8081
 
 int main(int argc, char const *argv[])
 {
     int sock = 0; long valread;
     struct sockaddr_in serv_addr;
-    char *hello = "Hello from client";
+    char *hello = "bye from client";
     char buffer[1024] = {0};
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
     }
     send(sock , hello , strlen(hello) , 0 );
     printf("Hello message sent\n");
-    valread = read( sock , buffer, 1024);
-    printf("%s\n",buffer );
+    //valread = read( sock , buffer, 1024);
+    //printf("%s\n",buffer );
     return 0;
 }
