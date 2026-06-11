@@ -1,11 +1,11 @@
 #include <cstddef>
-#include <stdio.h>
+#include <string>
+#include <iostream>
 
 template <typename T, typename F>
-void iter(T *array, const std::size_t length, F func) {
-  if (array == NULL || func == NULL)
-    return;
-  for (std::size_t i = 0; i < length; i++) {
-    (*func)(array[i]);
-  }
-}
+void iter(T *array, const std::size_t length, F func);
+void displayint(const int &num);
+void displaystr(const std::string &info);
+void displaydouble(const double &dbr);
+void displayfloat(const float &flt);
+void displaychar(const char &c);
