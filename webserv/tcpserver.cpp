@@ -5,18 +5,27 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <sys/epoll.h>
+#include <fcntl.h>
 
 #include "ConfigParser.hpp"
 #include "ConfigServer.hpp"
+#include "Client.hpp"
+#include "Service.hpp"
 
 #define PORT 8080
 #define MAX_EVENTS 10
+
+
 
 int main(int argc, char const *argv[])
 {
     int server_fd, new_socket; long valread;
     struct sockaddr_in addr;
     int addrlen = sizeof(addr);
+
+	std::map<int, Client> client;
+
+
 
 
     struct epoll_event ev, events[MAX_EVENTS];
@@ -81,10 +90,13 @@ int main(int argc, char const *argv[])
         perror("In listen");
         exit(EXIT_FAILURE);
     }
+	int flg = fcntl (listen_sock, F_GETFL, 0) ;
+	flg |= O_NONBLOCK;
+	if (fcntl (listen_sock, F_SETFL, flg)) {
+        perror("In fcntl");
+        exit(EXIT_FAILURE);
+	}
 
-
-    /* Code to set up listening socket, 'listen_sock',
-       (socket(), bind(), listen()) omitted. */
     epollfd = epoll_create1(0);
     if (epollfd == -1) {
         perror("epoll_create1");
@@ -127,25 +139,41 @@ int main(int argc, char const *argv[])
                 }
 				printf("okconsock\n");
 				fflush(stdout);
-                //setnonblocking(conn_sock);
-                ev.events = EPOLLIN | EPOLLET;
+				int flgcon = fcntl (conn_sock, F_GETFL, 0) ;
+				flgcon |= O_NONBLOCK;
+				if (fcntl (conn_sock, F_SETFL, flgcon)) {
+					perror("In fcntl");
+					exit(EXIT_FAILURE);
+				}
+                ev.events = EPOLLIN;
                 ev.data.fd = conn_sock;
-				char buffer[30000] = {0};
-				valread = read( conn_sock , buffer, 30000);
-				write(conn_sock , "hello" , 5);
-				printf("%s\n",buffer );
                 if (epoll_ctl(epollfd, EPOLL_CTL_ADD, conn_sock,
                             &ev) == -1) {
                     perror("epoll_ctl: conn_sock");
                     exit(EXIT_FAILURE);
                 }
-													printf("okconsockadd\n");
-
             } else {
-                //do_use_fd(events[n].data.fd);
-				//return 19;
-            }
-			printf("%s\n", "okokok");
+				char buffer[30000] = {0};
+				ssize_t len = recv(events[n].data.fd, buffer, 30000, 0);
+				Client &client_recv = client[events[n].data.fd];
+				if (len < 0) {
+					if (errno == EAGAIN || errno == EWOULDBLOCK)
+					  continue;
+					perror("in recv");
+					if (epoll_ctl(epollfd, EPOLL_CTL_DEL, events[n].data.fd, &ev) == -1) {
+						perror("epoll_ctl: conn_sock");
+						exit(EXIT_FAILURE);
+					}
+					close(events[n].data.fd);
+					client.erase(events[n].data.fd);
+					continue;
+				}
+				std::cout << "setrequest:" << buffer << std::endl;
+				client_recv.setRequest(buffer, len);
+				if (client_recv.getRequest().find("\r\n\r\n") != std::string::npos)
+				  client_recv.inspectRequest();
+				  
+			}
         }
     }
     // while(1)
