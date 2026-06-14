@@ -1,7 +1,7 @@
 #include "Location.hpp"
 #include "ConfigServer.hpp"
 #include "utils.cpp"
-
+#include <cstdlib>
 Location::Location() {
     this->_autoindex = false;
     this->_client_max_body_size = 1000000;
@@ -50,7 +50,7 @@ void Location::parseLocation(const std::vector<std::string>& tokens, size_t star
             new_location.setUploadStore(tokens[i + 1]);
             i++;
         } else if (tokens[i] == "return" && i + 2 < end) {
-            int code = std::atoi(tokens[i + 1].c_str());
+            int code = atoi(tokens[i + 1].c_str());
             std::string url = tokens[i + 2];
             new_location.setReturn(code, url);
             i += 2;
@@ -81,9 +81,9 @@ bool Location::getAutoindex() const {
     return this->_autoindex;
 }
 
-const std::map<int, std::string>& Location::getErrorPagesMap() const {
-    return this->_error_pages_map;
-}
+// const std::map<int, std::string>& Location::getErrorPagesMap() const {
+//     return this->_error_pages_map;
+// }
 
 const std::map<std::string, std::string>& Location::getCgiHandlersMap() const {
     return this->_cgi_handlers_map;

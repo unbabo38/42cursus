@@ -32,7 +32,7 @@ private:
     const std::vector<std::string>&     getIndexFilesVec() const;
     std::size_t                         getClientMaxBodySize() const; // 値渡し
     bool                                getAutoindex() const;         // 値渡し
-    const std::map<int, std::string>&   getErrorPagesMap() const;
+    // const std::map<int, std::string>&   getErrorPagesMap() const;
     const std::map<std::string, std::string>& getCgiHandlersMap() const;
     const std::set<std::string>&        getLimitExcept() const;
     const std::string&                  getUploadStore() const;

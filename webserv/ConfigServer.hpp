@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdint.h>
 #include <sstream>
+#include <iostream>
 #include <map>
 #include "Location.hpp"
 
