@@ -1,6 +1,5 @@
 #include "Client.hpp"
 #include "utils.cpp"
-#include "Response.cpp"
 
 #include <iostream>
 Client::Client() {};
@@ -24,6 +23,20 @@ const std::string &Client::getRequestTarget() const {
 
 const ConfigServer &Client::getServer() const {
   return this->_server;
+}
+
+const std::string &Client::getFields(const std::string &key) const {
+    // 1. findを使って要素を検索する（これならconstマップでも使える）
+    std::map<std::string, std::string>::const_iterator it = this->_fields.find(key);
+    
+    // 2. もしキーが存在しなかったら、空文字列の参照などを返す（または例外）
+    if (it == this->_fields.end()) {
+        static const std::string empty_string = "";
+        return empty_string;
+    }
+    
+    // 3. 発見できたらその値（value）を返す
+    return it->second;
 }
 
 void Client::setServer(ConfigServer &server) {
@@ -162,7 +175,7 @@ void Client::parseCompleted() {
   std::cout << "method = " << this->_method << std::endl;
   if (this->_method == "POST") {
 	if (!this->_isChunked) {
-	  this->_body.size() >= this->_contentLength;
+	  this->_contentLength = this->_body.size();
 	  this->_isParseCompleted = true;
 	}
   }

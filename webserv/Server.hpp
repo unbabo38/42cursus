@@ -52,8 +52,8 @@ class Server {
 	void  createEpoll();
 	void  createSocketAndEpoll(ConfigServer &confServ);
 	// const size_t &getAddrLength() const;
-	void  run();
-	void runServer();
+	void  run(std::vector<ConfigServer> );
+	void runServer(std::vector<ConfigServer> );
 	void setMonitorEpollout(int n);
 	void closeClient(int n);
 	void getClientRequest(int n);
@@ -64,7 +64,7 @@ class Server {
 	void epollWait();
 	bool checkFinishReceive(int n);
 	void setAndCheckRequest();
-	bool processClient(int n);
+	bool processClient(int n, std::vector<ConfigServer> servers);
 };
 
 #endif

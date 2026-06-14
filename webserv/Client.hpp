@@ -51,7 +51,7 @@ class Client {
     std::string getResponseStr() const;
 	const ConfigServer &getServer() const;
 	void setServer(ConfigServer &server);
-
+	const std::string &getFields(const std::string &key) const;
 
 
 
