@@ -11,9 +11,9 @@ class Response {
   public:
     Response();
 	~Response();
-	void createResponse(Client *clinet);
+	void createResponse(Client *clinet, std::vector<ConfigServer> servers);
 	std::string errorResponse(Client *client);
-	std::string regularResponse(Client *client);
+	std::string regularResponse(Client *client, std::vector<ConfigServer> servers);
 	const std::string &getResponseStr() const;
 	void setResponseStr(std::string response);
 	void initErrorMap();

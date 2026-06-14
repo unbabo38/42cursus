@@ -161,7 +161,7 @@ void Server::setAndCheckRequest() {
 		this->client_recv->inspectRequest();
 }
 
-bool Server::processClient(int n) {
+bool Server::processClient(int n, std::vector<ConfigServer> servers) {
 	this->getClientRequest(n);
 	std::cout << "buffer" << this->_buffer <<std::endl;
 
@@ -175,8 +175,9 @@ bool Server::processClient(int n) {
 		std::cout << "setAndCheck" << this->_buffer <<std::endl;
 		// parseが終わっていたらレスポンスを作ってクライアントを送信状態にする
 		if (this->client_recv->getParseCompleted()) {
+
 			Response response;
-    		response.createResponse(this->client_recv);
+    		response.createResponse(this->client_recv, servers);
 			this->client_recv->setResponseStr(response.getResponseStr());
 			this->setMonitorEpollout(n);
 			std::cout << "set epollo out" << this->_buffer <<std::endl;
@@ -191,21 +192,21 @@ bool Server::processClient(int n) {
 	return true;
 }
 
-void Server::runServer() {
+void Server::runServer(std::vector<ConfigServer> servers) {
 		for (int n = 0; n < this->_nfds; ++n) {
 			if (this->_events[n].data.fd == this->_listen_sock) {
 				this->connectToListeningSocket();
 			// listening socket以外=clientを受信した場合
             } else {
-				if (!this->processClient(n)) {
+				if (!this->processClient(n, servers)) {
 				  continue;
 				}
 			}
         }
 }
-void Server::run() {
+void Server::run(std::vector<ConfigServer> servers) {
     for (;;) {
 		this->epollWait();
-		this->runServer();
+		this->runServer(servers);
     }
 }

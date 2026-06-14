@@ -1,5 +1,6 @@
 
 #include "Response.hpp"
+#include "Client.hpp"
 #include <fstream>
 
 Response::Response() {};
@@ -22,8 +23,46 @@ std::string Response::errorResponse(Client *client) {
   return errorResponseHtml;
 }
 
-std::string Response::regularResponse(Client *client) {
-    std::string root = client->getServer().getRoot();
+std::string ft_trim(const std::string& str) {
+    // 狩り取る対象（半角スペース、タブ、改行、キャリッジリターン）
+    const std::string whitespace = " \t\r\n";
+    
+    // 文字列の先頭から、空白以外の文字が最初に現れる位置を探す
+    size_t start = str.find_first_not_of(whitespace);
+    if (start == std::string::npos) {
+        return ""; // 全部空白だった場合は空文字を返す
+    }
+    
+    // 文字列の末尾から、空白以外の文字が最初に現れる位置を探す
+    size_t end = str.find_last_not_of(whitespace);
+    
+    // 有効な文字の区間だけを切り出す
+    return str.substr(start, end - start + 1);
+}
+
+std::string Response::regularResponse(Client *client, std::vector<ConfigServer> servers) {
+
+  std::string raw_host = client->getFields("Host"); // 例: "virtual_server:8081"
+  std::string host_header = ft_trim(raw_host);
+  std::string pure_host;
+
+  size_t colon_pos = host_header.find(":");
+  if (colon_pos != std::string::npos) {
+      // コロンが見つかったら、その手前までを切り出す
+      pure_host = host_header.substr(0, colon_pos);
+  } else {
+      // コロンがなければそのまま
+      pure_host = host_header;
+  }
+  for (size_t i = 0; i < servers.size(); i++) {
+    std::cout << "servers[i]" << servers[i].getPort() << std::endl;
+    std::cout << "pure_host[i]" << pure_host << std::endl;
+    if (pure_host == servers[i].getServerName())
+      std::cout << servers[i].getServerName() << std::endl;
+
+  }
+  
+  std::string root = client->getServer().getRoot();
     std::string target_path = client->getRequestTarget();
     std::string filepath = root;
 
@@ -75,13 +114,13 @@ void Response::initErrorMap() {
     this->_errorMap[505] = "505 HTTP Version Not Supported";
 }
 
-void Response::createResponse(Client *client){
+void Response::createResponse(Client *client, std::vector<ConfigServer> servers){
   this->initErrorMap();
   if (this->_errorMap.find(client->getStatusCode()) != _errorMap.end()) {
     this->_response = this->errorResponse(client);
   }
   if (client->getStatusCode() == 200) {
-	this->_response = this->regularResponse(client);
+	this->_response = this->regularResponse(client, servers);
   }
   std::cout << "this->response:" << this->_response << std::endl;
 };

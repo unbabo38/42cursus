@@ -40,9 +40,9 @@ int main(int argc, char const *argv[])
 		loc = conf_serv.getLocation();
 	}
 	int read_result = 0;
-
+	std::cout << conf_parse.getServers().size() << std::endl;
 	serv.createSocketAndEpoll(conf_serv);
-	serv.run();
+	serv.run(conf_parse.getServers());
 
     return 0;
 }
