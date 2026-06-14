@@ -10,8 +10,8 @@
 #include "ConfigParser.hpp"
 #include "ConfigServer.hpp"
 #include "Client.hpp"
-#include "Service.hpp"
-
+#include "Server.hpp"
+#include "Response.hpp"
 #define PORT 8080
 #define MAX_EVENTS 10
 
@@ -36,6 +36,7 @@ int main(int argc, char const *argv[])
     // Creating socket file descriptor
 	ConfigParser conf_parse;
 	ConfigServer conf_serv;
+	Response response;
   	std::ifstream istrm(argv[1], std::ios::binary);
 	if (!istrm.is_open()) {
     	std::cout << "failed to open " << argv[1] << '\n';
@@ -156,23 +157,38 @@ int main(int argc, char const *argv[])
 				char buffer[30000] = {0};
 				ssize_t len = recv(events[n].data.fd, buffer, 30000, 0);
 				Client &client_recv = client[events[n].data.fd];
-				if (len < 0) {
-					if (errno == EAGAIN || errno == EWOULDBLOCK)
-					  continue;
-					perror("in recv");
-					if (epoll_ctl(epollfd, EPOLL_CTL_DEL, events[n].data.fd, &ev) == -1) {
-						perror("epoll_ctl: conn_sock");
-						exit(EXIT_FAILURE);
+
+				if (ev.events & EPOLLIN) {
+					if (len < 0) {
+						if (errno == EAGAIN || errno == EWOULDBLOCK)
+						continue;
+						perror("in recv");
+						if (epoll_ctl(epollfd, EPOLL_CTL_DEL, events[n].data.fd, &ev) == -1) {
+							perror("epoll_ctl: conn_sock");
+							exit(EXIT_FAILURE);
+						}
+						close(events[n].data.fd);
+						client.erase(events[n].data.fd);
+						continue;
 					}
-					close(events[n].data.fd);
-					client.erase(events[n].data.fd);
-					continue;
+					std::cout << "setrequest:" << buffer << std::endl;
+					client_recv.setRequest(buffer, len);
+					if (client_recv.getRequest().find("\r\n\r\n") != std::string::npos)
+					client_recv.inspectRequest();
+					if (client_recv.getParseCompleted()) {
+						response.createResponse(&client_recv);
+						ev.events = EPOLLOUT;
+
+						if (epoll_ctl(epollfd, EPOLL_CTL_MOD, events[n].data.fd, &ev) == -1) {
+							close(events[n].data.fd);
+//							client_map.erase(events[n].data.fd);
+						}
+					}
+				} else if (events[n].events & EPOLLOUT) {
+					std::string resStr = response.getResponseStr();
+					ssize_t sent = send(events[n].data.fd, resStr.c_str(), resStr.size(), 0);
+					std::cout << sent <<std::endl;
 				}
-				std::cout << "setrequest:" << buffer << std::endl;
-				client_recv.setRequest(buffer, len);
-				if (client_recv.getRequest().find("\r\n\r\n") != std::string::npos)
-				  client_recv.inspectRequest();
-				  
 			}
         }
     }
