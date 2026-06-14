@@ -1,5 +1,6 @@
 #include "Client.hpp"
 #include "utils.cpp"
+#include "Response.cpp"
 
 #include <iostream>
 Client::Client() {};
@@ -16,8 +17,20 @@ const std::string &Client::getRequest() const {
   return this->_request;
 }
 
+const std::string &Client::getRequestTarget() const {
 
-const std::string Client::inspectRequest() {
+  return this->_requestTarget;
+}
+
+const ConfigServer &Client::getServer() const {
+  return this->_server;
+}
+
+void Client::setServer(ConfigServer &server) {
+  this->_server = server;
+}
+
+void Client::inspectRequest() {
   std::string request = getRequest();
   //std::cout << "request:" << request << std::endl;
 
@@ -26,7 +39,7 @@ const std::string Client::inspectRequest() {
     this->_isParseCompleted = true;
     return ;
   }
-  return request;
+  return ;
 }
 std::vector<std::string> methodsUse = {
 	"GET",
@@ -41,6 +54,7 @@ std::vector<std::string> methodsNotUse = {
 	"POST",
 	"PATCH",
 	"CONNECT",
+	"PUT",
 };
 
 
@@ -154,7 +168,35 @@ void Client::parseCompleted() {
   }
   this->_isParseCompleted = true;
 }
+
+const int &Client::getStatusCode() const {
+  return this->_statusCode;
+}
+
+const std::map<int, std::string>& Client::getErrorPagesMap() const {
+    return this->_error_pages_map;
+}
+
+void Client::setErrorPagesMap(const std::map<int, std::string>& error_pages) {
+    this->_error_pages_map = error_pages;
+}
 // if (client_recv.getRequest().size() >= 4)
 // {
 // 	if (client_recv.getRequest().substr(client_recv.getRequest().size() - 4, 4) == "\r\n\r\n")
 // }
+
+const size_t &Client::getContentLength() const {
+  return this->_contentLength;
+}
+
+const bool &Client::getParseCompleted() const {
+  return this->_isParseCompleted;
+}
+
+void Client::setResponseStr(const std::string& str) {
+    this->_res.setResponseStr(str);
+}
+
+std::string Client::getResponseStr() const {
+    return this->_res.getResponseStr();
+}
