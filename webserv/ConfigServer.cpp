@@ -36,10 +36,8 @@ void ConfigServer::printServerConfig() const {
 
         // index_files_vec (vector) の中身を全出力
         std::cout << "    Index Files:    [ ";
-        const std::vector<std::string>& idxs = loc.getIndexFilesVec();
-        for (size_t j = 0; j < idxs.size(); ++j) {
-            std::cout << idxs[j] << " ";
-        }
+        const std::string& idxs = loc.getIndex();
+        std::cout << idxs << std::endl;;
         std::cout << "]" << std::endl;
 
         // limit_except (set) の中身を全出力

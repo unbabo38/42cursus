@@ -40,9 +40,19 @@ int main(int argc, char const *argv[])
 		loc = conf_serv.getLocation();
 	}
 	int read_result = 0;
-	std::cout << conf_parse.getServers().size() << std::endl;
-	serv.createSocketAndEpoll(conf_serv);
-	serv.run(conf_parse.getServers());
+	std::vector<ConfigServer> parsed_servers = conf_parse.getServers();
+    std::cout << "Parsed servers size: " << parsed_servers.size() << std::endl;
+
+    if (!parsed_servers.empty()) {
+        // 🎯 壊れた conf_serv ではなく、ベクターに退避させた正しい1台目のサーバー情報を渡す
+        serv.createSocketAndEpoll(parsed_servers);
+    } else {
+        std::cerr << "Error: No server config parsed!" << std::endl;
+        return 1;
+    }
+
+    // ループを実行（ここは綺麗に小分けされたベクターを渡せているのでそのままでOK）
+    serv.run(parsed_servers);
 
     return 0;
 }
