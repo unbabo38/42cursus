@@ -39,6 +39,15 @@ class Server {
 	ssize_t len_recv;
 	Client *client_recv;
 	char _buffer[30000];
+	std::set<int>            _listen_fds;
+
+	void createEpollBase();
+    int  createSingleListenSocket();
+    void setAddrForPort(int port);
+    void bindSingleSocket(int fd);
+    void listenSingleSocket(int fd);
+    void fcntlSingleSocket(int fd);
+    void addSocketToEpoll(int fd);
 
   public:
     Server();
@@ -50,7 +59,7 @@ class Server {
 	void  fcntlSocket();
 	void  setAddr(ConfigServer &confServ);
 	void  createEpoll();
-	void  createSocketAndEpoll(ConfigServer &confServ);
+	void  createSocketAndEpoll(const std::vector<ConfigServer>& parsed_servers);
 	// const size_t &getAddrLength() const;
 	void  run(std::vector<ConfigServer> );
 	void runServer(std::vector<ConfigServer> );

@@ -11,6 +11,7 @@ class Response {
   public:
     Response();
 	~Response();
+    Location longestPrefixMatch(std::string requestTarget, const std::vector<Location> &locations);
 	void createResponse(Client *clinet, std::vector<ConfigServer> servers);
 	std::string errorResponse(Client *client);
 	std::string regularResponse(Client *client, std::vector<ConfigServer> servers);

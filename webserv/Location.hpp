@@ -13,8 +13,9 @@ class ConfigServer;
 class Location{
 
 private:
+	std::string						   _location_path;
     std::string                        _root;
-    std::vector<std::string>           _index_files_vec;
+    std::string				           _index;
     std::size_t                        _client_max_body_size;
     bool                               _autoindex;
     std::map<int, std::string>         _error_pages_map;
@@ -25,11 +26,14 @@ private:
   public:
     Location();
 	~Location();
+	Location(const Location& other);
+    Location& operator=(const Location& other);
 	static void    parseLocation(const std::vector<std::string>& tokens, size_t start, size_t len, ConfigServer *confserv);
 
   public:
+	const std::string&					getLocationPath() const;
     const std::string&                  getRoot() const;
-    const std::vector<std::string>&     getIndexFilesVec() const;
+    const std::string&			        getIndex() const;
     std::size_t                         getClientMaxBodySize() const; // 値渡し
     bool                                getAutoindex() const;         // 値渡し
     // const std::map<int, std::string>&   getErrorPagesMap() const;
@@ -38,8 +42,9 @@ private:
     const std::string&                  getUploadStore() const;
     std::pair<int, std::string>         getReturn() const;            // 値渡し（std::pairは基本値渡しでOK）
 
+	void setLocationPath(const std::string& location_path);
     void setRoot(const std::string& root);
-    void setIndexFilesVec(const std::vector<std::string>& index_files);
+	void setIndex(const std::string& index);
     void setClientMaxBodySize(std::size_t size);
     void setAutoindex(bool autoindex);
     void setErrorPagesMap(const std::map<int, std::string>& error_pages);
@@ -47,8 +52,6 @@ private:
     void setLimitExcept(const std::set<std::string>& limit_except);
     void setUploadStore(const std::string& upload_store);
     void setReturn(int code, const std::string& url);
-
-
 };
 
 // typedef struct {

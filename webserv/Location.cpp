@@ -3,24 +3,46 @@
 #include "utils.cpp"
 #include <cstdlib>
 Location::Location() {
-    this->_autoindex = false;
-    this->_client_max_body_size = 1000000;
-    this->_root = "./html";
+    // this->_autoindex = false;
+    // this->_client_max_body_size = 1000000;
+    // this->_root = "./html";
 }
 
 Location::~Location() {
 }
 
+Location::Location(const Location& other) {
+    *this = other;
+}
+
+Location& Location::operator=(const Location& other) {
+    if (this != &other) {
+        this->_location_path     = other._location_path;
+        this->_root              = other._root;
+        this->_index 			 = other._index;
+        this->_client_max_body_size = other._client_max_body_size;
+        this->_autoindex         = other._autoindex;
+        this->_error_pages_map   = other._error_pages_map;
+        this->_cgi_handlers_map  = other._cgi_handlers_map;
+        this->_limit_except      = other._limit_except;
+        this->_upload_store      = other._upload_store;
+        this->_return            = other._return; // 👈 鬼門のstd::pairも確実に同期
+    }
+    return *this;
+}
+
 void Location::parseLocation(const std::vector<std::string>& tokens, size_t start, size_t end, ConfigServer *confserv) {
 	//std::cout <<"parseLocation:  start:"<< start << "end:" << end << std::endl;
 	Location new_location;
+	if (start + 1 < end);
+		new_location.setLocationPath(tokens[start + 1]);
 	for (int i = start; i < end; i++)
 	{
+
 		//std::cout <<"tokens[i]:  " << tokens[i] <<std::endl;
 		if (tokens[i] == "root" && i + 1 < end) {
 		  new_location.setRoot(tokens[i + 1]);
-
-
+		  std::cout << "root=" << tokens[i + 1] << std::endl;
 		} else if (tokens[i] == "autoindex") {
 
 		  if (tokens[i + 1] == "on")
@@ -30,11 +52,9 @@ void Location::parseLocation(const std::vector<std::string>& tokens, size_t star
 		  else
 		    throw std::runtime_error("invalid setting in autoindex");
 		} else if (tokens[i] == "index") {
-			std::vector<std::string> indexes;
-			if (tokens[i + 1] != ";" && i + 1 < end) {
-			  indexes.push_back(tokens[i + 1]);
+			if (i + 1 < end && tokens[i + 1] != ";") {
+				new_location.setIndex(tokens[i + 1]);
 			}
-			new_location.setIndexFilesVec(indexes);
 		} else if ((tokens[i] == "max_body_size" || tokens[i] == "client_max_body_size") && i + 1 < end) {
             new_location.setClientMaxBodySize(static_cast<uint16_t>(ft_stoi(tokens[i + 1])));
             i++;
@@ -65,12 +85,16 @@ void Location::parseLocation(const std::vector<std::string>& tokens, size_t star
 	confserv->addLocation(new_location);
 }
 
+const std::string& Location::getLocationPath() const {
+    return this->_location_path;
+}
+
 const std::string& Location::getRoot() const {
     return this->_root;
 }
 
-const std::vector<std::string>& Location::getIndexFilesVec() const {
-    return this->_index_files_vec;
+const std::string& Location::getIndex() const {
+    return this->_index;
 }
 
 std::size_t Location::getClientMaxBodySize() const {
@@ -105,12 +129,16 @@ std::pair<int, std::string> Location::getReturn() const {
 //                   Setters
 // ==========================================
 
+void Location::setLocationPath(const std::string& location_path) {
+    this->_location_path = location_path;
+}
+
 void Location::setRoot(const std::string& root) {
     this->_root = root;
 }
 
-void Location::setIndexFilesVec(const std::vector<std::string>& index_files) {
-    this->_index_files_vec = index_files;
+void Location::setIndex(const std::string& index) {
+    this->_index = index;
 }
 
 void Location::setClientMaxBodySize(std::size_t size) {

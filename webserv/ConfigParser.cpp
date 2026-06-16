@@ -136,11 +136,16 @@ void ConfigParser::splitConfToServers(std::string &content, ConfigServer *confse
 		start = findStartServer(start, content);
 		end = findEndServer(start, content);
 		std::cout << start << " " << end << std::endl;
+		if (start >= end || start == std::string::npos || end == std::string::npos) {
+        	std::cout << "Reached end of valid server blocks." << std::endl;
+        	break;
+    	}
 		if (start == end)
 			std::cout << "start=end" << std::endl;
 		//throw std::runtime_error("problem with scope");
 		//std::string con = static_cast<std::string> (content);
 		this->_server_config.push_back(content.substr(start, end - start + 1));
+		*confserv = ConfigServer();
 		parseServer(this->_server_config[this->_nb_server], confserv);
         //confserv->printServerConfig();
 		this->_servers.push_back(*confserv);
