@@ -16,11 +16,15 @@ std::string ft_to_string(size_t num) {
 std::string Response::errorResponse(Client *client) {
   std::string errorResponseHtml;
   std::map<int, std::string> errorPageMap = client->getErrorPagesMap();
-  std::string errorCode = errorPageMap[client->getStatusCode()];
+  //std::string errorCode = errorPageMap[client->getStatusCode()];
+  std::string errorCode = "404 Not Found";
+  std::string body =
+    "<html><body><h1>" + errorCode + "</h1></body></html>";
+
   errorResponseHtml = "HTTP/1.1 " + errorCode + "\r\n";
   errorResponseHtml += "Content-Type: text/html\r\n";
-  errorResponseHtml += "Content-Length: " + ft_to_string(client->getContentLength()) + "\r\n\r\n";
-  errorResponseHtml += "<html><body><h1>" + errorCode + "</h1></body></html>";
+  errorResponseHtml += "Content-Length: " + ft_to_string(body.size()) + "\r\n\r\n";
+  errorResponseHtml += body;
   return errorResponseHtml;
 }
 
@@ -64,6 +68,31 @@ Location Response::longestPrefixMatch(std::string requestTarget, const std::vect
   return locations[pos];
 }
 
+std::string Response::getContentType(const std::string& filepath)
+{
+    if (filepath.size() >= 5 &&
+        filepath.substr(filepath.size() - 5) == ".html")
+        return "text/html";
+
+    if (filepath.size() >= 4 &&
+        filepath.substr(filepath.size() - 4) == ".css")
+        return "text/css";
+
+    if (filepath.size() >= 3 &&
+        filepath.substr(filepath.size() - 3) == ".js")
+        return "application/javascript";
+
+    if (filepath.size() >= 4 &&
+        filepath.substr(filepath.size() - 4) == ".png")
+        return "image/png";
+
+    if (filepath.size() >= 4 &&
+        filepath.substr(filepath.size() - 4) == ".jpg")
+        return "image/jpeg";
+
+    return "application/octet-stream";
+}
+
 std::string Response::regularResponse(Client *client, std::vector<ConfigServer> servers) {
 
   std::string raw_host = client->getFields("Host"); // 例: "virtual_server:8081"
@@ -80,34 +109,23 @@ std::string Response::regularResponse(Client *client, std::vector<ConfigServer> 
       // コロンがなければそのまま
       host_header = tmp_header;
   }
-  for (size_t i = 0; i < servers.size(); i++) {
-    std::cout << "servers[i]" << servers[i].getPort() << std::endl;
-    std::cout << "host_header[i]:" << host_header << std::endl;
-    if (host_header == servers[i].getServerName()) {
-	  hostFlg = i;
-	}
-	std::cout << "server_name[i]" << servers[i].getServerName() << std::endl;
-	std::cout << "locationPath[i]:" << servers[i].getLocation()[0].getLocationPath() << std::endl;
-	loc = this->longestPrefixMatch(client->getRequestTarget(), servers[i].getLocation());
+	ConfigServer server = client->getServer();
+	loc = this->longestPrefixMatch(client->getRequestTarget(), server.getLocation());
 	std::string root_path = loc.getRoot();
-	std::cout << "root_path:" << root_path << std::endl;
-
-    if (root_path.empty()) {
-      root_path = servers[i].getRoot();
+	if (root_path.empty()) {
+      root_path = server.getRoot();
     }
     std::string request_target = client->getRequestTarget();
 	//   if (!root_path.empty() && root_path.back() == '/' && !request_target.empty() && request_target[0] == '/') {
     //         request_target = request_target.substr(1);
     //     }
-	std::cout << "root_path:" << root_path << std::endl;
-	std::cout << "request_target:" << request_target << std::endl;
-    filepath = root_path + request_target;
-	std::cout << "filepath:" << filepath << std::endl;
+	filepath = root_path + request_target;
 	if (!request_target.empty() && request_target[request_target.length() - 1] == '/') {
 		// 本来なら longestPrefixMatch で見つけた Location (loc) の index 設定ファイルを見る
 		if (!loc.getIndex().empty()) {
 			filepath += loc.getIndex(); // 設定ファイルに書かれた index.html 等を足す
 		} else {
+
 			filepath += "index.html"; // 設定がなければデフォルトのフォールバック
 		}
 	}
@@ -117,29 +135,17 @@ std::string Response::regularResponse(Client *client, std::vector<ConfigServer> 
 	while ((double_slash = filepath.find("//")) != std::string::npos) {
 		filepath.replace(double_slash, 2, "/");
 	}
-        break;
-  }
 
-  	// std::string root = client->getServer().getRoot();
-    // std::string target_path = client->getRequestTarget();
-  	// std::cout << loc.getLocationPath() << std::endl;
-    // if (target_path == "/") {
-    //     std::string index_file = "virtual.html";
-    //     if (!filepath.empty() && filepath.at(filepath.size() - 1) != '/') {
-    //         filepath += "/";
-    //     }
-    //     filepath += index_file;
-    // } else {
-    //     if (!filepath.empty() && filepath.at(filepath.size() - 1) == '/' && target_path.at(0) == '/') {
-    //         filepath += target_path.substr(1);
-    //     } else {
-    //         filepath += target_path;
-    //     }
-    // }
 	std::cout << "🎯 [Final File Path] -> " << filepath << std::endl;
   std::ifstream target(filepath.c_str());
-  if (!target.is_open())
-    this->errorResponse(client);
+
+std::cout << "filepath = [" << filepath << "]\n";
+std::cout << "is_open = " << target.is_open() << "\n";
+
+  if (!target.is_open()) {
+    //client->setStatusCode(404);   // 必要なら
+    return this->errorResponse(client);
+  }
   std::string body;
   if (target) {
 	std::stringstream ss;
@@ -155,7 +161,7 @@ std::string Response::regularResponse(Client *client, std::vector<ConfigServer> 
   std::string response;
 
   response = "HTTP/1.1 200 OK\r\n";
-  response += "Content-Type: text/html\r\n";
+  response += "Content-Type: " + getContentType(filepath) + "\r\n";
   response += "Content-Length: " + content_length + "\r\n\r\n";
   response += body;
   return response;
@@ -171,13 +177,54 @@ void Response::initErrorMap() {
     this->_errorMap[505] = "505 HTTP Version Not Supported";
 }
 
+std::string Response::postResponse(Client *client) {
+  ConfigServer server = client->getServer();
+  Location loc = this->longestPrefixMatch(client->getRequestTarget(), server.getLocation());
+  std::string root_path = loc.getRoot();
+  if (root_path.empty())
+      root_path = server.getRoot();
+  std::string filepath = root_path + client->getRequestTarget();
+  std::ofstream ofs(filepath.c_str());
+  if (!ofs.is_open())
+	perror("open");
+  ofs << client->getBody();
+  std::string response;
+  response = "HTTP/1.1 201 Created\r\n";
+  response += "Content-Length: 0\r\n\r\n";
+  return response;
+  //権限は
+}
+#include <cstdio>
+std::string Response::deleteResponse(Client *client) {
+  ConfigServer server = client->getServer();
+  Location loc = this->longestPrefixMatch(client->getRequestTarget(), server.getLocation());
+  std::string root_path = loc.getRoot();
+  if (root_path.empty())
+      root_path = server.getRoot();
+  std::string filepath = root_path + client->getRequestTarget();
+  if (std::remove(filepath.c_str()) == 0) {
+	return "HTTP/1.1 204 No Content\r\n"
+       "Content-Length: 0\r\n\r\n";
+  } else {
+	//これはやる
+	//client->setStatusCode(404);
+    return errorResponse(client);
+  }
+  //権限は
+}
+
 void Response::createResponse(Client *client, std::vector<ConfigServer> servers){
   this->initErrorMap();
   if (this->_errorMap.find(client->getStatusCode()) != _errorMap.end()) {
     this->_response = this->errorResponse(client);
   }
   if (client->getStatusCode() == 200) {
-	this->_response = this->regularResponse(client, servers);
+	if (client->getMethod() == "POST")
+		this->_response = this->postResponse(client);
+	else if (client->getMethod() == "GET")
+		this->_response = this->regularResponse(client, servers);
+	else if (client->getMethod() == "DELETE")
+    	this->_response = deleteResponse(client);
   }
   std::cout << "this->response:" << this->_response << std::endl;
 };

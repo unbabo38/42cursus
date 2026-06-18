@@ -26,10 +26,12 @@ class Client {
 	std::map<std::string, std::string> _fields;
 	size_t		 _contentLength;
 	Response 	_res;
+	int _server_port;
 
   public:
     Client();
     ~Client();
+	const std::string &getMethod() const;
 	void setRequest(const char* buf, const int &len);
 	const std::string &getRequest() const;
 	const std::string &getRequestTarget() const;
@@ -52,6 +54,9 @@ class Client {
 	const ConfigServer &getServer() const;
 	void setServer(ConfigServer &server);
 	const std::string &getFields(const std::string &key) const;
+	void setServerPort(int port);
+    int  getServerPort() const ;
+	const std::string &getBody() const;
 
 
 

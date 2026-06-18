@@ -40,7 +40,7 @@ class Server {
 	Client *client_recv;
 	char _buffer[30000];
 	std::set<int>            _listen_fds;
-
+	std::map<int, int>       _fd_to_port_map;
 	void createEpollBase();
     int  createSingleListenSocket();
     void setAddrForPort(int port);
@@ -66,10 +66,10 @@ class Server {
 	void setMonitorEpollout(int n);
 	void closeClient(int n);
 	void getClientRequest(int n);
-	void connectToListeningSocket();
-	void setMonitorEpollin();
-	void setSocketNonblocking();
-	void acceptListeningSocket();
+	void connectToListeningSocket(int listen_fd, const std::vector<ConfigServer>& servers);
+	void setMonitorEpollin(int fd);
+	void setSocketNonblocking(int conn_sock);
+	int acceptListeningSocket(int listen_fd, const std::vector<ConfigServer>& servers);
 	void epollWait();
 	bool checkFinishReceive(int n);
 	void setAndCheckRequest();

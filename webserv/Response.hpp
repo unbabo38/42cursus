@@ -18,7 +18,9 @@ class Response {
 	const std::string &getResponseStr() const;
 	void setResponseStr(std::string response);
 	void initErrorMap();
-
+	std::string getContentType(const std::string& filepath);
+	std::string postResponse(Client *client);
+	std::string deleteResponse(Client *client);
 };
 
 #endif

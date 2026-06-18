@@ -1,5 +1,6 @@
 #include "Client.hpp"
 #include "utils.cpp"
+#include <fstream>
 
 #include <iostream>
 Client::Client() {};
@@ -28,13 +29,13 @@ const ConfigServer &Client::getServer() const {
 const std::string &Client::getFields(const std::string &key) const {
     // 1. findを使って要素を検索する（これならconstマップでも使える）
     std::map<std::string, std::string>::const_iterator it = this->_fields.find(key);
-    
+
     // 2. もしキーが存在しなかったら、空文字列の参照などを返す（または例外）
     if (it == this->_fields.end()) {
         static const std::string empty_string = "";
         return empty_string;
     }
-    
+
     // 3. 発見できたらその値（value）を返す
     return it->second;
 }
@@ -42,6 +43,18 @@ const std::string &Client::getFields(const std::string &key) const {
 void Client::setServer(ConfigServer &server) {
   this->_server = server;
 }
+
+void Client::setServerPort(int port) {
+	this->_server_port = port;
+}
+int  Client::getServerPort() const {
+	return this->_server_port;
+}
+
+const std::string &Client::getMethod() const {
+  return this->_method;
+}
+
 
 void Client::inspectRequest() {
   std::string request = getRequest();
@@ -69,6 +82,10 @@ std::vector<std::string> methodsNotUse = {
 	"CONNECT",
 	"PUT",
 };
+
+const std::string &Client::getBody() const {
+  return this->_body;
+}
 
 
 void Client::checkMethod() {
