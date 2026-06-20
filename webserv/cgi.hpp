@@ -1,0 +1,16 @@
+#ifndef CGI_HPP
+#define CGI_HPP
+
+#include <string>
+#include "ConfigServer.hpp"
+
+class Client;
+
+class CGI {
+public:
+  std::string do_cgi(std::string cgi_path, std::string filepath, std::string query);
+  std::string do_cgi_post(std::string cgi_path, std::string filepath, std::string body);
+
+};
+
+#endif
