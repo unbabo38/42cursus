@@ -28,6 +28,27 @@ std::string Response::errorResponse(Client *client) {
   return errorResponseHtml;
 }
 
+std::string Response::errorResponse405(Client *client, std::set<std::string> &methods) {
+  std::string errorResponseHtml;
+  std::map<int, std::string> errorPageMap = client->getErrorPagesMap();
+  //std::string errorCode = errorPageMap[client->getStatusCode()];
+  std::string body =
+    "<html><body><h1>405 Method Not Allowed</h1></body></html>";
+
+  errorResponseHtml = "HTTP/1.1 405 Method Not Allowed\r\n";
+  errorResponseHtml += "Allow: ";
+  for (std::set<std::string>::iterator it = methods.begin();
+     it != methods.end(); ++it)
+  {
+    errorResponseHtml += *it;
+  }
+  errorResponseHtml += "\r\n";
+  errorResponseHtml += "Content-Type: text/html\r\n";
+  errorResponseHtml += "Content-Length: " + ft_to_string(body.size()) + "\r\n\r\n";
+  errorResponseHtml += body;
+  return errorResponseHtml;
+}
+
 std::string ft_trim(const std::string& str) {
     // 狩り取る対象（半角スペース、タブ、改行、キャリッジリターン）
     const std::string whitespace = " \t\r\n";
@@ -46,7 +67,7 @@ std::string ft_trim(const std::string& str) {
 }
 
 Location Response::longestPrefixMatch(std::string requestTarget, const std::vector<Location> &locations) {
-  int matched_length = -1;
+  size_t matched_length = 0;
   Location best_match;
   int pos = 0;
   for (int i = 0; i < locations.size(); i++) {
@@ -56,11 +77,15 @@ Location Response::longestPrefixMatch(std::string requestTarget, const std::vect
     }
 	if (requestTarget.compare(0, loc_path.size(), loc_path) == 0)
 	{
-		  std::cout << "Valid match candidate found: " << loc_path << " (size: " << loc_path.size() << ")" << std::endl;
-		  if (loc_path.size() > matched_length) {
-		  matched_length = loc_path.size();
-		  pos = i;
-		}
+		  std::cout << "candidate: " << loc_path << std::endl;
+			std::cout << "loc_path.size() = " << loc_path.size()
+					<< ", matched_length = " << matched_length << std::endl;
+
+			if (loc_path.size() > matched_length) {
+				std::cout << ">>> UPDATE <<<" << std::endl;
+				matched_length = loc_path.size();
+				pos = i;
+			}
 	}
   }
   std::cout << "🔍 [Match Result] Returning Path: [" << locations[pos].getLocationPath()
@@ -116,10 +141,12 @@ std::string Response::regularResponse(Client *client, std::vector<ConfigServer> 
       root_path = server.getRoot();
     }
     std::string request_target = client->getRequestTarget();
+	std::cout << "request_path:" << root_path << std::endl;
 	//   if (!root_path.empty() && root_path.back() == '/' && !request_target.empty() && request_target[0] == '/') {
     //         request_target = request_target.substr(1);
     //     }
-	filepath = root_path + request_target;
+	std::string relative = request_target.substr(loc.getLocationPath().size());
+	filepath = root_path + "/" + relative;
 	if (!request_target.empty() && request_target[request_target.length() - 1] == '/') {
 		// 本来なら longestPrefixMatch で見つけた Location (loc) の index 設定ファイルを見る
 		if (!loc.getIndex().empty()) {
@@ -141,12 +168,32 @@ std::string Response::regularResponse(Client *client, std::vector<ConfigServer> 
 
 std::cout << "filepath = [" << filepath << "]\n";
 std::cout << "is_open = " << target.is_open() << "\n";
+std::cout << "in root_path" << root_path << std::endl;
+  std::string query_string = "test";
+  std::map<std::string, std::string> cgifile = loc.getCgiHandlersMap();
 
-  if (!target.is_open()) {
+
+  std::string body;
+
+  if (!loc.getCgiHandlersMap().empty()
+      && loc.getCgiHandlersMap().count(".sh")) {
+	    std::cout << "cgifile[.sh]" << cgifile[".sh"] << std::endl;
+		body = this->cgi.do_cgi(cgifile[".sh"], filepath, query_string);
+		 std::stringstream body_length;
+		body_length << body.size();
+		std::string content_length = body_length.str();
+		std::string response;
+		response = "HTTP/1.1 200 OK\r\n";
+		response += "Content-Type: " + getContentType(filepath) + "\r\n";
+		response += "Content-Length: " + content_length + "\r\n\r\n";
+		response += body;
+		return response;
+  }
+  else if (!target.is_open()) {
     //client->setStatusCode(404);   // 必要なら
     return this->errorResponse(client);
   }
-  std::string body;
+
   if (target) {
 	std::stringstream ss;
 	ss << target.rdbuf();
@@ -155,11 +202,7 @@ std::cout << "is_open = " << target.is_open() << "\n";
   std::stringstream body_length;
   body_length << body.size();
   std::string content_length = body_length.str();
-
-
-
   std::string response;
-
   response = "HTTP/1.1 200 OK\r\n";
   response += "Content-Type: " + getContentType(filepath) + "\r\n";
   response += "Content-Length: " + content_length + "\r\n\r\n";
@@ -183,11 +226,41 @@ std::string Response::postResponse(Client *client) {
   std::string root_path = loc.getRoot();
   if (root_path.empty())
       root_path = server.getRoot();
+
+  std::string request_target = client->getRequestTarget();
+  std::map<std::string, std::string> cgi_file = loc.getCgiHandlersMap();
+
+  std::string cgi_path = cgi_file[".sh"];
+  std::cout << "cgifile[.sh]" << cgi_file[".sh"] << std::endl;
   std::string filepath = root_path + client->getRequestTarget();
+  std::string relative = request_target.substr(loc.getLocationPath().size());
+
+  filepath = root_path + "/" + relative;
+  // ★ CGI判定
+  if (!loc.getCgiHandlersMap().empty()
+      && loc.getCgiHandlersMap().count(".sh")) {
+	  std::string body = this->cgi.do_cgi_post(
+							cgi_path,
+							filepath,
+							client->getBody()
+						);
+
+	std::string res =
+		"HTTP/1.1 200 OK\r\n"
+		"Content-Type: text/plain\r\n"
+		"Content-Length: " + std::to_string(body.size()) + "\r\n"
+		"\r\n" +
+		body;
+
+	return res;
+  }
+
   std::ofstream ofs(filepath.c_str());
   if (!ofs.is_open())
 	perror("open");
   ofs << client->getBody();
+
+
   std::string response;
   response = "HTTP/1.1 201 Created\r\n";
   response += "Content-Length: 0\r\n\r\n";
@@ -213,10 +286,26 @@ std::string Response::deleteResponse(Client *client) {
   //権限は
 }
 
+
 void Response::createResponse(Client *client, std::vector<ConfigServer> servers){
   this->initErrorMap();
   if (this->_errorMap.find(client->getStatusCode()) != _errorMap.end()) {
     this->_response = this->errorResponse(client);
+  }
+  ConfigServer server = client->getServer();
+  Location loc = this->longestPrefixMatch(client->getRequestTarget(), server.getLocation());
+  std::cout << "matched location = " << loc.getLocationPath() << std::endl;
+std::cout << "client method = " << client->getMethod() << std::endl;
+  std::set<std::string> methods = loc.getLimitExcept();
+for (std::set<std::string>::iterator it = methods.begin();
+     it != methods.end(); ++it)
+{
+    std::cout << "allowed = [" << *it << "]" << std::endl;
+}
+  if (methods.find(client->getMethod()) == methods.end()) {
+    client->setStatusCode(405);
+    this->_response = this->errorResponse405(client, methods);
+	return ;
   }
   if (client->getStatusCode() == 200) {
 	if (client->getMethod() == "POST")

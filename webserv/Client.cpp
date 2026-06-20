@@ -230,3 +230,7 @@ void Client::setResponseStr(const std::string& str) {
 std::string Client::getResponseStr() const {
     return this->_res.getResponseStr();
 }
+
+void Client::setStatusCode(const int statusCode) {
+  this->_statusCode = statusCode;
+}

@@ -3,6 +3,7 @@
 
 #include <string>
 #include "ConfigServer.hpp"
+#include "cgi.hpp"
 class Client;
 class Response {
   private:
@@ -21,6 +22,8 @@ class Response {
 	std::string getContentType(const std::string& filepath);
 	std::string postResponse(Client *client);
 	std::string deleteResponse(Client *client);
+	std::string errorResponse405(Client *client, std::set<std::string> &methods);
+	CGI cgi;
 };
 
 #endif

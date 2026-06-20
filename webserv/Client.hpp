@@ -57,6 +57,7 @@ class Client {
 	void setServerPort(int port);
     int  getServerPort() const ;
 	const std::string &getBody() const;
+	void setStatusCode(const int statusCode);
 
 
 
