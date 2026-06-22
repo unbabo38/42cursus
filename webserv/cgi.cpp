@@ -1,12 +1,21 @@
 #include "cgi.hpp"
 #include "unistd.h"
 #include <sys/wait.h>
-
-std::string CGI::do_cgi(std::string cgi_path, std::string filepath, std::string query) {
+#include "Client.hpp"
+#include <cstdlib>
+std::string CGI::do_cgi(std::string cgi_path, std::string filepath, std::string query, Client* client) {
   std::cout << "do_cgi" << std::endl;
+
   int pipe_fd[2];
-  pipe(pipe_fd);
+  if (pipe(pipe_fd) < 0) {
+        return ""; // pipeのエラーハンドリングがあるとさらに強固です
+  }
   int pid = fork();
+  if (pid < 0) {
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+        return "";
+  }
 
   if (pid == 0) {
 	dup2(pipe_fd[1], STDOUT_FILENO);
@@ -29,16 +38,21 @@ std::string CGI::do_cgi(std::string cgi_path, std::string filepath, std::string 
 	exit(1);
   }
   close(pipe_fd[1]);
+  int flags = fcntl(pipe_fd[0], F_GETFL, 0);
+  fcntl(pipe_fd[0], F_SETFL, flags | O_NONBLOCK);
+  client->setCgiPid(pid);
+  client->setCgiOutFd(pipe_fd[0]);
+  client->setIsCgiRunning(true);
 
-  char buffer[4096];
-  std::string body;
+//   char buffer[4096];
+//   std::string body;
 
-  ssize_t readsize;
-  while((readsize = read(pipe_fd[0], buffer, sizeof(buffer))) > 0)
-	body.append(buffer, readsize);
-  close(pipe_fd[0]);
-  waitpid(pid, NULL, 0);
-  return body;
+//   ssize_t readsize;
+//   while((readsize = read(pipe_fd[0], buffer, sizeof(buffer))) > 0)
+// 	body.append(buffer, readsize);
+//   close(pipe_fd[0]);
+//   waitpid(pid, NULL, WNOHANG);
+  return "";
 }
 
 
@@ -65,7 +79,9 @@ std::string CGI::do_cgi_post(std::string cgi_path, std::string filepath, std::st
 		NULL
 	};
     std::string method = "REQUEST_METHOD=POST";
-    std::string len = "CONTENT_LENGTH=" + std::to_string(body.size());
+	std::stringstream ss;
+	ss << body;
+    std::string len = "CONTENT_LENGTH=" + ss.str().size();
 
     char *envp[] = {
         (char *)method.c_str(),

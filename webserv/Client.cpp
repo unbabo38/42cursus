@@ -3,7 +3,18 @@
 #include <fstream>
 
 #include <iostream>
-Client::Client() {};
+Client::Client() : _isCgiRunning(false) {
+	this->methodsUse.push_back("GET");
+    this->methodsUse.push_back("DELETE");
+    this->methodsUse.push_back("POST");
+
+    this->methodsNotUse.push_back("HEAD");
+    this->methodsNotUse.push_back("OPTIONS");
+    this->methodsNotUse.push_back("TRACE");
+    this->methodsNotUse.push_back("PATCH");
+    this->methodsNotUse.push_back("CONNECT");
+    this->methodsNotUse.push_back("PUT");
+};
 Client::~Client() {};
 
 void Client::setRequest(const char *buf, const int &len) {
@@ -67,21 +78,6 @@ void Client::inspectRequest() {
   }
   return ;
 }
-std::vector<std::string> methodsUse = {
-	"GET",
-	"DELETE",
-	"POST",
-};
-
-std::vector<std::string> methodsNotUse = {
-	"HEAD",
-	"OPTIONS",
-	"TRACE",
-	"POST",
-	"PATCH",
-	"CONNECT",
-	"PUT",
-};
 
 const std::string &Client::getBody() const {
   return this->_body;
@@ -233,4 +229,31 @@ std::string Client::getResponseStr() const {
 
 void Client::setStatusCode(const int statusCode) {
   this->_statusCode = statusCode;
+}
+
+
+void Client::setCgiPid(int pid) {
+  this->_cgiPid = pid;
+}
+void Client::setCgiOutFd(int fd) {
+  this->_cgiOutFd = fd;
+}
+void Client::setIsCgiRunning(bool tr) {
+  this->_isCgiRunning = tr;
+}
+void Client::appendCgiOutput(const char *buf, size_t n) {
+  this->_cgiOutput.append(buf, n);
+}
+
+int Client::getCgiPid() {
+  return this->_cgiPid;
+}
+int Client::getCgiOutFd() {
+  return this->_cgiOutFd;
+}
+bool Client::getIsCgiRunning() {
+  return this->_isCgiRunning;
+}
+std::string Client::getCgiOutput() {
+  return this->_cgiOutput;
 }

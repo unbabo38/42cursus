@@ -1,6 +1,6 @@
 NAME        = webserv
 CXX         = c++
-CXXFLAGS    = -std=c++11
+CXXFLAGS    = -std=c++98
 
 SRCS        = tcpservercopy.cpp ConfigParser.cpp ConfigServer.cpp Location.cpp Client.cpp Server.cpp Response.cpp cgi.cpp
 OBJS        = $(SRCS:.cpp=.o)

@@ -1,65 +1,13 @@
 #include "Server.hpp"
-
+#include <cstdio>   // perror を使うために必要
+#include <cstdlib>  // exit, EXIT_FAILURE を使うために必要
+#include <cerrno>   // errno, EAGAIN, EWOULDBLOCK を使うために必要
 Server::Server() {};
 Server::~Server() {};
 
 std::map<int, Client> Server::getClient() const {
   return this->_client;
 }
-
-// void  Server::createListenSocket() {
-//   if ((this->_listen_sock = socket(AF_INET, SOCK_STREAM, 0)) == 0)
-//   {
-//       perror("In socket");
-//       exit(EXIT_FAILURE);
-//   }
-// }
-
-// void  Server::bindSocket()  {
-// 	if (bind(this->_listen_sock, (struct sockaddr *)&this->_addr, sizeof(this->_addr))<0)
-// 	{
-// 		perror("In bind");
-// 		exit(EXIT_FAILURE);
-// 	}
-// }
-
-// void  Server::listenSocket() {
-// 	if (listen(this->_listen_sock, 10) < 0)
-//     {
-//         perror("In listen");
-//         exit(EXIT_FAILURE);
-//     }
-// }
-
-// void  Server::fcntlSocket() {
-// 	int flg = fcntl (this->_listen_sock, F_GETFL, 0) ;
-// 	flg |= O_NONBLOCK;
-// 	if (fcntl (this->_listen_sock, F_SETFL, flg)) {
-//         perror("In fcntl");
-//         exit(EXIT_FAILURE);
-// 	}
-// }
-
-// void  Server::setAddr(ConfigServer &confServ) {
-// 	this->_addr.sin_family = AF_INET;
-//     this->_addr.sin_addr.s_addr = INADDR_ANY;
-//     this->_addr.sin_port = htons( confServ.getPort() );
-// 	memset(this->_addr.sin_zero, '\0', sizeof this->_addr.sin_zero);
-// }
-
-// void  Server::createEpoll() {
-//  	this->_epollfd = epoll_create1(0);
-//     if (this->_epollfd == -1) {
-//         perror("epoll_create");
-//         exit(EXIT_FAILURE);
-// 	}
-//     this->_monitor.events = EPOLLIN;
-//     this->_monitor.data.fd = this->_listen_sock;
-//     if (epoll_ctl(this->_epollfd, EPOLL_CTL_ADD, this->_listen_sock, &this->_monitor) == -1) {
-//         perror("epoll_ctl: this->_listen_sock");
-//         exit(EXIT_FAILURE);
-// 	}
-// }
 
 // epollを単体で作るように分離
 void Server::createEpollBase() {
@@ -239,6 +187,17 @@ void Server::setMonitorEpollin(int conn_sock) {
     }
 }
 
+void Server::modMonitorEpollin(int conn_sock) {
+    struct epoll_event ev;
+    ev.events = EPOLLIN;
+    ev.data.fd = conn_sock;
+
+    if (epoll_ctl(this->_epollfd, EPOLL_CTL_MOD, conn_sock, &ev) == -1) {
+        perror("epoll_ctl: conn_sock");
+        exit(EXIT_FAILURE);
+    }
+}
+
 void Server::connectToListeningSocket(int listen_fd, const std::vector<ConfigServer>& servers) {
 	while (true) {
       int conn_sock = acceptListeningSocket(listen_fd, servers); // 🎯 serversを渡す
@@ -316,33 +275,78 @@ bool Server::processClient(int n, std::vector<ConfigServer> servers) {
 
 			Response response;
     		response.createResponse(&curr_client, servers);
-			curr_client.setResponseStr(response.getResponseStr());
+			if (!curr_client.getIsCgiRunning()) {
+				curr_client.setResponseStr(response.getResponseStr());
+			}
 			this->setMonitorEpollout(n);
 			std::cout << "set epollo out" << this->_buffer <<std::endl;
 		}
 		return true;
 	} else if (this->_events[n].events & EPOLLOUT) {
-		std::cout << "sending" << this->_buffer <<std::endl;
+		std::cout << "sendingINEOPLLOUT" << this->_buffer <<std::endl;
+		if (curr_client.getIsCgiRunning()) {
+		std::cout << "isCgirunning" << this->_buffer <<std::endl;
+			int status;
+			// ⭕ WNOHANGだから実行中なら即0が返る。絶対にハングしない！
+			pid_t res = waitpid(curr_client.getCgiPid(), &status, WNOHANG);
+
+			char buf[4096];
+			// ⭕ Step 1でO_NONBLOCKを仕込んだので、データがまだ来てなくても即-1(EAGAIN)で戻る！
+			ssize_t readnum = read(curr_client.getCgiOutFd(), buf, sizeof(buf));
+
+			if (readnum > 0) {
+				// パイプから出てきたCGIの出力を、クライアントのバッファに少しずつ貯める
+				curr_client.appendCgiOutput(buf, readnum);
+			}
+
+			// ⭕ 子プロセスが終了(res > 0)し、かつパイプのデータもすべて読み尽くした(readnum <= 0)なら、完全終了！
+			if (res > 0 && readnum <= 0) {
+				close(curr_client.getCgiOutFd());
+
+				curr_client.setIsCgiRunning(false); // CGIフェーズ完了！
+				std::string full_response = "HTTP/1.1 200 OK\r\n";
+				full_response += "Content-Type: text/html\r\n";
+				// CGIの出力（curr_client.getCgiOutput()）にすでにヘッダーが含まれている場合は、
+				// 重複しないように適宜調整してください。
+				std::stringstream ss;
+				ss << curr_client.getCgiOutput().size();
+				full_response += "Content-Length: " + ss.str() + "\r\n\r\n";
+				full_response += curr_client.getCgiOutput();
+
+				curr_client.setResponseStr(full_response);
+			} else {
+				//this->modMonitorEpollin(current_fd);
+			    return true;
+			}
+		}
+
 
 		std::string resStr = curr_client.getResponseStr();
-		ssize_t sent = send(this->_events[n].data.fd, resStr.c_str(), resStr.size(), 0);
-		if (sent == -1) {
-			if (errno == EAGAIN || errno == EWOULDBLOCK) {
-				// closeしない！
-				return true;
+		size_t sent_sum = 0;
+		size_t total_send = resStr.size();
+		const char *ptr = resStr.c_str();
+
+		while(sent_sum < total_send) {
+			ssize_t sent = send(this->_events[n].data.fd, ptr + sent_sum, total_send - sent_sum, 0);
+			if (sent < 0) {
+				if (errno == EAGAIN || errno == EWOULDBLOCK) {
+					// closeしない！
+					return true;
+				}
+				perror("send");
+				closeClient(this->_events[n].data.fd);
+				return false;
+			} else if (sent == 0) {
+				std::cout << "Successfully sent " << sent << " bytes." << std::endl;
+				std::cout << "resStr.size() = " << resStr.size() << std::endl;
+				std::cout << "sent = " << sent << std::endl;
+				this->closeClient(this->_events[n].data.fd);
+        		return false;
 			}
-			perror("send");
-			closeClient(this->_events[n].data.fd);
-        } else {
-            std::cout << "Successfully sent " << sent << " bytes." << std::endl;
-			std::cout << "resStr.size() = " << resStr.size() << std::endl;
-			std::cout << "sent = " << sent << std::endl;
-            // 🎯 送信完了後、即クローズ！
-            // 毎回 closeClient する仕様（Connection: close）にするなら、
-            // epoll_ctl(MOD) で EPOLLIN に戻す必要は一切ありません。
-            // 閉じるだけで、epoll からも自動で消え、無限ループも完全に止まります。
-            this->closeClient(this->_events[n].data.fd);
-        }
+			sent_sum += sent;
+		}
+		this->closeClient(this->_events[n].data.fd);
+
 		return true;
 	}
 	return true;
