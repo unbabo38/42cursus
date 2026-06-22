@@ -11,7 +11,8 @@
 #include "Client.hpp"
 #include "Response.hpp"
 #include <fcntl.h>
-
+#include <sys/wait.h>
+#include <cstdlib>
 #define MAX_EVENTS 10
 
 class Server {
@@ -74,6 +75,7 @@ class Server {
 	bool checkFinishReceive(int n);
 	void setAndCheckRequest();
 	bool processClient(int n, std::vector<ConfigServer> servers);
+	void modMonitorEpollin(int conn_sock);
 };
 
 #endif

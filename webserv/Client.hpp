@@ -7,13 +7,19 @@
 
 class Client {
   private:
+    std::vector<std::string> methodsUse;
+    std::vector<std::string> methodsNotUse;
 	ConfigServer _server;
 	int			 _socket;
 	int			 _statusCode;
 	bool		 _sentRequest;
 	bool 		 _isParseCompleted;
 	bool 		 _isChunked;
+	int 		 _cgiPid;
+	int 		 _cgiOutFd;
+	bool		 _isCgiRunning;
 
+	std::string  _cgiOutput;
 	std::string	 _request;
 	time_t		 _lastRequest;
 	std::string	 _requestTarget;
@@ -31,6 +37,7 @@ class Client {
   public:
     Client();
     ~Client();
+
 	const std::string &getMethod() const;
 	void setRequest(const char* buf, const int &len);
 	const std::string &getRequest() const;
@@ -58,9 +65,14 @@ class Client {
     int  getServerPort() const ;
 	const std::string &getBody() const;
 	void setStatusCode(const int statusCode);
-
-
-
+	void setCgiPid(int pid);
+	void setCgiOutFd(int fd);
+	void setIsCgiRunning(bool tr);
+	void appendCgiOutput(const char *buf, size_t n);
+	int getCgiPid();
+	int getCgiOutFd();
+	bool getIsCgiRunning();
+	std::string getCgiOutput();
 };
 
 #endif

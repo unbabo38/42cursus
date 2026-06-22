@@ -23,6 +23,7 @@ class Response {
 	std::string postResponse(Client *client);
 	std::string deleteResponse(Client *client);
 	std::string errorResponse405(Client *client, std::set<std::string> &methods);
+	std::string getFileType(const std::string &filepath);
 	CGI cgi;
 };
 

@@ -117,6 +117,14 @@ std::string Response::getContentType(const std::string& filepath)
 
     return "application/octet-stream";
 }
+std::string Response::getFileType(const std::string &filepath) {
+    size_t dot_pos = filepath.rfind('.');
+
+    if (dot_pos == std::string::npos || dot_pos == filepath.size() - 1) {
+        return "";
+    }
+    return filepath.substr(dot_pos);
+}
 
 std::string Response::regularResponse(Client *client, std::vector<ConfigServer> servers) {
 
@@ -166,28 +174,26 @@ std::string Response::regularResponse(Client *client, std::vector<ConfigServer> 
 	std::cout << "🎯 [Final File Path] -> " << filepath << std::endl;
   std::ifstream target(filepath.c_str());
 
-std::cout << "filepath = [" << filepath << "]\n";
-std::cout << "is_open = " << target.is_open() << "\n";
-std::cout << "in root_path" << root_path << std::endl;
+  std::string filetype = getFileType(filepath);
+  std::cout << "filetype" << filetype << std::endl;
   std::string query_string = "test";
   std::map<std::string, std::string> cgifile = loc.getCgiHandlersMap();
 
 
   std::string body;
-
-  if (!loc.getCgiHandlersMap().empty()
-      && loc.getCgiHandlersMap().count(".sh")) {
-	    std::cout << "cgifile[.sh]" << cgifile[".sh"] << std::endl;
-		body = this->cgi.do_cgi(cgifile[".sh"], filepath, query_string);
-		 std::stringstream body_length;
-		body_length << body.size();
-		std::string content_length = body_length.str();
-		std::string response;
-		response = "HTTP/1.1 200 OK\r\n";
-		response += "Content-Type: " + getContentType(filepath) + "\r\n";
-		response += "Content-Length: " + content_length + "\r\n\r\n";
-		response += body;
-		return response;
+  std::map<std::string, std::string>::iterator it = cgifile.find(filetype);
+  if (it != cgifile.end()) {
+	    std::string cgi_path = it->second;
+		body = this->cgi.do_cgi(cgi_path, filepath, query_string, client);
+		//  std::stringstream body_length;
+		// body_length << body.size();
+		// std::string content_length = body_length.str();
+		// std::string response;
+		// response = "HTTP/1.1 200 OK\r\n";
+		// response += "Content-Type: " + getContentType(filepath) + "\r\n";
+		// response += "Content-Length: " + content_length + "\r\n\r\n";
+		// response += body;
+		// return response;
   }
   else if (!target.is_open()) {
     //client->setStatusCode(404);   // 必要なら
@@ -244,15 +250,16 @@ std::string Response::postResponse(Client *client) {
 							filepath,
 							client->getBody()
 						);
+		std::stringstream ss;
+		ss << body;
+	    ss << "HTTP/1.1 200 OK\r\n"
+		<< "Content-Type: text/plain\r\n"
+		<< "Content-Length: " << body.size() << "\r\n" // bodyのサイズを直接流し込めます
+		<< "\r\n"
+		<< body; // もしボディがあれば
 
-	std::string res =
-		"HTTP/1.1 200 OK\r\n"
-		"Content-Type: text/plain\r\n"
-		"Content-Length: " + std::to_string(body.size()) + "\r\n"
-		"\r\n" +
-		body;
-
-	return res;
+		std::string response_str = ss.str();
+		return response_str;
   }
 
   std::ofstream ofs(filepath.c_str());
@@ -297,24 +304,37 @@ void Response::createResponse(Client *client, std::vector<ConfigServer> servers)
   std::cout << "matched location = " << loc.getLocationPath() << std::endl;
 std::cout << "client method = " << client->getMethod() << std::endl;
   std::set<std::string> methods = loc.getLimitExcept();
-for (std::set<std::string>::iterator it = methods.begin();
-     it != methods.end(); ++it)
-{
-    std::cout << "allowed = [" << *it << "]" << std::endl;
-}
-  if (methods.find(client->getMethod()) == methods.end()) {
-    client->setStatusCode(405);
-    this->_response = this->errorResponse405(client, methods);
-	return ;
+  std::string client_method = client->getMethod();
+  if (methods.size() == 0)
+  {
+	methods.insert("GET");
+	methods.insert("POST");
+	methods.insert("DELETE");
+  }
+  for (std::set<std::string>::iterator it = methods.begin();
+  	it != methods.end(); ++it)
+  {
+  	std::cout << "allowed = [" << *it << "]" << std::endl;
   }
   if (client->getStatusCode() == 200) {
-	if (client->getMethod() == "POST")
+	if (methods.find(client_method) == methods.end()) {
+    	client->setStatusCode(405);
+    	this->_response = this->errorResponse405(client, methods);
+		return ;
+	}
+	if (client_method== "POST")
 		this->_response = this->postResponse(client);
-	else if (client->getMethod() == "GET")
+	else if (client_method == "GET")
 		this->_response = this->regularResponse(client, servers);
-	else if (client->getMethod() == "DELETE")
+	else if (client_method == "DELETE") {
+		std::cout << "method=" << client->getMethod() << std::endl;
     	this->_response = deleteResponse(client);
+	}
+  } else {
+    client->setStatusCode(405);
+    this->_response = this->errorResponse405(client, methods);
   }
+
   std::cout << "this->response:" << this->_response << std::endl;
 };
 
@@ -325,9 +345,3 @@ const std::string &Response::getResponseStr() const {
 void Response::setResponseStr(std::string response) {
   this->_response = response;
 }
-
-// void Response::epollManager() {
-//   this->_getLaunch(i);
-
-//   if (this->_has)
-// }

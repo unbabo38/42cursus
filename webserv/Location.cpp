@@ -74,12 +74,14 @@ void Location::parseLocation(const std::vector<std::string>& tokens, size_t star
             std::string url = tokens[i + 2];
             new_location.setReturn(code, url);
             i += 2;
-        } else if (tokens[i] == "cgi_path" && i + 1 < end) {
-            std::map<std::string, std::string> cgi_map;
-            cgi_map[".sh"] = tokens[i + 1];
-            cgi_map[".py"] = tokens[i + 1];
+        } else if (tokens[i] == "cgi_path" && i + 2 < end) {
+            std::map<std::string, std::string> cgi_map = new_location.getCgiHandlersMap();
+			std::string file_type = tokens[i + 1];
+			std::string path = tokens[i + 2];
+
+            cgi_map[file_type] = path;
             new_location.setCgiHandlersMap(cgi_map);
-            i++;
+            i+= 2;
         }
 	}
 	confserv->addLocation(new_location);
