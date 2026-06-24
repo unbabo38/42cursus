@@ -3,8 +3,9 @@
 #include "ConfigServer.hpp"
 #include <iostream>
 #include <sstream>
+#include <sys/stat.h>
 
-static int ft_stoi(std::string str);
+static size_t ft_stoi(std::string str);
 static std::string ft_to_string(int num);
 static int is_file_exist_posix(const std::string& filename);
 

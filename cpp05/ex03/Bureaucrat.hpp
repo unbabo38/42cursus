@@ -15,10 +15,12 @@ private:
   void _checkGrade() const;
 
 public:
+  // Bureaucrat();
+
   Bureaucrat(const std::string &name, int grade);
   Bureaucrat(const Bureaucrat &other);
   Bureaucrat &operator=(const Bureaucrat &other);
-  virtual ~Bureaucrat();
+  ~Bureaucrat();
 
   const std::string &getName() const;
   int getGrade() const;
@@ -30,16 +32,12 @@ public:
 
   class GradeTooHighException : public std::exception {
   public:
-    virtual const char *what() const throw() {
-      return "Grade out of range(too high).";
-    }
+    virtual const char *what() const throw();
   };
 
   class GradeTooLowException : public std::exception {
   public:
-    virtual const char *what() const throw() {
-      return "Grade out of range(too low).";
-    }
+    virtual const char *what() const throw();
   };
 };
 

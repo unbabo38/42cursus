@@ -161,7 +161,7 @@ void Client::parseFields(std::string request, size_t i) {
 		i += line.size() + 2;
   	}
 	if (this->_fields.find("Content-Length") != this->_fields.end()) {
-		this->_contentLength = ft_stoi(this->_fields["Content-Length"]);
+		  this->_contentLength = ft_stoi(this->_fields["Content-Length"]);
     	this->_body = request.substr(i + 2, this->_contentLength);
 	}
 	if (this->_fields["Transfer-Encoding"] == "chunked") {
@@ -210,7 +210,7 @@ void Client::setErrorPagesMap(const std::map<int, std::string>& error_pages) {
 // 	if (client_recv.getRequest().substr(client_recv.getRequest().size() - 4, 4) == "\r\n\r\n")
 // }
 
-const size_t &Client::getContentLength() const {
+const size_t Client::getContentLength() const {
   return this->_contentLength;
 }
 

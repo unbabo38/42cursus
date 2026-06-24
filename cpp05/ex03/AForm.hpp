@@ -2,6 +2,7 @@
 #define AFORM_HPP
 
 #include <iostream>
+#include <stdexcept>
 #include <string>
 
 class Bureaucrat;
@@ -29,28 +30,24 @@ public:
 
   class GradeTooHighException : public std::exception {
   public:
-    virtual const char *what() const throw() {
-      return "Grade out of range(too high).";
-    }
+    virtual const char *what() const throw();
   };
 
   class GradeTooLowException : public std::exception {
   public:
-    virtual const char *what() const throw() {
-      return "Grade out of range(too low).";
-    }
+    virtual const char *what() const throw();
   };
 
   class FormNotSignedException : public std::exception {
   public:
-    virtual const char *what() const throw() {
-      return "Form is not signed yet.";
-    }
+    virtual const char *what() const throw();
   };
 
-  void beSigned(Bureaucrat &obj);
+  bool beSigned(Bureaucrat &obj);
   void execute(Bureaucrat const &executor) const;
   virtual void executeAction() const = 0;
 };
+
+std::ostream &operator<<(std::ostream &os, const AForm &obj);
 
 #endif
