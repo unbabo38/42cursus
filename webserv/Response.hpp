@@ -14,7 +14,7 @@ class Response {
 	~Response();
     Location longestPrefixMatch(std::string requestTarget, const std::vector<Location> &locations);
 	void createResponse(Client *clinet, std::vector<ConfigServer> servers);
-	std::string errorResponse(Client *client);
+	std::string errorResponse(Client *client, int errorNum);
 	std::string regularResponse(Client *client, std::vector<ConfigServer> servers);
 	const std::string &getResponseStr() const;
 	void setResponseStr(std::string response);
@@ -24,6 +24,9 @@ class Response {
 	std::string deleteResponse(Client *client);
 	std::string errorResponse405(Client *client, std::set<std::string> &methods);
 	std::string getFileType(const std::string &filepath);
+	std::string redirect301Response(Client *client, std::string url);
+	std::string responseBodyTooLong(Client *client);
+	bool checkFileName(std::string filename);
 	CGI cgi;
 };
 

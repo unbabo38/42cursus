@@ -198,6 +198,16 @@ void Server::modMonitorEpollin(int conn_sock) {
     }
 }
 
+void Server::modMonitorEpollout(int conn_sock) {
+    struct epoll_event ev;
+    ev.events = EPOLLOUT;
+    ev.data.fd = conn_sock;
+
+    if (epoll_ctl(this->_epollfd, EPOLL_CTL_MOD, conn_sock, &ev) == -1) {
+        perror("epoll_ctl: conn_sock");
+        exit(EXIT_FAILURE);
+    }
+}
 void Server::connectToListeningSocket(int listen_fd, const std::vector<ConfigServer>& servers) {
 	while (true) {
       int conn_sock = acceptListeningSocket(listen_fd, servers); // 🎯 serversを渡す
@@ -258,98 +268,114 @@ void Server::setAndCheckRequest() {
 }
 
 bool Server::processClient(int n, std::vector<ConfigServer> servers) {
-	//this->getClientRequest(n);
-	int current_fd = this->_events[n].data.fd;
-	Client& curr_client = this->_client[current_fd];
-	// 受信フラグが立っている場合
-	if (this->_events[n].events & EPOLLIN) {
-		this->getClientRequest(n);
-		if (!checkFinishReceive(n)) {
-			return false;
-		}
-		// this->setClientRequest(n);
-		setAndCheckRequest();
-		std::cout << "setAndCheck" << this->_buffer <<std::endl;
-		// parseが終わっていたらレスポンスを作ってクライアントを送信状態にする
-		if (curr_client.getParseCompleted()) {
+    int current_fd = this->_events[n].data.fd;
 
-			Response response;
-    		response.createResponse(&curr_client, servers);
-			if (!curr_client.getIsCgiRunning()) {
-				curr_client.setResponseStr(response.getResponseStr());
-			}
-			this->setMonitorEpollout(n);
-			std::cout << "set epollo out" << this->_buffer <<std::endl;
-		}
-		return true;
-	} else if (this->_events[n].events & EPOLLOUT) {
-		std::cout << "sendingINEOPLLOUT" << this->_buffer <<std::endl;
-		if (curr_client.getIsCgiRunning()) {
-		std::cout << "isCgirunning" << this->_buffer <<std::endl;
-			int status;
-			// ⭕ WNOHANGだから実行中なら即0が返る。絶対にハングしない！
-			pid_t res = waitpid(curr_client.getCgiPid(), &status, WNOHANG);
+    // =================================================================
+    // 🌟 ルートA: もし発火したFDが「誰かのCGIのパイプFD」だった場合
+    // =================================================================
+    for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); ++it) {
+        if (it->second.getIsCgiRunning() && it->second.getCgiOutFd() == current_fd) {
 
-			char buf[4096];
-			// ⭕ Step 1でO_NONBLOCKを仕込んだので、データがまだ来てなくても即-1(EAGAIN)で戻る！
-			ssize_t readnum = read(curr_client.getCgiOutFd(), buf, sizeof(buf));
+            // 🎯 ここは純粋に「CGIのパイプからデータを吸い出す」ためだけの聖域です！
+            char buf[4096];
+            ssize_t readnum = read(current_fd, buf, sizeof(buf));
+            if (readnum > 0) {
+				//このサーバーに接続してるクライアントのcgiに読み込んだ中身をいれる
+				//このcurrent_fdはcgioutput
+                it->second.appendCgiOutput(buf, readnum);
+            }
 
-			if (readnum > 0) {
-				// パイプから出てきたCGIの出力を、クライアントのバッファに少しずつ貯める
-				curr_client.appendCgiOutput(buf, readnum);
-			}
+            int status;
+            pid_t res = waitpid(it->second.getCgiPid(), &status, WNOHANG);
 
-			// ⭕ 子プロセスが終了(res > 0)し、かつパイプのデータもすべて読み尽くした(readnum <= 0)なら、完全終了！
-			if (res > 0 && readnum <= 0) {
-				close(curr_client.getCgiOutFd());
+            // 🎉 CGIが完全に終了し、データも全て吸い尽くしたら
+            if (res > 0 && readnum <= 0) {
+                // 用済みのCGIパイプを epoll から削除して閉じる
+                epoll_ctl(this->_epollfd, EPOLL_CTL_DEL, current_fd, NULL);
+                close(current_fd);
+                it->second.setIsCgiRunning(false);
 
-				curr_client.setIsCgiRunning(false); // CGIフェーズ完了！
-				std::string full_response = "HTTP/1.1 200 OK\r\n";
-				full_response += "Content-Type: text/html\r\n";
-				// CGIの出力（curr_client.getCgiOutput()）にすでにヘッダーが含まれている場合は、
-				// 重複しないように適宜調整してください。
-				std::stringstream ss;
-				ss << curr_client.getCgiOutput().size();
-				full_response += "Content-Length: " + ss.str() + "\r\n\r\n";
-				full_response += curr_client.getCgiOutput();
+                // レスポンス構築
+                std::string full_response = "HTTP/1.1 200 OK\r\n";
+                full_response += "Content-Type: text/html\r\n";
+                std::stringstream ss;
+                ss << it->second.getCgiOutput().size();
+                full_response += "Content-Length: " + ss.str() + "\r\n\r\n";
+                full_response += it->second.getCgiOutput();
+                it->second.setResponseStr(full_response);
 
-				curr_client.setResponseStr(full_response);
-			} else {
-				//this->modMonitorEpollin(current_fd);
-			    return true;
-			}
-		}
+                // 🔥 ここで満を持して、元の「ソケットFD（it->first）」を送信可能状態（EPOLLOUT）にする！
+                this->modMonitorEpollout(it->first);
+            }
+            return true; // CGIパイプの処理をしたので、ここで安全にイベントを抜ける
+        }
+    }
 
+    // =================================================================
+    // 🌐 ルートB: 純粋なクライアントソケットFDの処理（従来のロジック）
+    // =================================================================
+    Client& curr_client = this->_client[current_fd];
 
-		std::string resStr = curr_client.getResponseStr();
-		size_t sent_sum = 0;
-		size_t total_send = resStr.size();
-		const char *ptr = resStr.c_str();
+    // 1. 受信フラグ（EPOLLIN）
+    if (this->_events[n].events & EPOLLIN) {
+        this->getClientRequest(n);
+        if (!checkFinishReceive(n)) {
+            return false;
+        }
+        setAndCheckRequest();
 
-		while(sent_sum < total_send) {
-			ssize_t sent = send(this->_events[n].data.fd, ptr + sent_sum, total_send - sent_sum, 0);
-			if (sent < 0) {
-				if (errno == EAGAIN || errno == EWOULDBLOCK) {
-					// closeしない！
-					return true;
-				}
-				perror("send");
-				closeClient(this->_events[n].data.fd);
-				return false;
-			} else if (sent == 0) {
-				std::cout << "Successfully sent " << sent << " bytes." << std::endl;
-				std::cout << "resStr.size() = " << resStr.size() << std::endl;
-				std::cout << "sent = " << sent << std::endl;
-				this->closeClient(this->_events[n].data.fd);
-        		return false;
-			}
-			sent_sum += sent;
-		}
-		this->closeClient(this->_events[n].data.fd);
+        if (curr_client.getParseCompleted()) {
+            Response response;
+            response.createResponse(&curr_client, servers);
 
-		return true;
-	}
-	return true;
+            if (curr_client.getIsCgiRunning()) {
+                // 💡 CGIが起動した場合、ソケットFDはそのまま静かに眠らせておく（EPOLLOUTにはしない）
+                // その代わり、CGIのパイプFDを epoll に登録する！
+                struct epoll_event ev;
+                std::memset(&ev, 0, sizeof(ev));
+                ev.events = EPOLLIN; // CGIが文字を吐き出すのを待つ
+                ev.data.fd = curr_client.getCgiOutFd();
+                epoll_ctl(this->_epollfd, EPOLL_CTL_ADD, curr_client.getCgiOutFd(), &ev);
+
+                // ソケット側は空回りを防ぐため、EPOLLINのまま（OUTは付けない）維持
+                return true;
+            } else {
+                // 通常の静的ファイルなら、即座に送信フェーズ（EPOLLOUT）へ
+                curr_client.setResponseStr(response.getResponseStr());
+                this->setMonitorEpollout(n);
+            }
+        }
+        return true;
+
+    // 2. 送信フラグ（EPOLLOUT）
+    } else if (this->_events[n].events & EPOLLOUT) {
+        std::cout << "sendingINEOPLLOUT" << std::endl;
+
+        // 💡 ここに来るということは、ルートAによってCGIが100%完了し、
+        // レスポンス文字列が完成した状態で叩き起こされたということです。
+        // 面倒なCGI待ちのif文はここには一切不要になり、純粋に send するだけになります！
+
+        std::string resStr = curr_client.getResponseStr();
+        size_t sent_sum = 0;
+        size_t total_send = resStr.size();
+        const char *ptr = resStr.c_str();
+
+        while(sent_sum < total_send) {
+            ssize_t sent = send(current_fd, ptr + sent_sum, total_send - sent_sum, 0);
+            if (sent < 0) {
+                if (errno == EAGAIN || errno == EWOULDBLOCK) return true;
+                this->closeClient(current_fd);
+                return false;
+            } else if (sent == 0) {
+                this->closeClient(current_fd);
+                return false;
+            }
+            sent_sum += sent;
+        }
+        this->closeClient(current_fd);
+        return true;
+    }
+    return true;
 }
 
 void Server::runServer(std::vector<ConfigServer> servers) {

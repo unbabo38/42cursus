@@ -5,6 +5,8 @@
 #include <sstream>
 
 static int ft_stoi(std::string str);
+static std::string ft_to_string(int num);
+static int is_file_exist_posix(const std::string& filename);
 
 // typedef struct {
 //     size_t      	len;
