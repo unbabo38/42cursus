@@ -34,7 +34,7 @@ Location& Location::operator=(const Location& other) {
 void Location::parseLocation(const std::vector<std::string>& tokens, size_t start, size_t end, ConfigServer *confserv) {
 	//std::cout <<"parseLocation:  start:"<< start << "end:" << end << std::endl;
 	Location new_location;
-	if (start + 1 < end);
+	if (start + 1 < end)
 		new_location.setLocationPath(tokens[start + 1]);
 	for (int i = start; i < end; i++)
 	{
@@ -44,7 +44,7 @@ void Location::parseLocation(const std::vector<std::string>& tokens, size_t star
 		  new_location.setRoot(tokens[i + 1]);
 		  std::cout << "root=" << tokens[i + 1] << std::endl;
 		} else if (tokens[i] == "autoindex") {
-
+          std::cout << "autoindex: "<< tokens[i + 1] << std::endl;
 		  if (tokens[i + 1] == "on")
 	          new_location.setAutoindex(true);
 		  else if (tokens[i + 1] == "off")

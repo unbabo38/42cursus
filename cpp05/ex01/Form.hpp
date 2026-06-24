@@ -28,19 +28,23 @@ public:
 
   class GradeTooHighException : public std::exception {
   public:
-    virtual const char *what() const throw() {
-      return "Grade out of range(too high).";
-    }
+    virtual const char *what() const throw();
   };
 
   class GradeTooLowException : public std::exception {
   public:
-    virtual const char *what() const throw() {
-      return "Grade out of range(too low).";
-    }
+    virtual const char *what() const throw();
+  };
+
+  class FormNotSignedException : public std::exception {
+  public:
+    virtual const char *what() const throw();
   };
 
   bool beSigned(Bureaucrat &obj);
 };
+
+std::ostream &operator<<(std::ostream &os, const Form &obj);
+
 
 #endif

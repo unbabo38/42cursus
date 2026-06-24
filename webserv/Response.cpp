@@ -1,8 +1,8 @@
 
 #include "Response.hpp"
 #include "Client.hpp"
-#include <fstream>
 #include "utils.cpp"
+#include <fstream>
 
 Response::Response() {};
 Response::~Response() {};
@@ -155,8 +155,14 @@ std::string Response::regularResponse(Client *client, std::vector<ConfigServer> 
 	//   if (!root_path.empty() && root_path.back() == '/' && !request_target.empty() && request_target[0] == '/') {
     //         request_target = request_target.substr(1);
     //     }
+ 
 	std::string relative = request_target.substr(loc.getLocationPath().size());
+  
 	filePath = root_path + "/" + relative;
+  std::string autoIndex = Autoindex(filePath, loc);
+  if (autoIndex != "") {
+    return autoIndex;
+  }
 	if (!request_target.empty() && request_target[request_target.length() - 1] == '/') {
 		// 本来なら longestPrefixMatch で見つけた Location (loc) の index 設定ファイルを見る
 		if (!loc.getIndex().empty()) {
@@ -246,6 +252,51 @@ bool Response::checkFileName(std::string filename) {
   }
   return true;
 }
+
+#include <dirent.h>
+bool Response::isDirectory(const std::string& filename) {
+    DIR* dir = opendir(filename.c_str());
+    if (dir == NULL) {
+        return false;
+    }
+    return true;
+}
+std::string Response::Autoindex(const std::string& filename, Location &loc) {
+    std::cout << "Autoindex " << filename << std::endl;
+    DIR* dir = opendir(filename.c_str());
+    std::string html;
+    if (dir == NULL) {
+        return "";
+    }
+
+    if (loc.getAutoindex()) {
+      std::cout << "autoindex:on "<< std::endl;
+      html = "HTTP/1.1 200 OK\r\n";
+      html += "Content-Type: text/html\r\n";
+        // html += "Connection: close\r\n"; // 必要に応じて
+      html += "\r\n";
+      html += "<html><head><title>Index of " + filename + "</title></head>";
+      html += "<body><h1>Index of " + filename + "</h1><hr><pre>";
+      html += "<a href=\"../\">../</a>\n"; // 親ディレクトリへのリンク（必須ではないがあると親切）
+      struct dirent* entry;
+      while ((entry = readdir(dir)) != NULL) {
+          // entry->d_name でファイル名が取れる
+          std::string dName = entry->d_name;
+          if (dName == "." || dName == "..") continue;
+          if (isDirectory(dName)) {
+              dName += "/";
+          }
+          html += "<a href=\"" + dName + "\">" + dName + "</a>\n";
+      }
+    } else {
+      std::cout << "autoindex: false" << std::endl;
+
+    }
+
+    closedir(dir);
+    return html;
+}
+
 
 std::string Response::postResponse(Client *client) {
   ConfigServer server = client->getServer();
@@ -353,10 +404,10 @@ void Response::createResponse(Client *client, std::vector<ConfigServer> servers)
   std::cout << "statuscode:" << client->getStatusCode() << std::endl;
   std::map<int, std::string>::iterator it = this->_errorMap.find(client->getStatusCode());
   if (it != _errorMap.end()) {
-	std::string content_length = it->second; // 安全に値を取得
-	std::cout << "値は: " << content_length << std::endl;
-	this->_response = this->errorResponse(client, client->getStatusCode());
-	return ;
+    std::string content_length = it->second; // 安全に値を取得
+    std::cout << "値は: " << content_length << std::endl;
+    this->_response = this->errorResponse(client, client->getStatusCode());
+    return ;
   } else {
 	// キーが存在しない場合
   	std::cout << "Content-Lengthヘッダーはありません" << std::endl;
@@ -371,16 +422,17 @@ void Response::createResponse(Client *client, std::vector<ConfigServer> servers)
   std::cout << "client method = " << client->getMethod() << std::endl;
   std::set<std::string> methods = loc.getLimitExcept();
   std::string client_method = client->getMethod();
-  if (client->getContentLength() > loc.getClientMaxBodySize()) {
-	//this->_response = this->responseBodyTooLong(client);
-	this->_response = this->errorResponse(client, 413);
-	return;
-  }
+  // if (client->getContentLength() > loc.getClientMaxBodySize()) {
+	// //this->_response = this->responseBodyTooLong(client);
+  //   std::cout << "client->getContentLength()" << client->getContentLength() << "loc.getClientMaxBodySize()" << loc.getClientMaxBodySize() << std::endl;
+	//   this->_response = this->errorResponse(client, 413);
+	//   return;
+  // }
   if (methods.size() == 0)
   {
-	methods.insert("GET");
-	methods.insert("POST");
-	methods.insert("DELETE");
+    methods.insert("GET");
+    methods.insert("POST");
+    methods.insert("DELETE");
   }
   for (std::set<std::string>::iterator it = methods.begin();
   	it != methods.end(); ++it)

@@ -28,6 +28,8 @@ class Response {
 	std::string responseBodyTooLong(Client *client);
 	bool checkFileName(std::string filename);
 	CGI cgi;
+	bool isDirectory(const std::string& filename);
+	std::string Autoindex(const std::string& filename, Location &loc);
 };
 
 #endif

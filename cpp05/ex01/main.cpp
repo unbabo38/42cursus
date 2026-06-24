@@ -2,7 +2,6 @@
 #include "Form.hpp"
 #include <iostream>
 
-// 1. Instantiation Tests
 void test_bureaucrat_initialization_with_minimum_valid_grade() {
   try {
     Bureaucrat valid_low_bureaucrat("LowLevel", 150);
@@ -30,7 +29,6 @@ void test_bureaucrat_initialization_with_grade_too_high() {
   }
 }
 
-// 2. Bureaucrat Grade Modification Tests
 void test_bureaucrat_increment_beyond_maximum_limit() {
   try {
     Bureaucrat max_grade_bureaucrat("The Boss", 1);
@@ -51,11 +49,10 @@ void test_bureaucrat_decrement_beyond_minimum_limit() {
   }
 }
 
-// 3. Form Instantiation Tests
 void test_form_initialization_with_valid_grades() {
   try {
     Form valid_form("TaxForm", 100, 50);
-    std::cout << "SUCCESS" << std::endl;
+    std::cout << "SUCCESS:" << valid_form << std::endl;
   } catch (const std::exception &e) {
     std::cout << "FAILURE: " << e.what() << std::endl;
   }
@@ -70,7 +67,6 @@ void test_form_initialization_with_sign_grade_too_low() {
   }
 }
 
-// 4. Form Signing Action Tests
 void test_form_signing_by_bureaucrat_with_insufficient_grade() {
   try {
     Form high_tier_form("TopSecretPaper", 10, 10);

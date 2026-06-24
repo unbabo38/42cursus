@@ -4,8 +4,20 @@ int main(void) {
   int b = 3;
   ::swap(a, b);
   std::cout << "a = " << a << ", b = " << b << std::endl;
+  std::cout << "address of a = " << &a << ", address of b = " << &b << std::endl;
   std::cout << "min( a, b ) = " << ::min(a, b) << std::endl;
   std::cout << "max( a, b ) = " << ::max(a, b) << std::endl;
+  std::cout << "minaddress = " << &::min(a, b) << std::endl;
+  std::cout << "maxaddress = " << &::max(a, b) << std::endl;
+  
+  a = 2;
+  std::cout << "a = " << a << ", b = " << b << std::endl;
+  std::cout << "address of a = " << &a << ", address of b = " << &b << std::endl;
+  std::cout << "min( a, b ) = " << ::min(a, b) << std::endl;
+  std::cout << "max( a, b ) = " << ::max(a, b) << std::endl;
+  std::cout << "minaddress = " << &::min(a, b) << std::endl;
+  std::cout << "maxaddress = " << &::max(a, b) << std::endl;
+  
   std::string c = "chaine1";
   std::string d = "chaine2";
   ::swap(c, d);

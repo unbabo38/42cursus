@@ -29,15 +29,38 @@ void Form::_checkGrades() const {
 }
 
 const std::string Form::getName() const { return this->_name; }
+
 bool Form::getSign() const { return this->_sign; }
+
 int Form::getGradeToSign() const { return this->_gradeToSign; }
+
 int Form::getGradeToExecute() const { return this->_gradeToExecute; }
+
 bool Form::beSigned(Bureaucrat &obj) {
-  if (obj.getGrade() <= getGradeToSign()) {
+  if (obj.getGrade() <= this->getGradeToSign()) {
     this->_sign = true;
     return true;
   } else {
-    this->_sign = false;
-    return false;
+    throw Form::GradeTooLowException();
   }
+}
+
+const char* Form::GradeTooHighException::what() const throw() {
+  return "Grade is too high!";
+}
+
+const char* Form::GradeTooLowException::what() const throw() {
+  return "Grade is too low!";
+}
+
+const char* Form::FormNotSignedException::what() const throw() {
+  return "Form is not signed yet.";
+}
+
+std::ostream& operator<<(std::ostream& os, const Form& form) {
+    os << " Form Name is " << form.getName()
+       << " Signed: " << (form.getSign() ? "Yes" : "No")
+       << ", Sign Grade: " << form.getGradeToSign()
+       << ", Execute Grade: " << form.getGradeToExecute();
+    return os;
 }

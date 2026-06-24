@@ -4,8 +4,10 @@
 #include <iostream>
 #include <sys/types.h>
 
-int ft_stoi(std::string str)
+size_t ft_stoi(std::string str)
 {
+    if (str == "")
+      return 0;
     std::stringstream ss(str);
     if (str.length() > 10)
         throw std::runtime_error("too long");
@@ -16,7 +18,7 @@ int ft_stoi(std::string str)
     //         throw std::runtime_error("out of digit");
 	// 	}
     // }
-    int res;
+    size_t res;
     ss >> res;
     return (res);
 }
@@ -34,7 +36,6 @@ int is_file_exist_posix(const std::string& filename) {
   if (stat(filename.c_str(), &buffer) != 0) {
 	return -1;
   }
-
   if (buffer.st_mode & 0200) {
         return 1;
     } else {

@@ -7,7 +7,6 @@
 #include <ctime>
 #include <iostream>
 
-// 1. ShrubberyCreationForm Tests (Sign: 145, Exec: 137)
 void test_shrubbery_execution_success() {
   try {
     Bureaucrat elite_bureaucrat("EliteSato", 1);
@@ -31,7 +30,6 @@ void test_shrubbery_execution_failure_not_signed() {
   }
 }
 
-// 2. RobotomyRequestForm Tests (Sign: 72, Exec: 45)
 void test_robotomy_execution_success() {
   try {
     Bureaucrat manager_bureaucrat("ManagerTanaka", 40);
@@ -56,7 +54,6 @@ void test_robotomy_execution_failure_low_grade() {
   }
 }
 
-// 3. PresidentialPardonForm Tests (Sign: 25, Exec: 5)
 void test_presidential_execution_success() {
   try {
     Bureaucrat boss_bureaucrat("ThePresident", 1);

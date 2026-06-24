@@ -53,7 +53,7 @@ class Client {
 	const int &getStatusCode() const;
     const std::map<int, std::string>&   getErrorPagesMap() const;
     void setErrorPagesMap(const std::map<int, std::string>& error_pages);
-    const size_t &getContentLength() const;
+    const size_t getContentLength() const;
 	const bool &getParseCompleted() const;
 	void setResponseStr(const std::string& str);
 
