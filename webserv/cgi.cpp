@@ -3,6 +3,9 @@
 #include <sys/wait.h>
 #include "Client.hpp"
 #include <cstdlib>
+#include "utils.cpp"
+
+
 std::string CGI::do_cgi(std::string cgi_path, std::string filepath, std::string query, Client* client) {
   std::cout << "do_cgi" << std::endl;
 
@@ -56,7 +59,7 @@ std::string CGI::do_cgi(std::string cgi_path, std::string filepath, std::string 
 }
 
 
-std::string CGI::do_cgi_post(std::string cgi_path, std::string filepath, std::string body) {
+std::string CGI::do_cgi_post(std::string cgi_path, std::string filepath, std::string body, Client* client) {
   std::cout << "do_cgi_post" << std::endl;
   int in_pipe[2];
   int out_pipe[2];
@@ -78,10 +81,11 @@ std::string CGI::do_cgi_post(std::string cgi_path, std::string filepath, std::st
 		(char *)filepath.c_str(),
 		NULL
 	};
+	std::string size_str = ft_to_string(body.size()); // ※下にヘルパー関数置きます
+
+    // 🚨 execveが呼ばれるまで、この2つの変数が絶対にスコープを抜けないように並べる
     std::string method = "REQUEST_METHOD=POST";
-	std::stringstream ss;
-	ss << body;
-    std::string len = "CONTENT_LENGTH=" + ss.str().size();
+    std::string len = "CONTENT_LENGTH=" + size_str;
 
     char *envp[] = {
         (char *)method.c_str(),
@@ -94,16 +98,23 @@ std::string CGI::do_cgi_post(std::string cgi_path, std::string filepath, std::st
   close(in_pipe[0]);
   close(out_pipe[1]);
 
-  write(in_pipe[1], body.c_str(), body.size());
+  if (!body.empty()) {
+	write(in_pipe[1], body.c_str(), body.size());
+  }
   close(in_pipe[1]);
+  int flags = fcntl(out_pipe[0], F_GETFL, 0);
+  fcntl(out_pipe[0], F_SETFL, flags | O_NONBLOCK);
+  client->setCgiPid(pid);
+  client->setCgiOutFd(out_pipe[0]);
+  client->setIsCgiRunning(true);
 
-  char buffer[4096];
-  std::string result;
+//   char buffer[4096];
+//   std::string result;
 
-  ssize_t readsize;
-  while((readsize = read(out_pipe[0], buffer, sizeof(buffer))) > 0)
-	result.append(buffer, readsize);
-  close(out_pipe[0]);
-  waitpid(pid, NULL, 0);
-  return result;
+//   ssize_t readsize;
+//   while((readsize = read(out_pipe[0], buffer, sizeof(buffer))) > 0)
+// 	result.append(buffer, readsize);
+//   close(out_pipe[0]);
+//   waitpid(pid, NULL, 0);
+  return "";
 }

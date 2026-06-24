@@ -1,6 +1,8 @@
 #include "utils.hpp"
-
-
+#include <sys/stat.h>
+#include <string>
+#include <iostream>
+#include <sys/types.h>
 
 int ft_stoi(std::string str)
 {
@@ -17,4 +19,25 @@ int ft_stoi(std::string str)
     int res;
     ss >> res;
     return (res);
+}
+
+std::string ft_to_string(int num)
+{
+    std::stringstream ss;
+	ss << num;
+	return ss.str();
+}
+
+
+int is_file_exist_posix(const std::string& filename) {
+  struct stat buffer;
+  if (stat(filename.c_str(), &buffer) != 0) {
+	return -1;
+  }
+
+  if (buffer.st_mode & 0200) {
+        return 1;
+    } else {
+        return 0;
+  }
 }

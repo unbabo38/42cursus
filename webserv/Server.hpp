@@ -76,6 +76,8 @@ class Server {
 	void setAndCheckRequest();
 	bool processClient(int n, std::vector<ConfigServer> servers);
 	void modMonitorEpollin(int conn_sock);
+	void modMonitorEpollout(int conn_sock);
+
 };
 
 #endif

@@ -129,7 +129,6 @@ void Client::parseHeader(std::string &request) {
   bool flg;
 
   std::string first_line = request.substr(0, first_line_end);
-
   size_t first_space = first_line.find(' ');
   if (first_space == std::string::npos) return;
 
