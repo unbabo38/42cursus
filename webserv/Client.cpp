@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include <iostream>
-Client::Client() : _isCgiRunning(false) {
+Client::Client() : _isCgiRunning(false), _contentLength(0) {
 	this->methodsUse.push_back("GET");
     this->methodsUse.push_back("DELETE");
     this->methodsUse.push_back("POST");
@@ -161,6 +161,7 @@ void Client::parseFields(std::string request, size_t i) {
 		i += line.size() + 2;
   	}
 	if (this->_fields.find("Content-Length") != this->_fields.end()) {
+
 		  this->_contentLength = ft_stoi(this->_fields["Content-Length"]);
     	this->_body = request.substr(i + 2, this->_contentLength);
 	}
@@ -212,6 +213,10 @@ void Client::setErrorPagesMap(const std::map<int, std::string>& error_pages) {
 
 const size_t Client::getContentLength() const {
   return this->_contentLength;
+}
+
+const std::string Client::getField(std::string key) const {
+  return this->_fields.at(key);
 }
 
 const bool &Client::getParseCompleted() const {

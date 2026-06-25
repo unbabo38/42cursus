@@ -73,6 +73,7 @@ class Client {
 	int getCgiOutFd();
 	bool getIsCgiRunning();
 	std::string getCgiOutput();
+	const std::string getField(std::string key) const;
 };
 
 #endif

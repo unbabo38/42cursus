@@ -151,14 +151,18 @@ std::string Response::regularResponse(Client *client, std::vector<ConfigServer> 
       root_path = server.getRoot();
     }
     std::string request_target = client->getRequestTarget();
-	std::cout << "request_path:" << root_path << std::endl;
+	std::cout << "request_target:" << request_target << std::endl;
 	//   if (!root_path.empty() && root_path.back() == '/' && !request_target.empty() && request_target[0] == '/') {
     //         request_target = request_target.substr(1);
     //     }
- 
+
 	std::string relative = request_target.substr(loc.getLocationPath().size());
-  
-	filePath = root_path + "/" + relative;
+
+	filePath = root_path + relative;
+	if (isDirectory(filePath) && request_target[request_target.size() - 1] != '/') {
+		request_target += '/';
+		return this->redirect301Response(client, request_target);
+    }
   std::string autoIndex = Autoindex(filePath, loc);
   if (autoIndex != "") {
     return autoIndex;
@@ -259,6 +263,7 @@ bool Response::isDirectory(const std::string& filename) {
     if (dir == NULL) {
         return false;
     }
+	closedir(dir);
     return true;
 }
 std::string Response::Autoindex(const std::string& filename, Location &loc) {
@@ -301,6 +306,12 @@ std::string Response::Autoindex(const std::string& filename, Location &loc) {
 std::string Response::postResponse(Client *client) {
   ConfigServer server = client->getServer();
   Location loc = this->longestPrefixMatch(client->getRequestTarget(), server.getLocation());
+
+  if (client->getContentLength() > loc.getClientMaxBodySize()) {
+	//this->_response = this->responseBodyTooLong(client);
+	  this->_response = this->errorResponse(client, 413);
+	  return this->_response;
+  }
   std::string root_path = loc.getRoot();
   if (root_path.empty())
       root_path = server.getRoot();
@@ -381,9 +392,17 @@ std::string Response::deleteResponse(Client *client) {
 
 std::string Response::redirect301Response(Client *client, std::string url) {
   std::string response;
+  std::string hostname = "Host";
+
+  std::string host = client->getField(hostname);
+  if (host[0] == ' ')
+	host = host.substr(1);
   response = "HTTP/1.1 301 Moved Permanently\r\n";
   response += "Location:";
+  response += "http://";
+  response += host;
   response += url;
+  response += "\r\n";
   response += "Content-Length: 0\r\n\r\n";
   return response;
 
@@ -422,12 +441,13 @@ void Response::createResponse(Client *client, std::vector<ConfigServer> servers)
   std::cout << "client method = " << client->getMethod() << std::endl;
   std::set<std::string> methods = loc.getLimitExcept();
   std::string client_method = client->getMethod();
-  // if (client->getContentLength() > loc.getClientMaxBodySize()) {
-	// //this->_response = this->responseBodyTooLong(client);
-  //   std::cout << "client->getContentLength()" << client->getContentLength() << "loc.getClientMaxBodySize()" << loc.getClientMaxBodySize() << std::endl;
-	//   this->_response = this->errorResponse(client, 413);
-	//   return;
-  // }
+    std::cout << "client->getContentLength()" << client->getContentLength() << "loc.getClientMaxBodySize()" << loc.getClientMaxBodySize() << std::endl;
+
+//   if (client->getContentLength() > loc.getClientMaxBodySize()) {
+// 	//this->_response = this->responseBodyTooLong(client);
+// 	  this->_response = this->errorResponse(client, 413);
+// 	  return;
+//   }
   if (methods.size() == 0)
   {
     methods.insert("GET");

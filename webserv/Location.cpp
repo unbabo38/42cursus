@@ -3,9 +3,9 @@
 #include "utils.cpp"
 #include <cstdlib>
 Location::Location() {
-    // this->_autoindex = false;
-    // this->_client_max_body_size = 1000000;
-    // this->_root = "./html";
+    this->_autoindex = false;
+    this->_client_max_body_size = 1000000;
+    //this->_root = "./html";
 }
 
 Location::~Location() {
