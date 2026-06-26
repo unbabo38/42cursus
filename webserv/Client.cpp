@@ -3,8 +3,16 @@
 #include <fstream>
 
 #include <iostream>
-Client::Client() : _isCgiRunning(false), _contentLength(0) {
-	this->methodsUse.push_back("GET");
+Client::Client() :
+    _isCgiRunning(false),
+    _contentLength(0),
+    _statusCode(200),          // ◄ 200 (OK) で初期化
+    _phase(PARSE_HEADER),      // ◄ 最初のステージはヘッダーパース
+    _chunkState(CHUNK_SIZE),   // ◄ 最初のチャンク状態はサイズ読み込み
+    _isParseCompleted(false),  // ◄ まだパースは完了していない
+    _isChunked(false)          // ◄ 最初は通常の想定
+{
+    this->methodsUse.push_back("GET");
     this->methodsUse.push_back("DELETE");
     this->methodsUse.push_back("POST");
 
@@ -14,7 +22,7 @@ Client::Client() : _isCgiRunning(false), _contentLength(0) {
     this->methodsNotUse.push_back("PATCH");
     this->methodsNotUse.push_back("CONNECT");
     this->methodsNotUse.push_back("PUT");
-};
+}
 Client::~Client() {};
 
 void Client::setRequest(const char *buf, const int &len) {
@@ -27,7 +35,9 @@ void Client::setRequest(const char *buf, const int &len) {
 const std::string &Client::getRequest() const {
   return this->_request;
 }
-
+std::string &Client::getRefRequest() {
+  return this->_request;
+}
 const std::string &Client::getRequestTarget() const {
 
   return this->_requestTarget;
@@ -68,10 +78,10 @@ const std::string &Client::getMethod() const {
 
 
 void Client::inspectRequest() {
-  std::string request = getRequest();
-  //std::cout << "request:" << request << std::endl;
+//   std::string request = getRequest();
+//   std::cout << "request:" << request << std::endl;
 
-  this->parseHeader(request);
+  //this->parseHeader(request);
   if (this->_statusCode != 200) {
     this->_isParseCompleted = true;
     return ;
@@ -129,6 +139,7 @@ void Client::parseHeader(std::string &request) {
   bool flg;
 
   std::string first_line = request.substr(0, first_line_end);
+  std::cout << "first_line" << first_line << std::endl;
   size_t first_space = first_line.find(' ');
   if (first_space == std::string::npos) return;
 
@@ -146,9 +157,60 @@ void Client::parseHeader(std::string &request) {
     this->checkHttpVersion();
 	std::cout << this->_statusCode << std::endl;
   }
+  this->setPhase(PARSE_BODY);
 }
 
-void Client::parseFields(std::string request, size_t i) {
+size_t Client::ftHexaToDecimal(std::string rawChunke) {
+  size_t decimalValue;
+  std::stringstream ss;
+
+  ss << std::hex << rawChunke;
+  ss >> decimalValue;
+
+  if (ss.fail()) {
+      return 0;
+  }
+
+  return decimalValue;
+}
+
+void Client::processChunkedRequest(std::string &chunkedRequest) {
+  std::cout << "processChunkedRequest" << std::endl;
+  while(true) {
+  if (this->_chunkState == CHUNK_SIZE) {
+	size_t chunkeSize = chunkedRequest.find("\r\n");
+	if (chunkeSize == std::string::npos) return;
+	else {
+	  std::string rawChunke = chunkedRequest.substr(0, chunkeSize);
+	  this->_expectedChunkSize = ftHexaToDecimal(rawChunke);
+	  if (this->_expectedChunkSize == 0) {
+		this->_chunkState = CHUNK_END;
+		this->parseCompleted();
+	    return;
+	  }
+	  chunkedRequest = chunkedRequest.substr(chunkeSize + 2);
+	  this->_chunkState = CHUNK_DATA;
+	}
+  }
+  if (this->_chunkState == CHUNK_DATA) {
+	if (chunkedRequest.size() < this->_expectedChunkSize + 2) {
+	  return ;
+	}
+	this->_body += chunkedRequest.substr(0, this->_expectedChunkSize);
+	chunkedRequest = chunkedRequest.substr(this->_expectedChunkSize + 2);
+	this->_chunkState = CHUNK_SIZE;
+  }
+  if (this->_chunkState == CHUNK_END) {
+            return;
+    }
+  }
+}
+
+void Client::processNormalBody(std::string request) {
+	this->_body = request;
+}
+
+void Client::parseFields(std::string &request, size_t i) {
   	while(i < request.size()) {
 		size_t lineLen = request.find("\r\n", i);
 		if (lineLen == std::string::npos)
@@ -160,15 +222,17 @@ void Client::parseFields(std::string request, size_t i) {
 		this->divideKeyAndValue(line);
 		i += line.size() + 2;
   	}
+	request = request.substr(i + 2);
 	if (this->_fields.find("Content-Length") != this->_fields.end()) {
-
-		  this->_contentLength = ft_stoi(this->_fields["Content-Length"]);
-    	this->_body = request.substr(i + 2, this->_contentLength);
+		this->_contentLength = ft_stoi(this->_fields["Content-Length"]);
+		this->processNormalBody(request.substr(i + 2, this->_contentLength));
 	}
-	if (this->_fields["Transfer-Encoding"] == "chunked") {
+	else if (this->_fields["Transfer-Encoding"] == " chunked") {
     	this->_isChunked = true;
+		this->processChunkedRequest(request);
 	}
-	this->parseCompleted();
+	else
+		this->parseCompleted();
 	std::cout << this->_body << std::endl;
 }
 
@@ -244,6 +308,27 @@ void Client::setCgiOutFd(int fd) {
 }
 void Client::setIsCgiRunning(bool tr) {
   this->_isCgiRunning = tr;
+}
+bool Client::getIsChunked() {
+  return this->_isChunked;
+}
+
+// std::string& Client::getReceive() {
+//   return this->_request;
+// }
+void Client::appendRequest(std::string recv, ssize_t size) {
+  this->_request.append(recv, size);
+}
+
+void Client::setPhase(int phase) {
+	this->_phase = phase;
+}
+int Client::getPhase() {
+	return this->_phase;
+}
+
+std::map<std::string, std::string> Client::getFields() {
+  return this->_fields;
 }
 void Client::appendCgiOutput(const char *buf, size_t n) {
   this->_cgiOutput.append(buf, n);

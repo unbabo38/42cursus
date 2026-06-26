@@ -439,6 +439,7 @@ void Response::createResponse(Client *client, std::vector<ConfigServer> servers)
   Location loc = this->longestPrefixMatch(client->getRequestTarget(), server.getLocation());
   std::cout << "matched location = " << loc.getLocationPath() << std::endl;
   std::cout << "client method = " << client->getMethod() << std::endl;
+  std::cout << "client->getStatusCode = " << client->getStatusCode() << std::endl;
   std::set<std::string> methods = loc.getLimitExcept();
   std::string client_method = client->getMethod();
     std::cout << "client->getContentLength()" << client->getContentLength() << "loc.getClientMaxBodySize()" << loc.getClientMaxBodySize() << std::endl;

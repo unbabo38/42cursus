@@ -220,9 +220,31 @@ void Server::connectToListeningSocket(int listen_fd, const std::vector<ConfigSer
 }
 
 void Server::getClientRequest(int n) {
+	std::cout << "getClientRequest: " << std::endl;
+	this->client_recv = &this->_client[this->_events[n].data.fd];
 	std::memset(this->_buffer, 0, sizeof(this->_buffer));
 	this->len_recv = recv(this->_events[n].data.fd, this->_buffer, 30000, 0);
-	this->client_recv = &this->_client[this->_events[n].data.fd];
+	if (this->len_recv <= 0) {
+	  return;
+	}
+	this->client_recv->setRequest(this->_buffer, this->len_recv);
+	std::cout << "getPhase: " << this->client_recv->getPhase() << std::endl;
+	std::cout << "PARSE_HEADER" << PARSE_HEADER << std::endl;
+
+	if (this->client_recv->getPhase() == PARSE_HEADER) {
+        // ヘッダーをパースする（中で _recv_buf をゴリッと削り、_phase を PARSE_BODY に進める）
+        this->client_recv->parseHeader(this->client_recv->getRefRequest());
+    }
+	if (this->client_recv->getPhase() == PARSE_BODY) {
+		std::map<std::string, std::string> fields = this->client_recv->getFields();
+        if (this->client_recv->getIsChunked()) {
+            // 2回目以降にボディだけが届いたときは、上のヘッダー処理をスルーしてダイレクトにここに来る！
+			std::cout << "getischunked: " << std::endl;
+            this->client_recv->processChunkedRequest(this->client_recv->getRefRequest());
+        } else if (fields.find("Content-Length") != fields.end()) {
+            this->client_recv->processNormalBody(this->client_recv->getRefRequest());
+        }
+    }
 }
 
 
@@ -262,9 +284,9 @@ bool Server::checkFinishReceive(int n) {
 }
 
 void Server::setAndCheckRequest() {
-	this->client_recv->setRequest(this->_buffer, this->len_recv);
-	if (this->client_recv->getRequest().find("\r\n\r\n") != std::string::npos)
-		this->client_recv->inspectRequest();
+	//this->client_recv->setRequest(this->_buffer, this->len_recv);
+	// if (this->client_recv->getRequest().find("\r\n\r\n") != std::string::npos)
+	// 	this->client_recv->inspectRequest();
 }
 
 bool Server::processClient(int n, std::vector<ConfigServer> servers) {
@@ -322,7 +344,8 @@ bool Server::processClient(int n, std::vector<ConfigServer> servers) {
         if (!checkFinishReceive(n)) {
             return false;
         }
-        setAndCheckRequest();
+		this->client_recv->inspectRequest();
+        //setAndCheckRequest();
 
         if (curr_client.getParseCompleted()) {
             Response response;
