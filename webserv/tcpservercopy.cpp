@@ -19,6 +19,7 @@
 
 int main(int argc, char const *argv[])
 {
+	std::srand(std::time(NULL));
 	Server serv;
 
 	std::map<int, Client> client;

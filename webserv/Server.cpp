@@ -224,9 +224,12 @@ void Server::getClientRequest(int n) {
 	this->client_recv = &this->_client[this->_events[n].data.fd];
 	std::memset(this->_buffer, 0, sizeof(this->_buffer));
 	this->len_recv = recv(this->_events[n].data.fd, this->_buffer, 30000, 0);
-	if (this->len_recv <= 0) {
+	std::cout << "recv returned: " << this->len_recv << std::endl;
+	if (this->len_recv == 0) {
+	  closeClient(this->_events[n].data.fd);
 	  return;
 	}
+
 	this->client_recv->setRequest(this->_buffer, this->len_recv);
 	std::cout << "getPhase: " << this->client_recv->getPhase() << std::endl;
 	std::cout << "PARSE_HEADER" << PARSE_HEADER << std::endl;
@@ -245,6 +248,7 @@ void Server::getClientRequest(int n) {
             this->client_recv->processNormalBody(this->client_recv->getRefRequest());
         }
     }
+
 }
 
 
@@ -280,6 +284,7 @@ bool Server::checkFinishReceive(int n) {
 		closeClient(n);
 		return false;
 	}
+
 	return true;
 }
 

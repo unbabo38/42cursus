@@ -95,3 +95,11 @@ const std::vector<Location> &ConfigServer::getLocation() const {
 void ConfigServer::addErrorPage(const short &code, const std::string &path) {
     this->_error_pages[code] = path;
 }
+
+Session &ConfigServer::getSession(std::string sessionId) {
+  std::cout << "this = " << this << std::endl;
+  std::cout << "map " << &this->_sessions << std::endl;
+  std::cout << "key [" << "sessionId" << "]" << std::endl;
+  std::cout << "map size= " << _sessions.size() << std::endl;
+  return _sessions[sessionId];
+}

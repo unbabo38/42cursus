@@ -2,20 +2,24 @@
 #define RESPONSE_HPP
 
 #include <string>
+#include <ctime>
 #include "ConfigServer.hpp"
 #include "cgi.hpp"
+
 class Client;
+
 class Response {
   private:
     std::string _response;
 	std::map<int, std::string> _errorMap;
+
   public:
     Response();
 	~Response();
     Location longestPrefixMatch(std::string requestTarget, const std::vector<Location> &locations);
 	void createResponse(Client *clinet, std::vector<ConfigServer> servers);
 	std::string errorResponse(Client *client, int errorNum);
-	std::string regularResponse(Client *client, std::vector<ConfigServer> servers);
+	std::string regularResponse(Client *client);
 	const std::string &getResponseStr() const;
 	void setResponseStr(std::string response);
 	void initErrorMap();
@@ -30,6 +34,7 @@ class Response {
 	CGI cgi;
 	bool isDirectory(const std::string& filename);
 	std::string Autoindex(const std::string& filename, Location &loc);
+	std::string generateSessionId();
 };
 
 #endif

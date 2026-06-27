@@ -10,7 +10,9 @@ Client::Client() :
     _phase(PARSE_HEADER),      // ◄ 最初のステージはヘッダーパース
     _chunkState(CHUNK_SIZE),   // ◄ 最初のチャンク状態はサイズ読み込み
     _isParseCompleted(false),  // ◄ まだパースは完了していない
-    _isChunked(false)          // ◄ 最初は通常の想定
+    _isChunked(false),         // ◄ 最初は通常の想定
+	_sessionId(""),
+	_isCookie(false)
 {
     this->methodsUse.push_back("GET");
     this->methodsUse.push_back("DELETE");
@@ -43,7 +45,7 @@ const std::string &Client::getRequestTarget() const {
   return this->_requestTarget;
 }
 
-const ConfigServer &Client::getServer() const {
+ConfigServer &Client::getServer() {
   return this->_server;
 }
 
@@ -186,6 +188,7 @@ void Client::processChunkedRequest(std::string &chunkedRequest) {
 	  if (this->_expectedChunkSize == 0) {
 		this->_chunkState = CHUNK_END;
 		this->parseCompleted();
+		this->_phase = COMPLETE;
 	    return;
 	  }
 	  chunkedRequest = chunkedRequest.substr(chunkeSize + 2);
@@ -201,13 +204,16 @@ void Client::processChunkedRequest(std::string &chunkedRequest) {
 	this->_chunkState = CHUNK_SIZE;
   }
   if (this->_chunkState == CHUNK_END) {
-            return;
+	this->_phase = COMPLETE;
+        return;
     }
   }
 }
 
 void Client::processNormalBody(std::string request) {
 	this->_body = request;
+	this->_phase = COMPLETE;
+	this->parseCompleted();
 }
 
 void Client::parseFields(std::string &request, size_t i) {
@@ -223,6 +229,12 @@ void Client::parseFields(std::string &request, size_t i) {
 		i += line.size() + 2;
   	}
 	request = request.substr(i + 2);
+	std::string cookie = this->_fields["Cookie"];
+	if (cookie != "" && cookie != "session_id=") {
+		std::cout << "Cookie found:" << this->_fields["Cookie"] << std::endl;
+		this->_isCookie = true;
+		this->_sessionId = this->_fields["Cookie"];
+	}
 	if (this->_fields.find("Content-Length") != this->_fields.end()) {
 		this->_contentLength = ft_stoi(this->_fields["Content-Length"]);
 		this->processNormalBody(request.substr(i + 2, this->_contentLength));
@@ -243,7 +255,9 @@ void Client::divideKeyAndValue(std::string line) {
   std::string key = line.substr(0, keyPos);
   std::string value = line.substr(keyPos + 1);
   this->_fields[key] = value;
-  std::cout << "value=" << value << std::endl;
+  std::cout << "line = [" << line << "]\n";
+	std::cout << "key = [" << key << "]\n";
+	std::cout << "value = [" << value << "]\n";
   if (this->_fields.find("Host") == this->_fields.end())
     this->_statusCode = 400;
 }
@@ -345,4 +359,20 @@ bool Client::getIsCgiRunning() {
 }
 std::string Client::getCgiOutput() {
   return this->_cgiOutput;
+}
+
+bool Client::getIsCookie() {
+  return this->_isCookie;
+}
+
+void Client::setIsCookie() {
+  this->_isCookie = true;
+}
+
+void Client::setSessionId(std::string sessionId) {
+  this->_sessionId = sessionId;
+}
+
+std::string Client::getSessionId() {
+  return this->_sessionId;
 }

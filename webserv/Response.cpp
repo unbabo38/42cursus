@@ -1,9 +1,8 @@
-
 #include "Response.hpp"
 #include "Client.hpp"
 #include "utils.cpp"
 #include <fstream>
-
+#include <cstdlib>
 Response::Response() {};
 Response::~Response() {};
 
@@ -127,8 +126,16 @@ std::string Response::getFileType(const std::string &filePath) {
     }
     return filePath.substr(dot_pos);
 }
+std::string Response::generateSessionId() {
+    const char *hex = "0123456789abcdef";
+    std::string id;
 
-std::string Response::regularResponse(Client *client, std::vector<ConfigServer> servers) {
+    for (int i = 0; i < 16; i++) {
+        id += hex[rand() % 16];
+    }
+    return id;
+}
+std::string Response::regularResponse(Client *client) {
 
   std::string raw_host = client->getFields("Host"); // 例: "virtual_server:8081"
   std::string tmp_header = ft_trim(raw_host);
@@ -144,7 +151,7 @@ std::string Response::regularResponse(Client *client, std::vector<ConfigServer> 
       // コロンがなければそのまま
       host_header = tmp_header;
   }
-	ConfigServer server = client->getServer();
+	ConfigServer &server = client->getServer();
 	loc = this->longestPrefixMatch(client->getRequestTarget(), server.getLocation());
 	std::string root_path = loc.getRoot();
 	if (root_path.empty()) {
@@ -223,8 +230,40 @@ std::string Response::regularResponse(Client *client, std::vector<ConfigServer> 
   std::string response;
   response = "HTTP/1.1 200 OK\r\n";
   response += "Content-Type: " + getContentType(filePath) + "\r\n";
+  std::cout << "client->getIsCookie()" << client->getIsCookie() << std::endl;
+  if (!client->getIsCookie()) {
+	std::string sessionId = this->generateSessionId();
+	std::cout << "generated sessionId = [" << sessionId << "]" << std::endl;
+	client->setSessionId(sessionId);
+	response += "Set-Cookie: session_id=" + sessionId + "; Path=/; HttpOnly\r\n";
+	Session &s = server.getSession(client->getSessionId());
+	s.visitCount = 1;
+	std::cout << s.visitCount << std::endl;
+	response += "Visit-Count:";
+	response += ft_to_string(s.visitCount);
+	response += "\r\n";
+    // response += client->getSession(client->getSessionId()).visitCount;
+  } else if (client->getIsCookie()) {
+	Session &s = server.getSession(client->getSessionId());
+
+	std::cout << "cookieありvisited：" << s.visitCount << std::endl;
+
+	std::cout << "session_id=" << client->getSessionId() << std::endl;
+ 	std::cout << "befor=" << s.visitCount << std::endl;
+	std::cout <<"addres of server" << &server << std::endl;
+	std::cout <<"addres of server" << &s << std::endl;
+
+	s.visitCount++;
+	std::cout << "after=" << s.visitCount << std::endl;
+
+	response += "Visit-Count:";
+	response += ft_to_string(s.visitCount);
+	response += "\r\n";
+  }
   response += "Content-Length: " + content_length + "\r\n\r\n";
   response += body;
+  response += "\r\n";
+
   return response;
 }
 
@@ -304,7 +343,7 @@ std::string Response::Autoindex(const std::string& filename, Location &loc) {
 
 
 std::string Response::postResponse(Client *client) {
-  ConfigServer server = client->getServer();
+  ConfigServer &server = client->getServer();
   Location loc = this->longestPrefixMatch(client->getRequestTarget(), server.getLocation());
 
   if (client->getContentLength() > loc.getClientMaxBodySize()) {
@@ -373,7 +412,7 @@ std::string Response::postResponse(Client *client) {
 }
 #include <cstdio>
 std::string Response::deleteResponse(Client *client) {
-  ConfigServer server = client->getServer();
+  ConfigServer &server = client->getServer();
   Location loc = this->longestPrefixMatch(client->getRequestTarget(), server.getLocation());
   std::string root_path = loc.getRoot();
   if (root_path.empty())
@@ -435,7 +474,7 @@ void Response::createResponse(Client *client, std::vector<ConfigServer> servers)
     this->_response = this->errorResponse(client, 501);
   }
 
-  ConfigServer server = client->getServer();
+  ConfigServer &server = client->getServer();
   Location loc = this->longestPrefixMatch(client->getRequestTarget(), server.getLocation());
   std::cout << "matched location = " << loc.getLocationPath() << std::endl;
   std::cout << "client method = " << client->getMethod() << std::endl;
@@ -473,7 +512,7 @@ void Response::createResponse(Client *client, std::vector<ConfigServer> servers)
 	if (client_method== "POST")
 		this->_response = this->postResponse(client);
 	else if (client_method == "GET")
-		this->_response = this->regularResponse(client, servers);
+		this->_response = this->regularResponse(client);
 	else if (client_method == "DELETE") {
 		std::cout << "method=" << client->getMethod() << std::endl;
     	this->_response = deleteResponse(client);

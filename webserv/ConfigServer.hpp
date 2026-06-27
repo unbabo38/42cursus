@@ -8,7 +8,10 @@
 #include <iostream>
 #include <map>
 #include "Location.hpp"
-
+struct Session {
+    int visitCount;
+    std::string username;
+};
 class ConfigServer{
   private:
 	uint16_t 						_port;
@@ -21,6 +24,8 @@ class ConfigServer{
 	std::vector<Location> 			_locations;
     //struct sockaddr_in 				_server_address;
     int     						_listen_fd;
+	Session session;
+	std::map<std::string, Session> _sessions;
   public:
     ConfigServer();
 	~ConfigServer();
@@ -35,6 +40,7 @@ class ConfigServer{
 
 	const std::vector<Location>  &getLocation() const;
 	void printServerConfig() const;
+	Session &getSession(std::string sessionId);
 };
 
 // typedef struct {

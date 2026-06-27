@@ -15,11 +15,13 @@ enum ChunkState {
     CHUNK_DATA, // 実際のボディデータを読み取っている最中
     CHUNK_END   // すべてのチャンクを読み終えた（0\r\n\r\nが来た）
 };
+
+
 class Client {
   private:
     std::vector<std::string> methodsUse;
     std::vector<std::string> methodsNotUse;
-	ConfigServer _server;
+	ConfigServer& _server;
 	int 		 _phase;
 	int			 _socket;
 	int			 _statusCode;
@@ -31,6 +33,7 @@ class Client {
 	bool		 _isCgiRunning;
 	int 		 _expectedChunkSize;
 	int			 _chunkState;
+	bool		 _isCookie;
 
  	std::string  _cgiOutput;
 	std::string	 _request;
@@ -47,7 +50,7 @@ class Client {
 	size_t		 _contentLength;
 	Response 	_res;
 	int _server_port;
-
+	std::string _sessionId;
   public:
     Client();
     ~Client();
@@ -73,7 +76,7 @@ class Client {
 	void setResponseStr(const std::string& str);
 
     std::string getResponseStr() const;
-	const ConfigServer &getServer() const;
+	ConfigServer &getServer();
 	void setServer(ConfigServer &server);
 	const std::string &getFields(const std::string &key) const;
 	void setServerPort(int port);
@@ -98,6 +101,10 @@ class Client {
 	void processChunkedRequest(std::string &chunkedRequest);
 	size_t ftHexaToDecimal(std::string rawChunke);
 	void processNormalBody(std::string request);
+	bool getIsCookie();
+	std::string getSessionId();
+	void setSessionId(std::string sessionId);
+	void setIsCookie();
 };
 
 #endif
