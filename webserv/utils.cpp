@@ -42,3 +42,21 @@ int is_file_exist_posix(const std::string& filename) {
         return 0;
   }
 }
+
+
+std::string ft_trim(const std::string& str) {
+    // 狩り取る対象（半角スペース、タブ、改行、キャリッジリターン）
+    const std::string whitespace = " \t\r\n";
+
+    // 文字列の先頭から、空白以外の文字が最初に現れる位置を探す
+    size_t start = str.find_first_not_of(whitespace);
+    if (start == std::string::npos) {
+        return ""; // 全部空白だった場合は空文字を返す
+    }
+
+    // 文字列の末尾から、空白以外の文字が最初に現れる位置を探す
+    size_t end = str.find_last_not_of(whitespace);
+
+    // 有効な文字の区間だけを切り出す
+    return str.substr(start, end - start + 1);
+}

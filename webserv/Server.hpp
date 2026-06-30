@@ -1,6 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+
 #include <string>
 #include <sys/socket.h>
 #include <sys/epoll.h>
@@ -64,21 +65,22 @@ class Server {
 	void  createEpoll();
 	void  createSocketAndEpoll(const std::vector<ConfigServer>& parsed_servers);
 	// const size_t &getAddrLength() const;
-	void  run(std::vector<ConfigServer> );
-	void runServer(std::vector<ConfigServer> );
+	void  run(std::vector<ConfigServer> &servers);
+	void runServer(std::vector<ConfigServer> &servers);
 	void setMonitorEpollout(int n);
 	void closeClient(int n);
 	void getClientRequest(int n);
-	void connectToListeningSocket(int listen_fd, const std::vector<ConfigServer>& servers);
+	void connectToListeningSocket(int listen_fd, std::vector<ConfigServer>& servers);
 	void setMonitorEpollin(int fd);
 	void setSocketNonblocking(int conn_sock);
-	int acceptListeningSocket(int listen_fd, const std::vector<ConfigServer>& servers);
+	int acceptListeningSocket(int listen_fd, std::vector<ConfigServer>& servers);
 	void epollWait();
 	bool checkFinishReceive(int n);
 	void setAndCheckRequest();
-	bool processClient(int n, std::vector<ConfigServer> servers);
+	bool processClient(int n, std::vector<ConfigServer> &servers);
 	void modMonitorEpollin(int conn_sock);
 	void modMonitorEpollout(int conn_sock);
+	bool readCgi(int current_fd);
 
 };
 

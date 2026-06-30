@@ -135,7 +135,7 @@ void ConfigParser::splitConfToServers(std::string &content, ConfigServer *confse
 	{
 		start = findStartServer(start, content);
 		end = findEndServer(start, content);
-		std::cout << start << " " << end << std::endl;
+		//std::cout << start << " " << end << std::endl;
 		if (start >= end || start == std::string::npos || end == std::string::npos) {
         	std::cout << "Reached end of valid server blocks." << std::endl;
         	break;

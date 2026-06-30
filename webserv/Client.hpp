@@ -19,9 +19,10 @@ enum ChunkState {
 
 class Client {
   private:
+  bool _isSending;
     std::vector<std::string> methodsUse;
     std::vector<std::string> methodsNotUse;
-	ConfigServer& _server;
+	ConfigServer *_server;
 	int 		 _phase;
 	int			 _socket;
 	int			 _statusCode;
@@ -34,7 +35,8 @@ class Client {
 	int 		 _expectedChunkSize;
 	int			 _chunkState;
 	bool		 _isCookie;
-
+	int    		 _cgiInFd;           // CGIの標準入力に繋がるパイプの親側FD
+    size_t 		 _bodyBytesWritten;
  	std::string  _cgiOutput;
 	std::string	 _request;
 	time_t		 _lastRequest;
@@ -51,6 +53,7 @@ class Client {
 	Response 	_res;
 	int _server_port;
 	std::string _sessionId;
+	size_t _response_bytes_sent;
   public:
     Client();
     ~Client();
@@ -75,7 +78,7 @@ class Client {
 	const bool &getParseCompleted() const;
 	void setResponseStr(const std::string& str);
 
-    std::string getResponseStr() const;
+    const std::string &getResponseStr() const;
 	ConfigServer &getServer();
 	void setServer(ConfigServer &server);
 	const std::string &getFields(const std::string &key) const;
@@ -96,15 +99,31 @@ class Client {
 	int getPhase();
 	void setPhase(int phase);
 	std::map<std::string, std::string> getFields();
-	std::string getCgiOutput();
+	std::string &getCgiOutput();
 	const std::string getField(std::string key) const;
 	void processChunkedRequest(std::string &chunkedRequest);
 	size_t ftHexaToDecimal(std::string rawChunke);
-	void processNormalBody(std::string request);
+	void processNormalBody(const std::string &request);
 	bool getIsCookie();
 	std::string getSessionId();
 	void setSessionId(std::string sessionId);
 	void setIsCookie();
+	int    getCgiInFd() const;
+    void   setCgiInFd(int fd);
+
+    size_t getBodyBytesWritten() const;
+    void   setBodyBytesWritten(size_t bytes);
+    void   addBodyBytesWritten(size_t bytes);
+	std::string &getBody();
+
+	size_t &getResponseBytesSent() ;
+    void   addResponseBytesSent(size_t bytes);
+    void   setResponseBytesSent(size_t bytes);
+
+	void   clearForNextRequest();
+	void setIsSending(bool val) { this->_isSending = val; }
+    bool getIsSending() const { return this->_isSending; }
+
 };
 
 #endif

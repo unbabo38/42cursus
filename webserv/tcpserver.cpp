@@ -53,7 +53,7 @@ int main(int argc, char const *argv[])
 		conf_parse.splitConfToServers(file, &conf_serv);
 		std::vector<Location> loc;
 		loc = conf_serv.getLocation();
-		std::cout << loc[0].getRoot() << std::endl;
+		//std::cout << loc[0].getRoot() << std::endl;
 		std::cout << "autoindex" << loc[0].getAutoindex() << std::endl;
 
 		// 3. 1行ずつファイル終端まで読み込む
@@ -73,7 +73,7 @@ int main(int argc, char const *argv[])
 
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
-	std::cout << conf_serv.getPort() << std::endl;
+	//std::cout << conf_serv.getPort() << std::endl;
     addr.sin_port = htons( conf_serv.getPort() );
 	std::cout << "servername:" << conf_serv.getServerName() << std::endl;
 	//conf_serv.printServerConfig();

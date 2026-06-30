@@ -1,3 +1,5 @@
+
+
 #include "Server.hpp"
 #include <cstdio>   // perror を使うために必要
 #include <cstdlib>  // exit, EXIT_FAILURE を使うために必要
@@ -103,7 +105,7 @@ void Server::createSocketAndEpoll(const std::vector<ConfigServer>& parsed_server
         // 🎯 5. epoll に登録
         this->addSocketToEpoll(fd);
 
-        std::cout << "🚀 Listening on port: " << port << " (FD: " << fd << ")" << std::endl;
+        //std::cout << "🚀 Listening on port: " << port << " (FD: " << fd << ")" << std::endl;
     }
 }
 
@@ -119,7 +121,7 @@ void Server::epollWait() {
 	}
 }
 
-int Server::acceptListeningSocket(int listen_fd, const std::vector<ConfigServer>& servers) {
+int Server::acceptListeningSocket(int listen_fd, std::vector<ConfigServer>& servers) {
     this->_addrLen = sizeof(this->_addr);
 
     // 🎯 渡された listen_fd を使って accept する
@@ -146,16 +148,18 @@ int Server::acceptListeningSocket(int listen_fd, const std::vector<ConfigServer>
 
     // 2. 全サーバー設定の中から、このポートを担当している「最初のサーバー」を探す
     // (Hostヘッダーが一致しなかった場合のデフォルトサーバーになります)
-    ConfigServer default_server_for_port;
+    ConfigServer *default_server_for_port =NULL;
     for (size_t i = 0; i < servers.size(); i++) {
         if (servers[i].getPort() == connected_port) {
-            default_server_for_port = servers[i];
+            default_server_for_port = &servers[i];
             break; // 最初に見つかったブロック（先頭）をデフォルトとする
         }
     }
+	if (default_server_for_port != NULL) {
+      new_client.setServer(*default_server_for_port);
+	}
 
     // 3. クライアントに、このポート用のデフォルトサーバー設定を初期値として握らせる
-    new_client.setServer(default_server_for_port);
 
     // 4. 後ほど Host ヘッダーを見てバーチャルホストを厳密に切り替えるため、
     //    このクライアントが「物理的に何番ポートから来たか」もクライアント自身に覚えさせておく
@@ -182,7 +186,7 @@ void Server::setMonitorEpollin(int conn_sock) {
     ev.data.fd = conn_sock;
 
     if (epoll_ctl(this->_epollfd, EPOLL_CTL_ADD, conn_sock, &ev) == -1) {
-        perror("epoll_ctl: conn_sock");
+        perror("epoll_ctl ADD(setMonitorEpollin)");
         exit(EXIT_FAILURE);
     }
 }
@@ -193,7 +197,7 @@ void Server::modMonitorEpollin(int conn_sock) {
     ev.data.fd = conn_sock;
 
     if (epoll_ctl(this->_epollfd, EPOLL_CTL_MOD, conn_sock, &ev) == -1) {
-        perror("epoll_ctl: conn_sock");
+        perror("epoll_ctl MOD->IN(modMonitorEpollin)");
         exit(EXIT_FAILURE);
     }
 }
@@ -204,62 +208,89 @@ void Server::modMonitorEpollout(int conn_sock) {
     ev.data.fd = conn_sock;
 
     if (epoll_ctl(this->_epollfd, EPOLL_CTL_MOD, conn_sock, &ev) == -1) {
-        perror("epoll_ctl: conn_sock");
+        perror("epoll_ctl MOD->OUT(modMonitorEpollout)");
         exit(EXIT_FAILURE);
     }
 }
-void Server::connectToListeningSocket(int listen_fd, const std::vector<ConfigServer>& servers) {
+void Server::connectToListeningSocket(int listen_fd, std::vector<ConfigServer>& servers) {
 	while (true) {
       int conn_sock = acceptListeningSocket(listen_fd, servers); // 🎯 serversを渡す
 	  if (conn_sock == -1)
 		break;
       setSocketNonblocking(conn_sock);
       setMonitorEpollin(conn_sock);
-	  std::cout << "🚀 Accepted connection on FD: " << conn_sock << " (via Listen FD: " << listen_fd << ")" << std::endl;
+	  //std::cout << "🚀 Accepted connection on FD: " << conn_sock << " (via Listen FD: " << listen_fd << ")" << std::endl;
 	}
 }
 
 void Server::getClientRequest(int n) {
-	std::cout << "getClientRequest: " << std::endl;
-	this->client_recv = &this->_client[this->_events[n].data.fd];
+	//std::cout << "getClientRequest: " << std::endl;
+	int fd = this->_events[n].data.fd;
+    std::map<int, Client>::iterator it = this->_client.find(fd);
+    if (it == this->_client.end()) {     // 既に閉じた fd → 何もしない
+        this->client_recv = NULL;
+        this->len_recv = -1;
+        return;
+    }
+    this->client_recv = &it->second;
+	std::cout << "request client address: " << &this->client_recv << std::endl;
 	std::memset(this->_buffer, 0, sizeof(this->_buffer));
-	this->len_recv = recv(this->_events[n].data.fd, this->_buffer, 30000, 0);
-	std::cout << "recv returned: " << this->len_recv << std::endl;
-	if (this->len_recv == 0) {
-	  closeClient(this->_events[n].data.fd);
-	  return;
-	}
+	this->len_recv = recv(fd, this->_buffer, sizeof(this->_buffer) - 1, 0);
+	fprintf(stderr, "recv len=%zd errno=%d phase=%d req_size=%zu\n",
+        this->len_recv, errno, this->client_recv->getPhase(),
+        this->client_recv->getRefRequest().size());
+	if (this->len_recv <= 0)             // 0=切断 / <0=EAGAIN・エラー。どちらも append しない
+        return;
+	//std::cout << "recv returned: " << this->len_recv << std::endl;
+	// if (this->len_recv == 0) {
+	//   closeClient(this->_events[n].data.fd);
+	//   return;
+	// }
 
 	this->client_recv->setRequest(this->_buffer, this->len_recv);
-	std::cout << "getPhase: " << this->client_recv->getPhase() << std::endl;
-	std::cout << "PARSE_HEADER" << PARSE_HEADER << std::endl;
+	//std::cout << "getPhase: " << this->client_recv->getPhase() << std::endl;
+	//std::cout << "PARSE_HEADER" << PARSE_HEADER << std::endl;
 
 	if (this->client_recv->getPhase() == PARSE_HEADER) {
-        // ヘッダーをパースする（中で _recv_buf をゴリッと削り、_phase を PARSE_BODY に進める）
-        this->client_recv->parseHeader(this->client_recv->getRefRequest());
+        std::string &req = this->client_recv->getRefRequest();
+		size_t s = req.find_first_not_of("\r\n");
+		if (s != std::string::npos && s > 0)
+			req = req.substr(s);
+		else if (s == std::string::npos)
+			return;   // 全部改行なら待つ
+
+		if (req.find("\r\n\r\n") != std::string::npos)
+			this->client_recv->parseHeader(req);
+		else
+			return;
     }
 	if (this->client_recv->getPhase() == PARSE_BODY) {
 		std::map<std::string, std::string> fields = this->client_recv->getFields();
         if (this->client_recv->getIsChunked()) {
             // 2回目以降にボディだけが届いたときは、上のヘッダー処理をスルーしてダイレクトにここに来る！
-			std::cout << "getischunked: " << std::endl;
+			//std::cout << "getischunked: " << std::endl;
             this->client_recv->processChunkedRequest(this->client_recv->getRefRequest());
         } else if (fields.find("Content-Length") != fields.end()) {
+
             this->client_recv->processNormalBody(this->client_recv->getRefRequest());
         }
     }
-
 }
 
 
 void Server::closeClient(int client_fd) {
+    std::map<int, Client>::iterator it = this->_client.find(client_fd);
+    if (it == this->_client.end()) {
+        // 既に閉じられている → 二重close。何もしない
+        return;
+    }
+    std::cout << "[DEBUG] closeClient fd=" << client_fd << std::endl;   // ← これ
 
-	//perror("in recv");
-	if (epoll_ctl(this->_epollfd, EPOLL_CTL_DEL, client_fd, NULL) == -1) {
-		perror("epoll_ctl: this->_conn_sock");
-	}
-	close(client_fd);
-	this->_client.erase(client_fd);
+    if (epoll_ctl(this->_epollfd, EPOLL_CTL_DEL, client_fd, NULL) == -1) {
+        perror("epoll_ctl DEL in closeClient");
+    }
+    close(client_fd);
+    this->_client.erase(client_fd);
 }
 
 void Server::setMonitorEpollout(int n) {
@@ -278,6 +309,10 @@ int current_fd = this->_events[n].data.fd; // 今処理している正しいFD
 }
 
 bool Server::checkFinishReceive(int n) {
+	if (this->len_recv == 0) {            // 相手が接続を閉じた
+        closeClient(n);    // ← これが無いと無限ループ
+        return false;
+    }
 	if (this->len_recv < 0) {
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
 			return false;
@@ -294,47 +329,158 @@ void Server::setAndCheckRequest() {
 	// 	this->client_recv->inspectRequest();
 }
 
-bool Server::processClient(int n, std::vector<ConfigServer> servers) {
+#include "utils.cpp"
+// bool Server::readCgi(int n, std::vector<ConfigServer> &servers) {
+
+// }
+
+bool Server::processClient(int n, std::vector<ConfigServer> &servers) {
     int current_fd = this->_events[n].data.fd;
 
     // =================================================================
     // 🌟 ルートA: もし発火したFDが「誰かのCGIのパイプFD」だった場合
     // =================================================================
-    for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); ++it) {
+	//this->readCgi();
+	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); ++it) {
         if (it->second.getIsCgiRunning() && it->second.getCgiOutFd() == current_fd) {
+		std::cerr << "[DEBUG] processing fd=" << current_fd << std::endl;
+		if (current_fd == it->second.getCgiOutFd()) std::cout << " (CGI_OUT)";
+		else if (current_fd == it->second.getCgiInFd()) std::cout << " (CGI_IN)";
+		else std::cout << " (SOCKET)";
+		std::cout << std::endl;
+		std::cout << "[DEBUG] Reading CGI Pipe (fd=" << current_fd << ")" << std::endl;
 
-            // 🎯 ここは純粋に「CGIのパイプからデータを吸い出す」ためだけの聖域です！
-            char buf[4096];
-            ssize_t readnum = read(current_fd, buf, sizeof(buf));
-            if (readnum > 0) {
-				//このサーバーに接続してるクライアントのcgiに読み込んだ中身をいれる
-				//このcurrent_fdはcgioutput
-                it->second.appendCgiOutput(buf, readnum);
-            }
+		char buf[4096];
+		ssize_t readnum = read(current_fd, buf, sizeof(buf));
 
-            int status;
-            pid_t res = waitpid(it->second.getCgiPid(), &status, WNOHANG);
+		if (readnum > 0) {
+			std::cout << "[DEBUG] Successfully read " << readnum << " bytes from pipe" << std::endl;
+			it->second.appendCgiOutput(buf, readnum);
+			return true;
+		}
 
-            // 🎉 CGIが完全に終了し、データも全て吸い尽くしたら
-            if (res > 0 && readnum <= 0) {
+		if (readnum == -1) {
+			if (errno == EAGAIN || errno == EWOULDBLOCK) {
+				std::cout << "[DEBUG] Pipe empty (EAGAIN), waiting for more data..." << std::endl;
+				return true;
+			} else {
+				std::cerr << "[ERROR] Read error: " << strerror(errno) << std::endl;
+			}
+		}
+
+		if (readnum == 0) {
+			std::cout << "[DEBUG] EOF reached. Closing pipe fd=" << current_fd << std::endl;
+				int status;
+            	pid_t res = waitpid(it->second.getCgiPid(), &status, 0);
+
+				std::cout << "cgi_read_finished\n" << std::endl;
                 // 用済みのCGIパイプを epoll から削除して閉じる
                 epoll_ctl(this->_epollfd, EPOLL_CTL_DEL, current_fd, NULL);
                 close(current_fd);
                 it->second.setIsCgiRunning(false);
 
-                // レスポンス構築
-                std::string full_response = "HTTP/1.1 200 OK\r\n";
-                full_response += "Content-Type: text/html\r\n";
-                std::stringstream ss;
-                ss << it->second.getCgiOutput().size();
-                full_response += "Content-Length: " + ss.str() + "\r\n\r\n";
-                full_response += it->second.getCgiOutput();
-                it->second.setResponseStr(full_response);
+				// cgi_output は参照で受ける（コピーしない）
+				std::string &cgi_output = it->second.getCgiOutput();
 
-                // 🔥 ここで満を持して、元の「ソケットFD（it->first）」を送信可能状態（EPOLLOUT）にする！
-                this->modMonitorEpollout(it->first);
+				size_t delimiter = cgi_output.find("\r\n\r\n");
+				size_t offset = 4;
+				if (delimiter == std::string::npos) {
+					delimiter = cgi_output.find("\n\n");
+					offset = 2;
+				}
+
+				// ヘッダ部分（小さいのでコピーOK）
+				std::string cgi_headers;
+				if (delimiter != std::string::npos)
+					cgi_headers = cgi_output.substr(0, delimiter);
+
+				// ボディの開始位置だけ覚える（substrでコピーしない）
+				size_t body_start = (delimiter != std::string::npos) ? delimiter + offset : 0;
+				size_t body_len = cgi_output.size() - body_start;
+
+				// レスポンスヘッダを組み立てる（ヘッダは小さい）
+				std::stringstream ss;
+				ss << "HTTP/1.1 200 OK\r\n";
+				if (!cgi_headers.empty())
+					ss << cgi_headers << "\r\n";
+				else
+					ss << "Content-Type: text/html\r\n";
+				ss << "Content-Length: " << body_len << "\r\n\r\n";
+
+				// full_response = ヘッダ + ボディ。ヘッダ文字列を作ってから append で1回だけ足す
+				std::string full_response = ss.str();              // ヘッダ部のみ（小）
+				full_response.append(cgi_output, body_start, body_len);  // ボディを1回だけコピーして追記
+
+				it->second.setResponseStr(full_response);
+
+				// 元の「ソケットFD」を送信可能状態（EPOLLOUT）にする！
+				this->modMonitorEpollout(it->first);
             }
             return true; // CGIパイプの処理をしたので、ここで安全にイベントを抜ける
+        }
+    }
+	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); ++it) {
+        if (it->second.getIsCgiRunning() && it->second.getCgiInFd() == current_fd) {
+
+            // 🎯 ここでついに2つの変数が火を吹きます！
+            std::string &body = it->second.getBody();
+            size_t already_written = it->second.getBodyBytesWritten(); // 💡何バイト目まで送ったか
+			std::cout << "already_written" << already_written << std::endl;
+            while (already_written < body.size()) {
+				std::cout << "[DEBUG] Writing ALL data to CGI (100MB processed)" << std::endl;
+				ssize_t writenum = write(current_fd, body.c_str() + already_written, body.size() - already_written);
+					std::cout
+						<< "written "
+						<< already_written
+						<< "/"
+						<< body.size()
+						<< std::endl;
+				if (writenum > 0) {
+					already_written += writenum;
+					it->second.addBodyBytesWritten(writenum);
+				} else if (writenum == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+					// パイプがいっぱいになった。またイベントが来るのを待つ
+					return true;
+				} else {
+					// エラーまたは切断
+					close(current_fd);
+					it->second.setCgiInFd(-1);
+					std::cout << "[DEBUG] CGI InPipe CLOSED. Waiting for CGI output..." << std::endl;
+					return true;
+				}
+			}
+
+			// 全書き込み完了
+			std::cout << "[DEBUG] CGIへの書き込み完了！" << std::endl;
+			epoll_ctl(this->_epollfd, EPOLL_CTL_DEL, current_fd, NULL);
+			close(current_fd);
+			it->second.setCgiInFd(-1);
+			std::cout << "[DEBUG] CGI InPipe CLOSED. Waiting for CGI output..." << std::endl;
+			return true;
+			// size_t total_size = body.size();
+
+            // // 残りのデータから32KBだけ切り出す
+            // size_t rem = total_size - already_written;
+            // size_t chunk_size = (rem > 32768) ? 32768 : rem;
+
+            // // ノンブロッキングなので、送れる分だけ write する
+            // ssize_t writenum = write(current_fd, body.c_str() + already_written, chunk_size);
+
+            // if (writenum > 0) {
+            //     // 💡進捗カウンターを更新（次のループではこの続きから write できる）
+            //     it->second.addBodyBytesWritten(writenum);
+
+            //     // 🎯 100MB 全部を書き終えたら
+            //     if (it->second.getBodyBytesWritten() == total_size) {
+            //         // 用済みの入力パイプを epoll から削除して閉じる
+            //         // これにより、CGI側に「データ送信完了（EOF）」が伝わる
+			// 		std::cout << "[DEBUG] CGIへの書き込み完了！" << std::endl;
+            //         epoll_ctl(this->_epollfd, EPOLL_CTL_DEL, current_fd, NULL);
+            //         close(current_fd);
+            //         it->second.setCgiInFd(-1); // 終わった目印
+            //     }
+            // }
+            // return true; // イベント処理を抜ける
         }
     }
 
@@ -346,30 +492,39 @@ bool Server::processClient(int n, std::vector<ConfigServer> servers) {
     // 1. 受信フラグ（EPOLLIN）
     if (this->_events[n].events & EPOLLIN) {
         this->getClientRequest(n);
-        if (!checkFinishReceive(n)) {
+        if (!checkFinishReceive(this->_events[n].data.fd)) {
             return false;
         }
 		this->client_recv->inspectRequest();
         //setAndCheckRequest();
 
-        if (curr_client.getParseCompleted()) {
+        if (this->client_recv->getPhase() == COMPLETE && !this->client_recv->getIsCgiRunning()) {
             Response response;
-            response.createResponse(&curr_client, servers);
+            response.createResponse(this->client_recv, servers);
 
-            if (curr_client.getIsCgiRunning()) {
+            if (this->client_recv->getIsCgiRunning()) {
                 // 💡 CGIが起動した場合、ソケットFDはそのまま静かに眠らせておく（EPOLLOUTにはしない）
                 // その代わり、CGIのパイプFDを epoll に登録する！
                 struct epoll_event ev;
                 std::memset(&ev, 0, sizeof(ev));
                 ev.events = EPOLLIN; // CGIが文字を吐き出すのを待つ
-                ev.data.fd = curr_client.getCgiOutFd();
-                epoll_ctl(this->_epollfd, EPOLL_CTL_ADD, curr_client.getCgiOutFd(), &ev);
+                ev.data.fd = this->client_recv->getCgiOutFd();
+                epoll_ctl(this->_epollfd, EPOLL_CTL_ADD, this->client_recv->getCgiOutFd(), &ev);
 
+				std::memset(&ev, 0, sizeof(ev));
+				ev.events = EPOLLOUT;
+				ev.data.fd = this->client_recv->getCgiInFd();
+				epoll_ctl(_epollfd, EPOLL_CTL_ADD, this->client_recv->getCgiInFd(), &ev);
                 // ソケット側は空回りを防ぐため、EPOLLINのまま（OUTは付けない）維持
                 return true;
             } else {
                 // 通常の静的ファイルなら、即座に送信フェーズ（EPOLLOUT）へ
-                curr_client.setResponseStr(response.getResponseStr());
+                this->client_recv->setResponseStr(response.getResponseStr());
+				std::cout
+    << "body.size=" << this->client_recv->getBody().size()
+    << std::endl;
+				std::cout << this->client_recv->getResponseStr() << std::endl;
+
                 this->setMonitorEpollout(n);
             }
         }
@@ -377,20 +532,24 @@ bool Server::processClient(int n, std::vector<ConfigServer> servers) {
 
     // 2. 送信フラグ（EPOLLOUT）
     } else if (this->_events[n].events & EPOLLOUT) {
-        std::cout << "sendingINEOPLLOUT" << std::endl;
+        //std::cout << "sendingINEOPLLOUT" << std::endl;
 
         // 💡 ここに来るということは、ルートAによってCGIが100%完了し、
         // レスポンス文字列が完成した状態で叩き起こされたということです。
         // 面倒なCGI待ちのif文はここには一切不要になり、純粋に send するだけになります！
 
-        std::string resStr = curr_client.getResponseStr();
-        size_t sent_sum = 0;
+        const std::string &resStr = curr_client.getResponseStr();
+        size_t &sent_sum = curr_client.getResponseBytesSent();
         size_t total_send = resStr.size();
         const char *ptr = resStr.c_str();
+				std::cout << "response client address: " << &curr_client << std::endl;
 
         while(sent_sum < total_send) {
             ssize_t sent = send(current_fd, ptr + sent_sum, total_send - sent_sum, 0);
+			std::cout << "[DEBUG] Sent " << sent << " bytes. Progress: "
+          << sent_sum + sent << "/" << total_send << std::endl;
             if (sent < 0) {
+				    std::cout << "send error errno=" << errno << std::endl;
                 if (errno == EAGAIN || errno == EWOULDBLOCK) return true;
                 this->closeClient(current_fd);
                 return false;
@@ -400,13 +559,20 @@ bool Server::processClient(int n, std::vector<ConfigServer> servers) {
             }
             sent_sum += sent;
         }
-        this->closeClient(current_fd);
+        if (sent_sum >= total_send) {
+			curr_client.clearForNextRequest();
+		    this->modMonitorEpollin(current_fd);
+			return true;
+			// std::cout << "[DEBUG] Full response sent successfully!" << std::endl;
+			// shutdown(current_fd, SHUT_WR);
+			// this->closeClient(current_fd);
+		}
         return true;
     }
     return true;
 }
 
-void Server::runServer(std::vector<ConfigServer> servers) {
+void Server::runServer(std::vector<ConfigServer> &servers) {
 		for (int n = 0; n < this->_nfds; ++n) {
 			int event_fd = this->_events[n].data.fd;
 			if (this->_listen_fds.count(event_fd)) {
@@ -419,7 +585,7 @@ void Server::runServer(std::vector<ConfigServer> servers) {
 			}
         }
 }
-void Server::run(std::vector<ConfigServer> servers) {
+void Server::run(std::vector<ConfigServer> &servers) {
     for (;;) {
 		this->epollWait();
 		this->runServer(servers);

@@ -56,7 +56,7 @@ void Location::parseLocation(const std::vector<std::string>& tokens, size_t star
 				new_location.setIndex(tokens[i + 1]);
 			}
 		} else if ((tokens[i] == "max_body_size" || tokens[i] == "client_max_body_size") && i + 1 < end) {
-            new_location.setClientMaxBodySize(static_cast<uint16_t>(ft_stoi(tokens[i + 1])));
+            new_location.setClientMaxBodySize(static_cast<size_t>(ft_stoi(tokens[i + 1])));
             i++;
         } else if ((tokens[i] == "method" || tokens[i] == "allow_methods") && i + 1 < end) {
             std::set<std::string> methods;

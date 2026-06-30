@@ -19,6 +19,10 @@
 
 int main(int argc, char const *argv[])
 {
+	std::freopen("/dev/null", "w", stdout);
+std::freopen("/dev/null", "w", stderr);
+
+	signal(SIGPIPE, SIG_IGN);
 	std::srand(std::time(NULL));
 	Server serv;
 
@@ -29,7 +33,7 @@ int main(int argc, char const *argv[])
 	Response response;
   	std::ifstream istrm(argv[1], std::ios::binary);
 	if (!istrm.is_open()) {
-    	std::cout << "failed to open " << argv[1] << '\n';
+    	//std::cout << "failed to open " << argv[1] << '\n';
 	} else {
 		double d;
 		std::string line;
@@ -42,7 +46,7 @@ int main(int argc, char const *argv[])
 	}
 	int read_result = 0;
 	std::vector<ConfigServer> parsed_servers = conf_parse.getServers();
-    std::cout << "Parsed servers size: " << parsed_servers.size() << std::endl;
+    //std::cout << "Parsed servers size: " << parsed_servers.size() << std::endl;
 
     if (!parsed_servers.empty()) {
         // 🎯 壊れた conf_serv ではなく、ベクターに退避させた正しい1台目のサーバー情報を渡す
