@@ -412,7 +412,7 @@ bool Server::processClient(int n, std::vector<ConfigServer> &servers) {
 				full_response.append(cgi_output, body_start, body_len);  // ボディを1回だけコピーして追記
 
 				it->second.setResponseStr(full_response);
-
+				{ std::string tmp; tmp.swap(it->second.getCgiOutput()); }
 				// 元の「ソケットFD」を送信可能状態（EPOLLOUT）にする！
 				this->modMonitorEpollout(it->first);
             }
@@ -455,6 +455,7 @@ bool Server::processClient(int n, std::vector<ConfigServer> &servers) {
 			epoll_ctl(this->_epollfd, EPOLL_CTL_DEL, current_fd, NULL);
 			close(current_fd);
 			it->second.setCgiInFd(-1);
+			{ std::string tmp; tmp.swap(it->second.getBody()); }
 			std::cout << "[DEBUG] CGI InPipe CLOSED. Waiting for CGI output..." << std::endl;
 			return true;
 			// size_t total_size = body.size();
