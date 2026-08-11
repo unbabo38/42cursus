@@ -101,6 +101,13 @@ std::string Response::getContentType(const std::string& filePath)
         filePath.substr(filePath.size() - 4) == ".jpg")
         return "image/jpeg";
 
+	if (filePath.size() >= 4 && filePath.substr(filePath.size() - 4) == ".mp4")
+		return "video/mp4";
+	if (filePath.size() >= 4 && filePath.substr(filePath.size() - 4) == ".gif")
+		return "image/gif";
+	if (filePath.size() >= 5 && filePath.substr(filePath.size() - 5) == ".json")
+		return "application/json";
+
     return "application/octet-stream";
 }
 std::string Response::getFileType(const std::string &filePath) {
@@ -482,7 +489,7 @@ std::string Response::redirect301Response(Client *client, std::string url) {
   if (host[0] == ' ')
 	host = host.substr(1);
   response = "HTTP/1.1 301 Moved Permanently\r\n";
-  response += "Location:";
+  response += " Location:";
   response += "http://";
   response += host;
   response += url;

@@ -19,8 +19,8 @@
 
 int main(int argc, char const *argv[])
 {
-	std::freopen("/dev/null", "w", stdout);
-std::freopen("/dev/null", "w", stderr);
+// 	std::freopen("/dev/null", "w", stdout);
+// std::freopen("/dev/null", "w", stderr);
 
 	signal(SIGPIPE, SIG_IGN);
 	std::srand(std::time(NULL));

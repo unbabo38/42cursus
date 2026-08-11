@@ -350,7 +350,7 @@ bool Server::processClient(int n, std::vector<ConfigServer> &servers) {
 		std::cout << std::endl;
 		std::cout << "[DEBUG] Reading CGI Pipe (fd=" << current_fd << ")" << std::endl;
 
-		char buf[4096];
+		char buf[65536];
 		ssize_t readnum = read(current_fd, buf, sizeof(buf));
 
 		if (readnum > 0) {

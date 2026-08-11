@@ -455,8 +455,8 @@ std::map<std::string, std::string> Client::getFields() {
   return this->_fields;
 }
 void Client::appendCgiOutput(const char *buf, size_t n) {
-    if (this->_cgiOutput.find("500 Internal Server Error") != std::string::npos)
-        return;
+    // if (this->_cgiOutput.find("500 Internal Server Error") != std::string::npos)
+    //     return;
     this->_cgiOutput.append(buf, n);   // 上限チェックを削除
 }
 

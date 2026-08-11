@@ -32,9 +32,10 @@ std::string CGI::do_cgi(std::string cgi_path, std::string filepath, std::string 
 	};
     std::string method     = "REQUEST_METHOD=GET";
 	std::string qs         = "QUERY_STRING=" + query;
-	std::string path_info  = "PATH_INFO=";
+	std::string path_info  = "PATH_INFO=" + client->getRequestTarget();
 	std::string protocol   = "SERVER_PROTOCOL=HTTP/1.1"; // 👈 これでエラーが消えるはず！
 	std::string script_name = "SCRIPT_NAME=" + client->getRequestTarget();
+    std::string secret    = "HTTP_X_SECRET_HEADER_FOR_TEST=1"; // 👈 テスターの秘密の鍵
 
 	char *envp[] = {
 		(char *)method.c_str(),
@@ -45,6 +46,11 @@ std::string CGI::do_cgi(std::string cgi_path, std::string filepath, std::string 
 		NULL
 	};
 	std::cerr << "📢 [CHILD] いまから実行しようとしているパス: [" << cgi_path << "]" << std::endl;
+	std::cerr << "=== CGI envp ===" << std::endl;
+	for (int i = 0; envp[i] != NULL; i++)
+    	std::cerr << "  envp[" << i << "] = [" << envp[i] << "]" << std::endl;
+	std::cerr << "argv[0] = [" << argv[0] << "]" << std::endl;
+	std::cerr << "argv[1] = [" << argv[1] << "]" << std::endl;
 	execve(argv[0], argv, envp);
 	std::cerr << "❌ [CHILD ERROR] execveに失敗しました！ 原因: " << strerror(errno) << std::endl;
 	exit(1);
