@@ -7,7 +7,7 @@
 #include <string>
 
 template <typename T>
-typename T::iterator easyfind(T &container, const int &num);
+const int &easyfind(T &container, const int &num);
 
 #include "easyfind.tpp"
 

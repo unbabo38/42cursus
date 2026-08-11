@@ -5,8 +5,15 @@ int main() {
     n[3] = 42;
 
     try {
-        std::vector<int>::iterator res = easyfind(n, 42);
-        std::cout << "found: " << *res << std::endl;
+        const int res = easyfind(n, 42);
+        std::cout << "found: " << res << std::endl;
+    } catch (const std::exception &e) {
+        std::cout << e.what() << std::endl;
+    }
+    
+    try {
+        const int res = easyfind(n, 2);
+        std::cout << "found: " << res << std::endl;
     } catch (const std::exception &e) {
         std::cout << e.what() << std::endl;
     }
