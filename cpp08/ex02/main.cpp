@@ -2,6 +2,8 @@
 
 int main() {
   MutantStack<int> m;
+
+  std::cout << "---stackと同様の動作をするか---" << std::endl;
   m.push(1);
   std::cout << m.top() << std::endl;
   m.pop();

@@ -12,8 +12,28 @@ void testBasic() {
     sp.addNumber(9);
     sp.addNumber(11);
 
-    std::cout << "shortestSpan: " << sp.shortestSpan() << std::endl; // 2
-    std::cout << "longestSpan: " << sp.longestSpan() << std::endl;   // 14
+	Span same(5);
+	same.addNumber(1);
+	same.addNumber(1);
+	same.addNumber(1);
+	same.addNumber(1);
+	same.addNumber(1);
+
+	Span bigName(2);
+	bigName.addNumber(2147483647);
+	bigName.addNumber(-2147483648);
+
+	std::cout << "---3, 6, 9, 11, 17のテスト---" << std::endl;
+    std::cout << "shortestSpan: " << sp.shortestSpan() << std::endl;
+    std::cout << "longestSpan: " << sp.longestSpan() << std::endl;
+
+    std::cout << "---全部1のテスト---" << std::endl;
+    std::cout << "same number shortestSpan: " << same.shortestSpan() << std::endl;
+    std::cout << "same number longestSpan: " << same.longestSpan() << std::endl;
+
+    std::cout << "---INTMAX,INTMINのテスト---" << std::endl;
+    std::cout << "int max min shortestSpan: " << bigName.shortestSpan() << std::endl;
+    std::cout << "int max min longestSpan: " << bigName.longestSpan() << std::endl;
 
     try {
         sp.addNumber(100);
@@ -23,7 +43,7 @@ void testBasic() {
 }
 
 void testExceptions() {
-    std::cout << "\n=== Exception test ===" << std::endl;
+    std::cout << "\n---例外のテスト(空データ、データ数１)---" << std::endl;
     Span sp(3);
     try {
         sp.shortestSpan();
@@ -40,7 +60,7 @@ void testExceptions() {
 }
 
 void testLargeScale(unsigned int n) {
-    std::cout << "\n=== Large scale test (" << n << " numbers) ===" << std::endl;
+    std::cout << "\n大きなスケールのテスト (" << n << " numbers) ---" << std::endl;
 
     std::srand(static_cast<unsigned int>(std::time(NULL)));
 
@@ -64,7 +84,7 @@ int main() {
     testBasic();
     testExceptions();
     testLargeScale(10000);
-    testLargeScale(1000000); // 100万個でも試す
+    testLargeScale(1000000);
 
     return 0;
 }
